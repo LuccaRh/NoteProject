@@ -1,8 +1,28 @@
 services:
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8787:8787"
+    volumes:
+      - ./apps/api:/app
+      # Volume anonimo: impede que o .venv do host (Python do Arch, caminhos
+      # absolutos de /home) sombreie o que a imagem construiu. Mesmo truque do
+      # /app/node_modules no servico web.
+      - /app/.venv
+      - notes-data:/data
+    environment:
+      - NOTESD_DB=/data/notes.db
+      - NOTESD_HOST=0.0.0.0
+      - NOTESD_RELOAD=1
+
   web:
     build:
       context: ./apps/web
       dockerfile: Dockerfile.dev
+    depends_on:
+      - api
     ports:
       - "5173:5173"
     volumes:
@@ -10,3 +30,7 @@ services:
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - NOTESD_URL=http://api:8787
+
+volumes:
+  notes-data:

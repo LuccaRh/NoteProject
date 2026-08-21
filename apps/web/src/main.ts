@@ -1,9 +1,8 @@
-import "./style.css";
-import { createEditor } from "./editor";
+import './style.css'
+import { mountApp } from './ui/app'
 
-// Referência ao elemento real do DOM
-const container = document.getElementById("editor");
+const sidebar = document.getElementById('sidebar')
+const editor = document.getElementById('editor')
+if (!sidebar || !editor) throw new Error('index.html: falta #sidebar ou #editor')
 
-// Altera o elemento diretamente no DOM
-const editor = createEditor(container);
-console.log(editor);
+void mountApp(sidebar, editor)

@@ -1,3 +1,151 @@
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f6f6f7;
+  --border: #e3e3e6;
+  --text: #1a1a1c;
+  --muted: #77777f;
+  --accent: #3b6ef5;
+  --danger: #c0392b;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1b1f;
+    --bg-soft: #16161a;
+    --border: #2e2e35;
+    --text: #e6e6ea;
+    --muted: #8b8b96;
+    --accent: #7aa2ff;
+    --danger: #e06c60;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+#app {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  height: 100%;
+}
+
+/* ---------- sidebar ---------- */
+
+#sidebar {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--bg-soft);
+  border-right: 1px solid var(--border);
+}
+
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-head h1 { margin: 0; font-size: 0.95rem; letter-spacing: 0.02em; }
+
+.sidebar-head button {
+  width: 1.6rem;
+  height: 1.6rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.sidebar-head button:hover { border-color: var(--accent); color: var(--accent); }
+
+.note-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+}
+
+.note-list li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.45rem 0.55rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.86rem;
+}
+
+.note-list li:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.note-list li.active { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+
+.note-list .title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-list time { font-size: 0.72rem; color: var(--muted); }
+
+.note-list .delete {
+  padding: 0 0.25rem;
+  visibility: hidden;
+  cursor: pointer;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.note-list li:hover .delete { visibility: visible; }
+.note-list .delete:hover { color: var(--danger); }
+
+.sidebar-foot {
+  padding: 0.5rem 0.9rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.sidebar-foot .is-error { color: var(--danger); }
+
+/* ---------- editor ---------- */
+
+#editor { min-width: 0; overflow: hidden; }
+#editor.is-empty::after {
+  display: block;
+  padding: 3rem;
+  color: var(--muted);
+  content: "Nenhuma nota. Ctrl+N para criar a primeira.";
+}
+#editor.is-empty .cm-editor { display: none; }
+
+.cm-editor { height: 100vh; font-size: 15px; }
+.cm-editor.cm-focused { outline: none; }
+.cm-scroller {
+  font-family: ui-monospace, "JetBrains Mono", "SFMono-Regular", monospace;
+  line-height: 1.65;
+}
+.cm-content { max-width: 46rem; margin: 0 auto; padding: 2rem 1rem 40vh; }
+.cm-gutters { display: none; }
+
 .md-h1 { font-size: 1.8em; font-weight: 700; }
 .md-h2 { font-size: 1.4em; font-weight: 700; }
 .md-h3 { font-size: 1.2em; font-weight: 600; }
