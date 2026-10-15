@@ -1,0 +1,4 @@
+body { margin: 0; }
+
+.cm-editor { height: 100vh; font-size: 15px; }
+.cm-editor.cm-focused { outline: none; }
