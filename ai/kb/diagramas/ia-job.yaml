@@ -1,0 +1,22 @@
+titulo: Caminho de um pedido de IA, do gatilho à proposta aceita
+tipo: blocos
+grade: [210, 110]
+destino: IA no projeto/Figuras
+nos:
+  gat:   {tipo: entrada, pos: [0, 1], texto: "gatilho<br>botão · skill<br>hook · agenda"}
+  fila:  {tipo: banco, pos: [1, 1], texto: "fila de jobs<br>sincroniza<br>precisa: [...]", cor: amarelo}
+  wsrv:  {tipo: bloco, pos: [2, 0], texto: "worker no servidor<br>(navegador)", cor: laranja}
+  wdmn:  {tipo: bloco, pos: [2, 2], texto: "worker no daemon<br>(app desktop)", cor: verde}
+  ctx:   {tipo: bloco, pos: [3, 1], texto: "monta o contexto<br>.workspace/ + seção", cor: amarelo}
+  prov:  {tipo: bloco, pos: [4, 1], texto: "provedor<br>Claude (chave)<br>Ollama", cor: roxo}
+  prop:  {tipo: bloco, pos: [5, 1], texto: "proposta<br>edição por âncora", cor: azul}
+  ok:    {tipo: bloco, pos: [6, 1], texto: "aceitar / recusar<br>no editor", cor: azul}
+arestas:
+  - [gat, fila, {rotulo: "1"}]
+  - [fila, wsrv, {rotulo: "2 pega"}]
+  - [fila, wdmn, {rotulo: "2 pega"}]
+  - [wsrv, ctx, {rotulo: "3"}]
+  - [wdmn, ctx, {rotulo: "3"}]
+  - [ctx, prov, {rotulo: "4"}]
+  - [prov, prop, {rotulo: "5"}]
+  - [prop, ok, {rotulo: "6"}]

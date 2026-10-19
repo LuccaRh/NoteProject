@@ -1,0 +1,25 @@
+titulo: Back — daemon local e servidor de sync
+tipo: blocos
+grade: [240, 100]
+destino: Estrutura do projeto/Figuras
+nos:
+  app:   {tipo: bloco, pos: [0, 0], texto: "app.py<br>(rotas FastAPI)", cor: verde}
+  repo:  {tipo: bloco, pos: [0, 1], texto: "repo.py<br>(título, FTS)", cor: verde}
+  db:    {tipo: banco, pos: [0, 2], texto: "notes.db<br>notes + notes_fts", cor: amarelo}
+  loc:   {tipo: grupo, contem: [app, repo, db], texto: "notesd (⏳ app desktop)", cor: cinza}
+  syn:   {tipo: bloco, pos: [2, 1], texto: "cliente de sync<br>(version > N)", cor: verde}
+  http:  {tipo: bloco, pos: [3, 0], texto: "FastAPI HTTP<br>login · bootstrap", cor: laranja}
+  ws:    {tipo: bloco, pos: [3, 1], texto: "WebSocket + y-py<br>doc em RAM (TTL)", cor: laranja}
+  pg:    {tipo: banco, pos: [4, 0], texto: "Postgres<br>users · notes · version", cor: amarelo}
+  mi:    {tipo: banco, pos: [4, 1], texto: "S3<br>snapshots · imagens", cor: amarelo}
+  rd:    {tipo: banco, pos: [4, 2], texto: "Redis pub/sub<br>(só com >1 instância)", cor: cinza}
+  srv:   {tipo: grupo, contem: [http, ws, pg, mi, rd], texto: "servidor (⏳ M0–M4)", cor: cinza}
+arestas:
+  - [app, repo]
+  - [repo, db]
+  - [repo, syn, {tracejada: true}]
+  - [syn.c, http.e, {rotulo: "token"}]
+  - [syn.d, ws.e, {rotulo: "Yjs"}]
+  - [http, pg]
+  - [ws, mi]
+  - [ws, rd, {tracejada: true}]

@@ -1,0 +1,3 @@
+#!/bin/sh
+# Ativo com: git config core.hooksPath ai/tools/githooks (ai/tools/instalar.sh)
+exec python3 "$(git rev-parse --show-toplevel)/ai/tools/commit_msg.py" "$1"

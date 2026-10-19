@@ -1,0 +1,7 @@
+# Vault do Obsidian -> cópia versionada aqui. Sincronizado nos dois sentidos por
+# tools/obsidian_sync.py (hooks SessionStart/Stop e ./np obsidian).
+# A pasta Note Project inteira; o resto do vault (Faculdade, Programing com notas do
+# trabalho) fica só no vault e não entra neste repo.
+vault: ~/Documents/Obsidian Vault/Note Project
+pastas:
+  "": obsidian

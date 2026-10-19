@@ -1,0 +1,23 @@
+titulo: Do pedido à resposta
+tipo: blocos
+grade: [270, 100]
+destino: Workspace de IA
+nos:
+  p:      {tipo: entrada, pos: [0, 1], texto: "pedido"}
+  foco:   {tipo: bloco, pos: [1, 1], texto: "hook foco<br>(escopo da branch)", cor: vermelho}
+  s:      {tipo: bloco, pos: [2, 1], texto: "sessão<br>CLAUDE.md + regras", cor: verde}
+  leitor: {tipo: bloco, pos: [2, 0], texto: "agente leitor<br>(arquivo grande)", cor: cinza}
+  chk:    {tipo: bloco, pos: [2, 2], texto: "./np check<br>(prova)", cor: roxo}
+  ctx:    {tipo: bloco, pos: [3, 1], texto: "./np contexto<br><área>", cor: roxo}
+  cod:    {tipo: bloco, pos: [4, 0], texto: "código<br>(por trecho)", cor: azul}
+  lib:    {tipo: banco, pos: [4, 1], texto: "kb/libs<br>(cards)", cor: amarelo}
+  obs:    {tipo: banco, pos: [4, 2], texto: "obsidian/<br>(notas)", cor: amarelo}
+arestas:
+  - [p, foco]
+  - [foco, s, {rotulo: "avisa se sai"}]
+  - [s, leitor]
+  - [s, chk]
+  - [s, ctx]
+  - [ctx, cod]
+  - [ctx, lib]
+  - [ctx, obs]

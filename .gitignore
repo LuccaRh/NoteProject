@@ -1,0 +1,5 @@
+# gerado (estado dos hooks do workspace, png de diagramas)
+build/
+__pycache__/
+*.swp
+.DS_Store

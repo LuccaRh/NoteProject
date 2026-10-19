@@ -1,0 +1,22 @@
+titulo: Roadmap do NoteProject
+tipo: blocos
+grade: [250, 130]
+destino: Plano do projeto/Figuras
+nos:
+  m0:  {tipo: bloco, pos: [0, 0], texto: "M0<br>esqueleto do servidor<br>(FastAPI, compose, Postgres)", cor: laranja}
+  m1:  {tipo: bloco, pos: [1, 0], texto: "M1<br>notas no navegador<br>(API, build, pastas, views)", cor: amarelo}
+  m2:  {tipo: bloco, pos: [2, 0], texto: "M2<br>login e TLS<br>(cookie, Caddy, CI)", cor: vermelho}
+  m3:  {tipo: bloco, pos: [3, 0], texto: "M3<br>no ar na AWS<br>(Terraform, CI/CD, backup)", cor: roxo}
+  m4:  {tipo: bloco, pos: [4, 0], texto: "M4<br>edição ao vivo<br>(WebSocket + Yjs)", cor: verde}
+  desk: {tipo: bloco, pos: [4, 1], texto: "Desktop app<br>notesd · offline · token", cor: cinza}
+  mob: {tipo: bloco, pos: [4, 2], texto: "Mobile app<br>celular", cor: cinza}
+  ed:  {tipo: bloco, pos: [1, 1], texto: "Editor<br>(chips, âncora, blocos, MCP, fila)", cor: azul}
+  n1:  {tipo: nota, pos: [2.6, 1], texto: "trilha principal: escrita à mão<br>trilha do editor: delegada, só revisão"}
+arestas:
+  - [m0, m1]
+  - [m1, m2]
+  - [m2, m3]
+  - [m3, m4]
+  - [m4, desk, {tracejada: true, rotulo: "depois"}]
+  - [desk, mob, {tracejada: true, rotulo: "depois"}]
+  - [m1.b, ed.c, {tracejada: true, rotulo: "em paralelo"}]

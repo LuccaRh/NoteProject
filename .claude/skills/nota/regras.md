@@ -1,0 +1,1 @@
+../../../ai/obsidian/Workspace de IA/Regras de página.md

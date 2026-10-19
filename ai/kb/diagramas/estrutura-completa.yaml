@@ -1,0 +1,60 @@
+titulo: NoteProject no final — front, back e infra
+tipo: blocos
+grade: [200, 110]
+destino: Estrutura do projeto/Figuras
+nos:
+  # clientes: navegador (M0–M4), app desktop, celular; hoje só o editor web ✅
+  mcp:   {tipo: bloco, pos: [0, 0], texto: "Claude Code<br>(cliente MCP)", cor: azul}
+  ed:    {tipo: bloco, pos: [0, 1], texto: "editor · Tauri<br>CodeMirror 6 + Yjs<br>KaTeX · Ctrl+P fuzzy", cor: azul}
+  d:     {tipo: bloco, pos: [1, 1], texto: "notesd :8787<br>(FastAPI)", cor: verde}
+  db:    {tipo: banco, pos: [1, 2], texto: "SQLite<br>+ FTS5", cor: amarelo}
+  dev:   {tipo: grupo, contem: [mcp, ed, d, db], texto: "app desktop · local-first", cor: cinza}
+  mob:   {tipo: bloco, pos: [1, 4], texto: "celular · React Native<br>+ SQLite", cor: azul}
+  nav:   {tipo: bloco, pos: [0, 3], texto: "navegador<br>só online · UI otimista", cor: azul}
+  dns:   {tipo: bloco, pos: [2, 0], texto: "DNS<br>Cloudflare", cor: roxo}
+
+  # servidor dentro da EC2 (M0–M4 ⏳)
+  cad:   {tipo: bloco, pos: [3, 1], texto: "Caddy :443<br>Let's Encrypt<br>app · /api · /sync", cor: vermelho}
+  auth:  {tipo: bloco, pos: [3, 0], texto: "auth (FastAPI)<br>login · sessões", cor: laranja}
+  api:   {tipo: bloco, pos: [4, 0], texto: "notes (FastAPI)<br>notas · busca<br>build do front", cor: laranja}
+  wk:    {tipo: bloco, pos: [3, 2], texto: "worker de IA<br>lê pedidos no Postgres<br>(depois da v1)", cor: laranja}
+  sync:  {tipo: bloco, pos: [4, 1], texto: "sync<br>WebSocket + y-py", cor: laranja}
+  red:   {tipo: bloco, pos: [4, 2], texto: "Redis pub/sub<br>(só com 2+ syncs)", cor: laranja}
+  pg:    {tipo: banco, pos: [5, 0], texto: "Postgres<br>users · notes<br>(volume no EBS)", cor: amarelo}
+  bk:    {tipo: bloco, pos: [5, 2], texto: "cron<br>pg_dump", cor: roxo}
+  ec2:   {tipo: grupo, contem: [cad, auth, api, wk, sync, red, pg, bk], texto: "EC2 t4g.small · docker compose (na mão)", cor: cinza}
+
+  # serviços da AWS em volta
+  s3:    {tipo: banco, pos: [6, 1], texto: "S3<br>snapshots Yjs · anexos<br>ink · backups", cor: amarelo}
+  sg:    {tipo: bloco, pos: [6, 3], texto: "Security Group<br>só 443 aberta", cor: vermelho}
+  ssm:   {tipo: bloco, pos: [4, 3], texto: "SSM<br>shell sem porta 22", cor: roxo}
+  cw:    {tipo: bloco, pos: [5, 3], texto: "CloudWatch<br>alarme se cair", cor: roxo}
+  iam:   {tipo: bloco, pos: [3, 3], texto: "IAM roles<br>EC2→S3 · GitHub OIDC", cor: vermelho}
+  bud:   {tipo: bloco, pos: [6, 4], texto: "Budgets<br>alarme de custo", cor: roxo}
+  aws:   {tipo: grupo, contem: [ec2, s3, sg, ssm, cw, iam, bud], texto: "conta AWS · criada por Terraform", cor: roxo}
+
+  # entrega
+  gha:   {tipo: bloco, pos: [3, 6], texto: "GitHub Actions<br>make check · build", cor: roxo}
+  ghcr:  {tipo: bloco, pos: [4, 6], texto: "GHCR<br>imagens", cor: roxo}
+  gh:    {tipo: grupo, contem: [gha, ghcr], texto: "GitHub", cor: cinza}
+  tf:    {tipo: bloco, pos: [6, 6], texto: "Terraform<br>recria a conta AWS", cor: roxo}
+arestas:
+  - [ed.d, d.e, {rotulo: "HTTP"}]
+  - [mcp.d, d.c, {rotulo: "MCP"}]
+  - [d, db]
+  - [d, dns, {rotulo: "nome"}]
+  - [d, cad, {rotulo: "WSS + token", tracejada: true}]
+  - [mob.d, cad.b, {rotulo: "WSS", tracejada: true, pontos: [[2.3, 4], [2.3, 1.6], [3, 1.6]]}]
+  - [nav.d, cad.e, {rotulo: "HTTPS + cookie", tracejada: true, pontos: [[2, 3], [2, 1]]}]
+  - [cad.c, auth.b, {rotulo: "/api/auth"}]
+  - [cad, api, {rotulo: "/api/notes"}]
+  - [cad, sync]
+  - [api, pg]
+  - [sync.d, pg.b]
+  - [sync, s3]
+  - [sync, red, {tracejada: true}]
+  - [bk.d, s3.b, {rotulo: "backup", tracejada: true}]
+  - [gha, ghcr, {rotulo: "push"}]
+  - [ghcr, ssm, {rotulo: "compose pull", tracejada: true}]
+  - [gha, iam, {rotulo: "OIDC", tracejada: true}]
+  - [tf, bud, {rotulo: "cria", tracejada: true}]

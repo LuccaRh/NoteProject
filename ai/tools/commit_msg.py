@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+"""Lint da mensagem de commit do NoteProject (regras em CLAUDE.md, "Tarefas, commits e branches").
+
+Formato (o mesmo da nota Programing/Naming, "Commit naming"):
+- título em inglês, imperativo, com maiúscula, sem ponto final, ≤ 72 caracteres;
+- sem prefixo (`feat:`, `fix:`, `docs:`...);
+- nada de Claude/IA, sem Co-Authored-By nem "Generated with";
+- nada de "wip", "fix", "update", "changes" sozinhos: diga o que mudou.
+Merge, revert e fixup!/squash! gerados pelo git passam (o fixup some no rebase --autosquash).
+
+    python3 tools/commit_msg.py <arquivo>   # hook commit-msg (tools/githooks/commit-msg)
+    python3 tools/commit_msg.py -m "msg"
+
+Sai com 1 e lista os erros se a mensagem quebrar alguma regra.
+"""
+from __future__ import annotations
+
+import argparse
+import pathlib
+import re
+import sys
+
+PROIBIDO = re.compile(r"claude|anthropic|co-authored-by|generated with", re.I)
+PREFIXO = re.compile(r"^[a-z]+(\([^)]*\))?!?: ")              # feat: , fix(web): , docs!:
+GERADO = re.compile(r"^(Merge (branch|pull request|remote-tracking)|Revert \"|(fixup|squash|amend)! )")
+VAGO = re.compile(r"^(wip|fix|fixes|update|updates|changes|adjustments|misc|stuff)\b\W*\d*$", re.I)
+ACENTO = re.compile(r"[ãõáéíóúâêôàç]", re.I)                  # sinal de português
+NAO_IMPERATIVO = re.compile(r"^\w+(ed|ing|s)\b")               # Added, Adding, Adds
+VERBOS_OK = {"Address", "Process", "Pass", "Bypass", "Focus", "Discuss", "Express", "Access"}
+
+
+def erros(texto: str) -> list[str]:
+    linhas = [l for l in texto.splitlines() if not l.startswith("#")]
+    while linhas and not linhas[0].strip():
+        linhas.pop(0)
+    if not linhas:
+        return ["mensagem vazia"]
+    titulo, e = linhas[0], []
+    if achou := sorted({m.group(0).lower() for m in PROIBIDO.finditer("\n".join(linhas))}):
+        e.append(f"menciona {achou} (nada de Claude/IA, sem Co-Authored-By)")
+    if GERADO.match(titulo):
+        return e
+    if PREFIXO.match(titulo):
+        e.append("sem prefixo (feat:, fix:, docs:...): só o imperativo")
+    if VAGO.match(titulo.strip()):
+        e.append(f"'{titulo.strip()}' não diz o que mudou: nomeie o resultado")
+    if len(titulo) > 72:
+        e.append(f"título com {len(titulo)} caracteres (máx. 72)")
+    if titulo[:1] != titulo[:1].upper():
+        e.append("título começa com maiúscula")
+    if titulo.rstrip().endswith("."):
+        e.append("título sem ponto final")
+    if ACENTO.search(titulo):
+        e.append("título em inglês")
+    pal = titulo.split()[0] if titulo.split() else ""
+    if NAO_IMPERATIVO.match(pal) and pal not in VERBOS_OK:
+        e.append(f"título no imperativo ('{pal}' → 'Add', não 'Added/Adds')")
+    if len(linhas) > 1 and linhas[1].strip():
+        e.append("linha em branco entre título e corpo")
+    return e
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("arquivo", nargs="?")
+    ap.add_argument("-m")
+    a = ap.parse_args(argv)
+    texto = a.m if a.m is not None else (
+        pathlib.Path(a.arquivo).read_text(errors="replace") if a.arquivo else sys.stdin.read())
+    if e := erros(texto):
+        print("commit bloqueado (CLAUDE.md, 'Tarefas, commits e branches'):", *(f"  - {x}" for x in e),
+              sep="\n", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,0 +1,26 @@
+titulo: AWS gerenciada — o que empresas maiores usam
+tipo: blocos
+grade: [190, 100]
+destino: Estrutura do projeto/Figuras
+nos:
+  dev:   {tipo: entrada, pos: [0, 1], texto: "dispositivos"}
+  r53:   {tipo: bloco, pos: [1, 0], texto: "Route 53<br>(DNS)", cor: roxo}
+  alb:   {tipo: bloco, pos: [2, 1], texto: "ALB + ACM<br>(HTTPS)", cor: vermelho}
+  api:   {tipo: bloco, pos: [3, 0], texto: "ECS (Express Mode)<br>api", cor: laranja}
+  sync:  {tipo: bloco, pos: [3, 1], texto: "ECS (Express Mode)<br>sync", cor: laranja}
+  rds:   {tipo: banco, pos: [4, 0], texto: "RDS<br>Postgres", cor: amarelo}
+  s3:    {tipo: banco, pos: [4, 1], texto: "S3<br>(blobs)", cor: amarelo}
+  cw:    {tipo: bloco, pos: [3, 2], texto: "deploy: ECS update<br>CloudWatch logs", cor: roxo}
+  vpc:   {tipo: grupo, contem: [alb, api, sync, rds, s3, cw], texto: "VPC · IAM · Security Groups", cor: cinza}
+  ci:    {tipo: bloco, pos: [1, 3], texto: "GitHub Actions<br>(OIDC → IAM)", cor: roxo}
+  ecr:   {tipo: banco, pos: [2, 3], texto: "ECR<br>(imagens)", cor: roxo}
+arestas:
+  - [dev, r53, {rotulo: "nome"}]
+  - [dev, alb, {rotulo: "HTTPS/WSS"}]
+  - [alb, api]
+  - [alb, sync]
+  - [api, rds]
+  - [sync, s3]
+  - [ci, ecr]
+  - [ecr, cw, {tracejada: true}]
+legenda: {simples: "alternativa enxuta: 1 EC2 com o mesmo compose + S3 no lugar do MinIO"}
