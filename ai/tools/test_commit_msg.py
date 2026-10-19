@@ -13,7 +13,10 @@ class TestCommitMsg(unittest.TestCase):
                     "Create headings decoration\n\nThe parser marks ATX headings only.",
                     "Merge branch 'add-sync' into master",
                     'Revert "Add headings to codemirror editor"',
-                    "fixup! Add headings to codemirror editor"):
+                    "fixup! Add headings to codemirror editor",
+                    "[docs] Add vault notes on the roadmap",
+                    "[ai-workspace] Run workspace tool tests in CI",
+                    "[docs] Add roadmap\n\nCo-Authored-By: Claude <x@y>"):
             self.assertEqual(erros(msg), [], msg)
 
     def test_invalidas(self):
@@ -28,6 +31,11 @@ class TestCommitMsg(unittest.TestCase):
             "Add sync\nbody": "linha em branco",
             "Add sync\n\nCo-Authored-By: Claude <x@y>": "Claude",
             "A" * 73: "72",
+            "[feat] Add sync": "desconhecida",
+            "[docs]Add notes": "espaço",
+            "[docs] add notes": "maiúscula",
+            "[docs] Added notes": "imperativo",
+            "[ai-workspace] wip": "não diz",
         }
         for msg, trecho in casos.items():
             self.assertTrue(any(trecho in e for e in erros(msg)), f"{msg!r}: {erros(msg)}")

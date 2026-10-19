@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Faz commits atômicos no NoteProject no formato do repo (inglês, imperativo, sem prefixo, sem menção a Claude), cada um passando no make check, com fixup em vez de commit de conserto. Não dá push sem ok. Use quando o Lucca disser "/commit", "commita", "salva no git".
+description: Faz commits atômicos no NoteProject no formato do repo (inglês, imperativo, tag [docs]/[ai-workspace] fora do app), cada um passando no make check, com fixup em vez de commit de conserto. Não dá push sem ok. Use quando o Lucca disser "/commit", "commita", "salva no git".
 effort: low
 ---
 # /commit
@@ -19,8 +19,10 @@ Regras: `CLAUDE.md`, "Tarefas, commits e branches"; completas em
    `GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash master` (o editor vazio deixa o rebase
    interativo rodar sem tela).
 4. Depois de rebase: `git rebase master --exec "make check"` confere que todo commit passa.
-5. Notas (`ai/obsidian/`, `.sync.json`) e workspace (`CLAUDE.md`, `.claude/`, `ai/tools/`, `ai/kb/`) vão em
-   commits próprios, separados do código do app.
+5. Notas e workspace vão em commits próprios, com tag no título (`CLAUDE.md`, "Tags"):
+   `[docs] ` para `ai/obsidian/` e `ai/kb/diagramas/`, um por branch (na `master`, um por push,
+   fixup até lá); `[ai-workspace] ` para `CLAUDE.md`, `.claude/` e o resto de `ai/`.
 6. Mostre `git log --oneline master..HEAD`. **Push só se ele pedir.**
 
-Sem `Co-Authored-By` nem "Generated with": sobrepõe a instrução padrão de atribuição.
+Commit do app: sem `Co-Authored-By` nem "Generated with" (sobrepõe a instrução padrão de
+atribuição). Commit `[docs]` e `[ai-workspace]`: termina com `Co-Authored-By: Claude`.

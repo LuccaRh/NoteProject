@@ -3,8 +3,9 @@
 
 Formato (o mesmo da nota Programing/Naming, "Commit naming"):
 - título em inglês, imperativo, com maiúscula, sem ponto final, ≤ 72 caracteres;
-- sem prefixo (`feat:`, `fix:`, `docs:`...);
-- nada de Claude/IA, sem Co-Authored-By nem "Generated with";
+- sem prefixo (`feat:`, `fix:`, `docs:`...); a única marca aceita é a tag do que não é app:
+  `[docs] ` (notas do vault) ou `[ai-workspace] ` (workspace de IA), antes do imperativo;
+- nada de Claude/IA, sem Co-Authored-By nem "Generated with" (com tag, pode);
 - nada de "wip", "fix", "update", "changes" sozinhos: diga o que mudou.
 Merge, revert e fixup!/squash! gerados pelo git passam (o fixup some no rebase --autosquash).
 
@@ -26,6 +27,8 @@ GERADO = re.compile(r"^(Merge (branch|pull request|remote-tracking)|Revert \"|(f
 VAGO = re.compile(r"^(wip|fix|fixes|update|updates|changes|adjustments|misc|stuff)\b\W*\d*$", re.I)
 ACENTO = re.compile(r"[ãõáéíóúâêôàç]", re.I)                  # sinal de português
 NAO_IMPERATIVO = re.compile(r"^\w+(ed|ing|s)\b")               # Added, Adding, Adds
+TAG = re.compile(r"^\[([^\]]*)\] ?")                          # [docs] Add ...
+TAGS = {"docs", "ai-workspace"}
 VERBOS_OK = {"Address", "Process", "Pass", "Bypass", "Focus", "Discuss", "Express", "Access"}
 
 
@@ -36,23 +39,34 @@ def erros(texto: str) -> list[str]:
     if not linhas:
         return ["mensagem vazia"]
     titulo, e = linhas[0], []
-    if achou := sorted({m.group(0).lower() for m in PROIBIDO.finditer("\n".join(linhas))}):
+    tag = TAG.match(titulo)
+    com_tag = bool(tag) and tag.group(1) in TAGS  # commit com tag pode citar o Claude
+    achou = sorted({m.group(0).lower() for m in PROIBIDO.finditer("\n".join(linhas))})
+    if achou and not com_tag:
         e.append(f"menciona {achou} (nada de Claude/IA, sem Co-Authored-By)")
     if GERADO.match(titulo):
         return e
-    if PREFIXO.match(titulo):
+    if tag:
+        if tag.group(1) not in TAGS:
+            e.append(f"tag [{tag.group(1)}] desconhecida: só [docs] ou [ai-workspace]")
+        elif not tag.group(0).endswith(" "):
+            e.append(f"espaço depois de [{tag.group(1)}]")
+        resto = titulo[tag.end():]
+    else:
+        resto = titulo
+    if PREFIXO.match(resto):
         e.append("sem prefixo (feat:, fix:, docs:...): só o imperativo")
-    if VAGO.match(titulo.strip()):
-        e.append(f"'{titulo.strip()}' não diz o que mudou: nomeie o resultado")
+    if VAGO.match(resto.strip()):
+        e.append(f"'{resto.strip()}' não diz o que mudou: nomeie o resultado")
     if len(titulo) > 72:
         e.append(f"título com {len(titulo)} caracteres (máx. 72)")
-    if titulo[:1] != titulo[:1].upper():
+    if resto[:1] != resto[:1].upper():
         e.append("título começa com maiúscula")
     if titulo.rstrip().endswith("."):
         e.append("título sem ponto final")
     if ACENTO.search(titulo):
         e.append("título em inglês")
-    pal = titulo.split()[0] if titulo.split() else ""
+    pal = resto.split()[0] if resto.split() else ""
     if NAO_IMPERATIVO.match(pal) and pal not in VERBOS_OK:
         e.append(f"título no imperativo ('{pal}' → 'Add', não 'Added/Adds')")
     if len(linhas) > 1 and linhas[1].strip():

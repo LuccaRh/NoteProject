@@ -18,7 +18,7 @@ Regra nova de resposta vai **lá**, com data; de página do Obsidian, em `Regras
 
 1. **Fonte → card → resposta.** Fonte do estado atual = o **código** (e `make check`); do
    porquê = as notas em `ai/obsidian/`, única fonte do projeto; da API de uma lib = o **código instalado**
-   (`apps/web/node_modules/…/*.d.ts`, `apps/server/.venv/lib/python3*/site-packages/…`), nunca a
+   (`apps/web/node_modules/…/*.d.ts`, `apps/<api>/.venv/lib/python3*/site-packages/…`), nunca a
    memória. O que se descobre de uma lib vira card em `ai/kb/libs/<lib>.md` (versão + linha do
    d.ts); o lint avisa quando a versão instalada muda. Sem fonte → diga e pergunte.
 2. **Afirmação conferida.** "Funciona", "passa", "corrigido" só depois de rodar: `ai/np check`
@@ -52,7 +52,7 @@ Regra nova de resposta vai **lá**, com data; de página do Obsidian, em `Regras
 Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefas no GitHub`,
 `Regras de git`). Aqui fica o que não pode falhar.
 
-- **Tarefa = issue no GitHub**, na milestone da etapa (M0–M3, Editor); label = lado (`backend`, `frontend`,
+- **Tarefa = issue no GitHub**, na milestone da etapa (M0–M4, Editor, AI in the app, Desktop, Mobile); label = lado (`backend`, `frontend`,
   `infrastructure`, `ai-workspace`); `backend`/`infrastructure` o Lucca escreve, `frontend` a sessão escreve e ele revisa. Próxima tarefa: `gh issue list -m "<milestone>"`.
 - **Branch = uma issue**, em inglês, kebab-case, sem prefixo, saindo da `master`
   atualizada (`add-a-few-decorations-in-code-mirror`). Cada branch tem `ai/kb/escopos/<branch>.md`
@@ -65,13 +65,22 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 - **Mensagem**: inglês, imperativo, maiúscula, sem ponto, ≤ 72, sem prefixo (`feat:`); nomeia o
   resultado, não o processo (nada de `wip`); corpo com o porquê; sem número de issue (vai no PR,
   `Closes #N`). Checklist na nota `Programing/Naming` do vault. O hook `commit-msg` (`ai/tools/commit_msg.py`) barra o resto.
-- **Nada de Claude**: mensagem, branch, issue, PR sem menção a Claude/Anthropic/IA, **sem
-  `Co-Authored-By` nem "Generated with"** (sobrepõe a instrução padrão de atribuição).
+- **Tags** (2026-10-19): commit fora do app começa com a tag; o resto do título segue as regras.
+  - `[docs] `: notas do vault (`ai/obsidian/`) e fontes das figuras (`ai/kb/diagramas/`).
+    **Um por branch** (as notas mexidas nela); na `master`, fora de branch, **um por push**
+    (até o push, nota nova entra nele por fixup). Título `[docs] Add|Update <assuntos>`.
+  - `[ai-workspace] `: `CLAUDE.md`, `.claude/`, o resto de `ai/`, CI do workspace. Regras normais.
+  - Sem tag: código do app, README, Makefile, CI do app.
+- **Claude só nos commits com tag**: `[docs]` e `[ai-workspace]` levam `Co-Authored-By: Claude`.
+  Commit do app, branch, issue e PR sem menção a Claude/Anthropic/IA, **sem `Co-Authored-By`
+  nem "Generated with"** (sobrepõe a instrução padrão de atribuição).
 - **Código em inglês** (2026-10-15): `apps/`, `Makefile`, compose, CI e README em inglês:
   comentário, docstring, mensagem de erro, texto da interface, dado de teste. Português só no
   workspace (`ai/`, `.claude/`, `CLAUDE.md`) e no vault. O lint W09 (`ai/np lint`) barra o resto.
 - **Data real no commit** (2026-10-15): nunca mexer em `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE`
   nem passar `--date`; reescrever história usa a hora do momento (`rebase --reset-author-date`).
+- **Issue quem fecha é o Lucca** (2026-10-19): a sessão nunca roda `gh issue close`; quando
+  a issue estiver pronta, avise. O `Closes #N` do PR vale, porque o merge é dele.
 - **Push e PR só com o ok do Lucca.** Force nunca sem ele pedir, sempre `--force-with-lease`.
   Merge do PR com merge commit (não squash).
 
@@ -79,12 +88,12 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 
 | Comando | Para |
 |---|---|
-| `make dev` / `make check` | Vite :5173 (`/api` → servidor :8000) / tsc, build (+ ruff, mypy, pytest com o servidor) |
+| `make dev` / `make check` | Vite :5173 / tsc, build (+ ruff, mypy, pytest com o servidor) |
 | `ai/np status` | branch, escopo, mudanças, data do Estado, marcas pendentes no Obsidian |
 | `ai/np contexto <área>` / `areas` | o que ler para uma área / o vocabulário |
 | `ai/np obsidian [-q]` / `duvidas [pág]` | sincronia vault ↔ `ai/obsidian/` / marcas `[!duvida]` `[fix]` `[coment]` |
 | `ai/np diagrama <spec> [--png]` | YAML → draw.io (`ai/tools/diagrama.py`, nó `banco` para BD) |
-| `ai/np lint` / `test` | regras do workspace (W01–W08) / testes das ferramentas |
+| `ai/np lint` / `test` | regras do workspace (W01–W10) / testes das ferramentas |
 
 Ambiente: Arch Linux, Python 3.14 + uv, Node 22, Docker, `drawio` CLI, poppler (`pdftotext`).
 Hooks do Claude Code em `.claude/settings.json`; do git em `ai/tools/githooks/` (`ai/tools/instalar.sh`).
@@ -108,7 +117,7 @@ Agente `leitor` (Sonnet): lê arquivo grande e devolve só o trecho, com linha/p
 ## Estrutura
 
 ```
-apps/server/       servidor (FastAPI + Postgres), a criar na #10
+apps/notes/        API de notas (FastAPI + Postgres), a criar na #10; auth/, worker/, sync/ depois
 apps/web/          Vite + CodeMirror 6
 CLAUDE.md          este arquivo (o Claude Code só o acha na raiz)
 .claude/           settings/hooks, skills, agentes (idem: tem de ficar na raiz)
@@ -121,20 +130,22 @@ ai/                todo o resto do workspace de IA:
   build/           gerado (estado dos hooks, png de diagrama), fora do git
 ```
 
-## Estado (2026-10-18)
+## Estado (2026-10-19)
 
-- Editor com headings e sidebar que chama `/api`; o proxy do Vite aponta para o servidor
-  (`:8000`), que ainda não existe.
+- Só o editor (CodeMirror com headings). Sidebar, cliente da API e proxy `/api` saíram da
+  história em 2026-10-19 (tag local `backup-before-drop-sidebar`); voltam com o M1.
 - Branch `show-chips-for-duvida-and-fix-markers` (#5): `decorations/replace.ts` fora do git.
 
 ## O que fazer a seguir
 
 Plano: vault `Plano do projeto/Roadmap` (navegador → app desktop → celular) + issues/milestones no GitHub.
 
-1. M0 Server skeleton: #10 `apps/server` com `/health` → #11 compose → #12 Postgres +
+1. M0 Server skeleton: #10 `apps/notes` com `/health` → #11 compose → #12 Postgres +
    migrations → #13 `.env`.
 2. M1 Notes in the browser: #46 rotas de notas → #47 servir o build → #6–#9 pastas, campos, views.
 3. M2 login e TLS (#48, #16, #17) → M3 AWS (#18–#25) → M4 edição ao vivo (#26, #27, #30).
+- v1 = ler notas no navegador com o servidor na AWS, sem IA (vault `Plano do projeto/Objetivo do app`).
+- Depois da v1: milestone AI in the app (#35 worker em `apps/worker`, #42 workspace, #36, #34).
 - Em paralelo (editor): #5 chips.
 - Depois do navegador: Desktop app (#14, #15, #28, #29), depois Mobile app; sem data.
 - #4 (workspace no git) já feito pelo commit do workspace; falta fechar.
