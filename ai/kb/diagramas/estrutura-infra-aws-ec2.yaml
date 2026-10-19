@@ -1,0 +1,27 @@
+titulo: Plano — EC2 na AWS, serviços na mão dentro dela
+tipo: blocos
+grade: [200, 110]
+destino: Estrutura do projeto/Figuras
+nos:
+  dev:   {tipo: entrada, pos: [0, 1], texto: "dispositivos"}
+  dns:   {tipo: bloco, pos: [1, 0], texto: "DNS<br>(Cloudflare, grátis)", cor: roxo}
+  cad:   {tipo: bloco, pos: [2, 1], texto: "Caddy :443<br>Let's Encrypt", cor: vermelho}
+  api:   {tipo: bloco, pos: [3, 0], texto: "api<br>(FastAPI)", cor: laranja}
+  sync:  {tipo: bloco, pos: [3, 1], texto: "sync<br>(WebSocket)", cor: laranja}
+  pg:    {tipo: banco, pos: [4, 0], texto: "Postgres<br>(container + EBS)", cor: amarelo}
+  bk:    {tipo: bloco, pos: [4, 2], texto: "cron<br>pg_dump", cor: roxo}
+  ec2:   {tipo: grupo, contem: [cad, api, sync, pg, bk], texto: "EC2 t4g · NA MÃO: Linux + docker compose", cor: cinza}
+  s3:    {tipo: banco, pos: [5, 1], texto: "S3<br>blobs + backups", cor: amarelo}
+  iam:   {tipo: bloco, pos: [2, 3], texto: "IAM roles<br>EC2→S3 · GitHub OIDC", cor: vermelho}
+  bud:   {tipo: bloco, pos: [5, 3], texto: "Budgets<br>alarme de US$ 1", cor: roxo}
+  aws:   {tipo: grupo, contem: [ec2, s3, iam, bud], texto: "conta AWS · criada por Terraform", cor: roxo}
+  gha:   {tipo: bloco, pos: [0, 3], texto: "GitHub Actions<br>build → GHCR", cor: roxo}
+arestas:
+  - [dev, dns, {rotulo: "nome"}]
+  - [dev, cad, {rotulo: "HTTPS/WSS"}]
+  - [cad, api]
+  - [cad, sync]
+  - [api, pg]
+  - [sync, s3]
+  - [bk, s3.b, {tracejada: true}]
+  - [gha, iam, {rotulo: "OIDC"}]

@@ -1,0 +1,21 @@
+titulo: Caminho de um pedido até o sync, dentro da EC2
+tipo: blocos
+grade: [250, 110]
+destino: Estrutura do projeto/Figuras
+nos:
+  dev:   {tipo: entrada, pos: [0, 1], texto: "dispositivo<br>wss://notes.exemplo.com<br>/sync"}
+  dns:   {tipo: bloco, pos: [0, 0], texto: "DNS<br>nome → IP da EC2", cor: roxo}
+  sg:    {tipo: bloco, pos: [1, 1], texto: "Security Group<br>só a 443 entra", cor: vermelho}
+  cad:   {tipo: bloco, pos: [2, 1], texto: "caddy<br>443 publicada", cor: vermelho}
+  api:   {tipo: bloco, pos: [3, 0], texto: "api<br>:8000", cor: laranja}
+  sync:  {tipo: bloco, pos: [3, 2], texto: "sync<br>:porta interna", cor: laranja}
+  pg:    {tipo: banco, pos: [4, 0], texto: "Postgres<br>:5432", cor: amarelo}
+  rede:  {tipo: grupo, contem: [cad, api, sync, pg], texto: "rede do compose · nome do serviço = endereço", cor: cinza}
+  ec2:   {tipo: grupo, contem: [rede], texto: "EC2 · IP público", cor: roxo}
+arestas:
+  - [dev, dns, {rotulo: "1 nome?"}]
+  - [dev, sg, {rotulo: "2 :443"}]
+  - [sg, cad, {rotulo: "3"}]
+  - [cad, api, {rotulo: "/api"}]
+  - [cad, sync, {rotulo: "4 /sync"}]
+  - [api, pg]
