@@ -2,3 +2,7 @@ body { margin: 0; }
 
 .cm-editor { height: 100vh; font-size: 15px; }
 .cm-editor.cm-focused { outline: none; }
+
+.md-h1 { font-size: 1.8em; font-weight: 700; }
+.md-h2 { font-size: 1.4em; font-weight: 700; }
+.md-h3 { font-size: 1.2em; font-weight: 600; }
