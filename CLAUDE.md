@@ -130,9 +130,11 @@ ai/                todo o resto do workspace de IA:
   build/           gerado (estado dos hooks, png de diagrama), fora do git
 ```
 
-## Estado (2026-10-19)
+## Estado (2026-10-20)
 
-- Só o editor (CodeMirror com headings). Sidebar, cliente da API e proxy `/api` saíram da
+- Editor (CodeMirror com headings) + `apps/notes` só com `GET /health` (uv, estrutura `src/`,
+  padrão de todo serviço Python; `make check-notes` e job `notes` no CI). Branch
+  `scaffold-the-basic-of-the-notes-service` (#10) pronta, sem push. Sidebar, cliente da API e proxy `/api` saíram da
   história em 2026-10-19 (tag local `backup-before-drop-sidebar`); voltam com o M1.
 - Branch `show-chips-for-duvida-and-fix-markers` (#5): `decorations/replace.ts` fora do git.
 
@@ -140,7 +142,7 @@ ai/                todo o resto do workspace de IA:
 
 Plano: vault `Plano do projeto/Roadmap` (navegador → app desktop → celular) + issues/milestones no GitHub.
 
-1. M0 Server skeleton: #10 `apps/notes` com `/health` → #11 compose → #12 Postgres +
+1. M0 Server skeleton: #10 (PR a abrir) → #11 compose (antes: pergunta `fastapi dev` × `run` em `API de notas`) → #12 Postgres +
    migrations → #13 `.env`.
 2. M1 Notes in the browser: #46 rotas de notas → #47 servir o build → #6–#9 pastas, campos, views.
 3. M2 login e TLS (#48, #16, #17) → M3 AWS (#18–#25) → M4 edição ao vivo (#26, #27, #30).
