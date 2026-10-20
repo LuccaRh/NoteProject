@@ -1,0 +1,19 @@
+titulo: async def e def na mesma app FastAPI
+tipo: blocos
+grade: [230, 100]
+destino: Conceitos/Figuras
+nos:
+  cli:  {tipo: bloco, pos: [0, 1], texto: "clientes", cor: azul}
+  loop: {tipo: bloco, pos: [1, 1], texto: "event loop<br>(1 thread)", cor: verde}
+  ra:   {tipo: bloco, pos: [2, 0], texto: "async def get_note<br>await db.fetch(…)", cor: verde}
+  rs:   {tipo: bloco, pos: [2, 2], texto: "def search<br>driver síncrono", cor: verde}
+  tp:   {tipo: grupo, contem: [rs], texto: "threadpool (40 threads): recebe as rotas def", cor: cinza}
+  db:   {tipo: banco, pos: [3.4, 1], texto: "Postgres", cor: amarelo}
+  bad:  {tipo: bloco, pos: [1, 3], texto: "time.sleep() dentro de async def<br>= loop parado, todos esperam", cor: vermelho}
+arestas:
+  - [cli, loop]
+  - [loop, ra, {rotulo: "roda no loop"}]
+  - [loop, rs]
+  - [ra.d, db.c, {rotulo: "await: solta o loop"}]
+  - [rs.d, db.b, {rotulo: "bloqueia só a thread"}]
+  - [bad, loop, {tracejada: true}]

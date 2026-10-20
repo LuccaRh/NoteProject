@@ -27,6 +27,7 @@ O app em três partes (front, back, infra), marcando o que já existe no código
 
 | Página | Ideia |
 |---|---|
+| [[API de notas]] | o serviço `notes` em [[FastAPI]]: rotas, etapas e o esqueleto da #10 |
 | [[O daemon notesd]] | desenho do [[Daemon\|daemon]] do app desktop: camadas, rotas, busca |
 | [[Pastas, campos e views]] | organizar = escolher onde criar a nota |
 | [[Marcador no texto, conteúdo fora]] | o texto guarda um marcador curto; o pesado mora fora |
