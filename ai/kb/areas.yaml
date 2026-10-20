@@ -43,7 +43,7 @@ sync:
 
 servidor:
   nome: Servidor (FastAPI + Postgres; WebSocket e blobs depois)
-  notas: ["Conceitos/Postgres e migrations.md", "Conceitos/S3 — armazenamento de objetos.md", "Conceitos/Redis pub-sub.md"]
+  notas: ["Conceitos/FastAPI.md", "Conceitos/Python — módulo, package e venv.md", "Estrutura do projeto/API de notas.md", "Conceitos/Postgres e migrations.md", "Conceitos/S3 — armazenamento de objetos.md", "Conceitos/Redis pub-sub.md"]
   lado: back
   aprender: true
   futuro: true

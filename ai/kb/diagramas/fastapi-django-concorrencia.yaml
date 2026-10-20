@@ -1,0 +1,26 @@
+titulo: 200 clientes, 50 ms de banco por pedido — Django clássico × FastAPI
+tipo: blocos
+grade: [230, 90]
+destino: Conceitos/Figuras
+nos:
+  cd:   {tipo: bloco, pos: [0, 1], texto: "200 clientes", cor: azul}
+  fila: {tipo: bloco, pos: [1, 1], texto: "fila<br>196 esperando", cor: vermelho}
+  w1:   {tipo: bloco, pos: [2, 0], texto: "worker 1: pedido A<br>parado esperando o banco", cor: verde}
+  w2:   {tipo: bloco, pos: [2, 1], texto: "worker 2: pedido B<br>parado esperando o banco", cor: verde}
+  w3:   {tipo: bloco, pos: [2, 2], texto: "worker 3 e 4: C, D<br>parados esperando", cor: verde}
+  gd:   {tipo: grupo, contem: [fila, w1, w2, w3], texto: "Django clássico: gunicorn, 4 processos WSGI", cor: cinza}
+  dbd:  {tipo: banco, pos: [3, 1], texto: "Postgres<br>4 consultas por vez", cor: amarelo}
+  nd:   {tipo: nota, pos: [3, 2], texto: "~77 pedidos/s<br>(4 ÷ 0,052 s)"}
+  cf:   {tipo: bloco, pos: [0, 4], texto: "200 clientes", cor: azul}
+  loop: {tipo: bloco, pos: [1.5, 4], texto: "event loop (1 processo)<br>A, B, C… 200 em andamento<br>cada await solta o loop", cor: verde}
+  gf:   {tipo: grupo, contem: [loop], texto: "FastAPI: uvicorn, async def + driver async", cor: cinza}
+  dbf:  {tipo: banco, pos: [3, 4], texto: "Postgres<br>pool de conexões", cor: amarelo}
+  nf:   {tipo: nota, pos: [3, 5], texto: "limite: o pool e<br>os 2 ms de CPU"}
+arestas:
+  - [cd, fila]
+  - [fila, w1]
+  - [fila, w2]
+  - [fila, w3]
+  - [w2, dbd]
+  - [cf, loop]
+  - [loop, dbf, {rotulo: "await"}]

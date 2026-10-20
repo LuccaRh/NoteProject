@@ -2,29 +2,46 @@
 
 A notes app opened in the browser, served by its own server.
 
-Current state: a CodeMirror 6 editor that styles Markdown headings. Notes are not saved yet;
-the server (FastAPI + Postgres) is the next step.
+Current state: a CodeMirror 6 editor that styles Markdown headings, and the start of the notes
+API (only a health check). Notes are not saved yet.
 
 ```
 apps/
   web/     CodeMirror 6 editor.
+  notes/   Notes API (FastAPI). See apps/notes/README.md.
 ```
 
 ## Run
 
-```bash
-make install   # npm install
-make dev       # Vite on :5173
-```
+Each service runs in its own terminal. The notes API needs [uv](https://docs.astral.sh/uv/).
 
-Open <http://localhost:5173>.
+| Service | Start | Open in the browser |
+|---|---|---|
+| web (editor) | `make install` once, then `make dev` | <http://localhost:5173> |
+| notes (API) | `cd apps/notes && uv run fastapi dev src/notes/main.py` | <http://localhost:8000/docs> |
 
-Or with containers: `docker compose up --build` (ports bound to localhost only).
+The ports come from each tool: 5173 is set in `apps/web/vite.config.ts`, and 8000 is the
+default of `fastapi dev`. Both listen on localhost only and reload when a file is saved.
+
+To run everything, start both commands, one per terminal. There is no single command for the
+whole stack yet; `docker compose up --build` only starts the web container for now.
+
+### Trying an API in the browser
+
+Every FastAPI service serves its own interactive docs at `/docs` (Swagger UI), built from the
+code:
+
+1. Open `http://localhost:<port>/docs`; it lists every route.
+2. Click a route, then **Try it out** and **Execute**.
+3. The page shows the request it sent (as a `curl` command), the status code and the body.
+
+A `GET` route can also be opened straight in the address bar, e.g.
+<http://localhost:8000/health> shows `{"status":"ok"}`.
 
 ## Check
 
 ```bash
-make check     # tsc + vite build
+make check     # web: tsc + vite build; notes: ruff, mypy, pytest
 ```
 
 ## Next steps

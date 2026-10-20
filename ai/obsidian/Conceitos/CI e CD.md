@@ -18,7 +18,7 @@ flowchart LR
 - Para o deploy entrar na nuvem sem chave guardada: [[OIDC]].
 
 > [!example] No NoteProject
-> O CI roda o `make check` a cada push; o deploy por merge é plano ([[Infra — deploy e operação]]).
+> O CI roda, a cada push, os mesmos checks do `make check` (um job por serviço); o deploy por merge é plano ([[Infra — deploy e operação]]).
 
 Docs: [GitHub Actions](https://docs.github.com/en/actions),
 [GHCR](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry).
