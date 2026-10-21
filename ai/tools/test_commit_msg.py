@@ -10,7 +10,7 @@ from commit_msg import erros  # noqa: E402
 class TestCommitMsg(unittest.TestCase):
     def test_validas(self):
         for msg in ("Add headings to codemirror editor",
-                    "Create headings decoration\n\nThe parser marks ATX headings only.",
+                    "[ai-workspace] Add the commit hook\n\nThe hook blocks bodies on app commits.",
                     "Merge branch 'add-sync' into master",
                     'Revert "Add headings to codemirror editor"',
                     "fixup! Add headings to codemirror editor",
@@ -36,6 +36,7 @@ class TestCommitMsg(unittest.TestCase):
             "[docs] add notes": "maiúscula",
             "[docs] Added notes": "imperativo",
             "[ai-workspace] wip": "não diz",
+            "Add sync\n\nThe server needs it.": "sem corpo",
         }
         for msg, trecho in casos.items():
             self.assertTrue(any(trecho in e for e in erros(msg)), f"{msg!r}: {erros(msg)}")
