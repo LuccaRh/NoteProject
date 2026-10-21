@@ -244,7 +244,7 @@ def _ingles() -> list[str]:
     alvos = [p for p in (REPO / "apps").rglob("*")
              if p.suffix in {".py", ".ts", ".sql", ".css", ".html", ".toml"}
              and not {"node_modules", ".venv", "dist"} & set(p.parts)]
-    alvos += [REPO / n for n in ("Makefile", "docker-compose.yml", "README.md")]
+    alvos += [REPO / n for n in ("Makefile", "docker-compose-dev.yml", "README.md")]
     alvos += sorted((REPO / "apps").glob("*/Dockerfile*")) + sorted((REPO / ".github").rglob("*.yml"))
     out = []
     for f in alvos:
