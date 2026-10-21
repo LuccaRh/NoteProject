@@ -12,5 +12,6 @@ Como o projeto anda: em que ordem, onde ficam as tarefas e como cada mudança en
 | [[Tarefas no GitHub]] | issue = branch = PR; milestone = etapa; labels por lado (backend, frontend, infrastructure, ai-workspace) |
 | [[Regras de git]]     | branch, commit, mensagem, PR e merge                                                                      |
 | [[Um repo ou vários]] | monorepo com `apps/` e `infra/`, e não um repo por serviço                                                |
+| [[00 Mapa — Issues feitas\|Issues feitas]] | uma página por milestone: o que cada issue entregou e o que ficou aprendido |
 
 Detalhe das trilhas: [[Trilha de infra]] (infra peça por peça) e [[Ordem de implementação]] (editor e IA).

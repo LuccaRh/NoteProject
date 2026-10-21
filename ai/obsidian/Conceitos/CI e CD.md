@@ -6,7 +6,7 @@ tags: [noteproject, conceito, infra]
 Todo commit pode quebrar algo, e todo deploy feito à mão pode esquecer um passo.
 
 - **CI** (integração contínua): a cada push, um robô roda testes e build. O commit que quebra fica vermelho antes do merge.
-- **CD** (entrega contínua): depois do merge, o robô gera a imagem e põe no ar.
+- **CD** (entrega contínua): depois do merge, o robô gera a imagem e põe no ar. Sem CD configurado, o merge só junta o código na branch principal: nada vai ao ar.
 - **GitHub Actions**: o robô do GitHub; cada workflow é um YAML em `.github/workflows/`.
 - **GHCR**: o registry de imagens do GitHub (`ghcr.io/...`); o servidor baixa a imagem pronta de lá.
 

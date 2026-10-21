@@ -24,7 +24,7 @@ O histórico serve para alguém (inclusive o próprio autor, meses depois) enten
 Formato (o hook `commit-msg` barra o que fugir dele):
 
 - inglês, imperativo, maiúscula, sem ponto final, ≤ 72 caracteres (mirar ~50), sem prefixo (`feat:`, `fix:`);
-- corpo opcional, separado por linha em branco, com o **porquê**;
+- (2026-10-21) **commit do app só com título**; corpo (separado por linha em branco, com o **porquê**) só nos commits `[docs]` e `[ai-workspace]`;
 - descreve o estado final, não o processo: nada de `wip`, `fix`, `update`, "for now", "stop doing X";
 - sem número de issue na mensagem: a ligação com a issue fica no PR.
 

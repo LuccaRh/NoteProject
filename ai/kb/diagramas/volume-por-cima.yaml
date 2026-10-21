@@ -1,0 +1,22 @@
+titulo: Volume por cima da imagem
+tipo: blocos
+grade: [230, 110]
+destino: Conceitos/Figuras
+nos:
+  df:    {tipo: bloco, pos: [0, 2], texto: "Dockerfile<br>COPY package.json<br>RUN npm install", cor: roxo}
+  img:   {tipo: bloco, pos: [1, 2], texto: "imagem<br>/app/package.json<br>/app/node_modules (musl)", cor: roxo}
+  anon:  {tipo: bloco, pos: [3, 0], texto: "3º volume anônimo<br>/app/node_modules<br>(cópia da imagem)", cor: amarelo}
+  bind:  {tipo: bloco, pos: [3, 1], texto: "2º bind mount ./web → /app<br>(pasta do host, ao vivo)", cor: azul}
+  base:  {tipo: bloco, pos: [3, 2], texto: "1º arquivos da imagem<br>(o /app dela fica coberto)", cor: roxo}
+  ct:    {tipo: grupo, contem: [anon, bind, base], texto: "container: folhas empilhadas (a de cima vale)", cor: cinza}
+  host:  {tipo: bloco, pos: [5, 1], texto: "host ./web<br>código + node_modules (gnu)", cor: cinza}
+  cmd:   {tipo: bloco, pos: [3, 4], texto: "CMD<br>npm run dev<br>vê a folha de cima", cor: verde}
+arestas:
+  - [df, img, {rotulo: "build"}]
+  - [img, base, {rotulo: "base"}]
+  - [host.e, bind.d, {rotulo: "montado"}]
+  - [img.c, anon.e, {rotulo: "cópia se vazio", tracejada: true}]
+  - [base.b, cmd.c, {rotulo: "sobe"}]
+legenda:
+  "ordem": "build → volumes (ao criar o container, pai antes do filho) → CMD"
+  "gnu × musl": "libs do host (glibc) ficam cobertas; as da imagem (alpine, musl) valem"
