@@ -1,0 +1,22 @@
+# Recipe for the notes dev image; containers start from it
+# Version of python used in this image
+FROM python:3.14-slim
+
+# Add the uv and uvx executables to the image bin
+COPY --from=ghcr.io/astral-sh/uv:0.13.1 /uv /uvx /bin/
+
+# Go to the app dir in the image system files
+WORKDIR /app
+
+# Add pyproject and uv.lock to the current dir (/app)
+COPY pyproject.toml uv.lock ./
+# Install all the packages in pyproject and create .venv in image
+RUN uv sync --locked --no-install-project
+
+# Add all the code to the image
+COPY . .
+RUN uv sync --locked
+
+EXPOSE 8000
+
+CMD ["uv", "run", "fastapi", "dev", "src/notes/main.py", "--host", "0.0.0.0", "--port", "8000"]

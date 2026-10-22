@@ -23,8 +23,8 @@ Each service runs in its own terminal. The notes API needs [uv](https://docs.ast
 The ports come from each tool: 5173 is set in `apps/web/vite.config.ts`, and 8000 is the
 default of `fastapi dev`. Both listen on localhost only and reload when a file is saved.
 
-To run everything, start both commands, one per terminal. There is no single command for the
-whole stack yet; `docker compose up --build` only starts the web container for now.
+To run everything, start both commands, one per terminal, or run both in containers with
+`docker compose -f docker-compose-dev.yml up --build` (same ports, same reload).
 
 ### Trying an API in the browser
 

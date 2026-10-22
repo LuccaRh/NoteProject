@@ -59,7 +59,7 @@ infra:
   nome: Containers, CI, deploy, proxy/TLS, backup, monitoramento
   notas: ["Conceitos/00 Mapa — Conceitos.md", "Conceitos/Container e Docker Compose.md", "Conceitos/Reverse proxy.md", "Conceitos/CI e CD.md"]
   lado: infra
-  codigo: [docker-compose.yml, Makefile, .github/workflows/, apps/web/Dockerfile.dev]
+  codigo: [docker-compose-dev.yml, Makefile, .github/workflows/, apps/web/Dockerfile.dev]
   aprender: true
 
 ia:

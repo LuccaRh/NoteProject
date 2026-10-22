@@ -9,8 +9,8 @@ Enquanto tudo roda no notebook, infra é só o [[Container e Docker Compose|`doc
 
 | Arquivo | Faz |
 |---|---|
-| `docker-compose.yml` | `web` (Vite :5173); o `api` entra com o servidor (#11) |
-| `apps/web/Dockerfile.dev` | imagens de desenvolvimento, com reload |
+| `docker-compose-dev.yml` | `web` (Vite :5173) e `notes` (FastAPI :8000), com reload; sobe com `-f` |
+| `apps/web/Dockerfile.dev`, `apps/notes/Dockerfile.dev` | imagens de desenvolvimento, com reload |
 | `Makefile` | `make dev` sem [[Container e Docker Compose\|Docker]]; `make check` |
 | `.github/workflows/ci.yml` | tsc + build do web; testes de `ai/tools/`; ruff, mypy e pytest entram com o servidor (#17) |
 

@@ -38,6 +38,14 @@ Escolha: **`src/`**, com o package instalado no `.venv` pelo `uv sync`.
 
 Revisar se o serviço virar um script de um arquivo só, sem testes, ou se o empacotamento do uv atrapalhar a imagem ([[Container e Docker Compose|Docker]], #11).
 
+## Imagem ⏳ #11
+
+O serviço roda num [[Container e Docker Compose|container]] do compose, com imagem feita pelo `apps/notes/Dockerfile` ([[Dockerfile e camadas]]):
+
+- base com Python 3.14 e o uv; libs do `uv.lock` instaladas **antes** de copiar o `src/`, para a edição do código não reinstalar as libs;
+- `.dockerignore` com a `.venv` do host;
+- sobe com `fastapi run`, que escuta em `0.0.0.0`: o pedido do host chega pela rede do Docker, não pelo loopback do container ([[IP, porta e rede de containers]]).
+
 Ainda a decidir: o alvo do `Makefile` que roda ruff, mypy e pytest do serviço (hoje só existem `check-web` e `check-tools`), com `uv run` na pasta `apps/notes`.
 
 ## Exercício
@@ -57,3 +65,6 @@ Pronto quando:
 - `make check` roda e passa os testes do serviço; com o teste quebrado de propósito (esperar 201), ele falha.
 
 Pergunta para responder antes da #11: com `fastapi dev`, um `curl` vindo de outra máquina da rede chega na app? E com `fastapi run`? Por quê?
+
+> [!note]- Resposta
+> Com `fastapi dev` não: ele escuta em `127.0.0.1`, e o pedido de fora chega pelo IP de rede da máquina. Com `fastapi run` sim: `0.0.0.0` aceita por todos os IPs. No container vale o mesmo, porque o pedido do host chega pela rede do Docker (`172.18.0.x`), não pelo loopback do container ([[IP, porta e rede de containers]]).

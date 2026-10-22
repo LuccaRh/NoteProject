@@ -17,6 +17,7 @@ Gerais:
 - (2026-10-09) **Geral antes do detalhe; o simples antes das variações.**
 - (2026-10-13) **Figura vai para a página `.md`**, embutida com legenda curta; nunca só o caminho no chat.
 - (2026-10-14) **Trecho colado + "corrige/faça assim" → devolva o trecho corrigido no chat**, sem editar arquivo. Só mexa em arquivo se ele disser onde.
+- (2026-10-20) **A resposta vem depois das ferramentas**: não explicar nada antes de chamar skill ou ferramenta (o texto pode não aparecer); chamar primeiro e responder inteiro no fim.
 
 Próprias deste projeto:
 

@@ -6,6 +6,7 @@ Formato (o mesmo da nota Programing/Naming, "Commit naming"):
 - sem prefixo (`feat:`, `fix:`, `docs:`...); a única marca aceita é a tag do que não é app:
   `[docs] ` (notas do vault) ou `[ai-workspace] ` (workspace de IA), antes do imperativo;
 - nada de Claude/IA, sem Co-Authored-By nem "Generated with" (com tag, pode);
+- commit do app (sem tag) só com título; corpo só nos commits com tag;
 - nada de "wip", "fix", "update", "changes" sozinhos: diga o que mudou.
 Merge, revert e fixup!/squash! gerados pelo git passam (o fixup some no rebase --autosquash).
 
@@ -46,6 +47,8 @@ def erros(texto: str) -> list[str]:
         e.append(f"menciona {achou} (nada de Claude/IA, sem Co-Authored-By)")
     if GERADO.match(titulo):
         return e
+    if not com_tag and any(l.strip() for l in linhas[1:]):
+        e.append("commit do app sem corpo: só o título (corpo só com [docs]/[ai-workspace])")
     if tag:
         if tag.group(1) not in TAGS:
             e.append(f"tag [{tag.group(1)}] desconhecida: só [docs] ou [ai-workspace]")

@@ -42,7 +42,8 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Como
 
 | Página | Ideia |
 |---|---|
-| [[Container e Docker Compose]] | serviço empacotado; vários descritos num arquivo |
+| [[Container e Docker Compose]] | serviço empacotado; vários descritos num arquivo; volume montado por cima da imagem |
+| [[Dockerfile e camadas]] | receita da imagem; build × container; a ordem das instruções decide o que o cache reaproveita |
 | [[EC2]] | a máquina alugada |
 | [[S3 — armazenamento de objetos]] | arquivos grandes por chave, fora da máquina |
 | [[IAM]] | quem pode fazer o quê na AWS, sem chave fixa |

@@ -14,7 +14,7 @@ Regras: `CLAUDE.md`, "Tarefas, commits e branches"; completas em
    - `git add <arquivos>` (nunca `-A` às cegas; `build/` e segredos fora);
    - `git diff --cached --stat`: todo arquivo é desta mudança?
    - mensagem: "If applied, this commit will <título>"; nomeia o resultado com o identificador do
-     código (`Add duvida chip decoration`), ≤ 72, corpo com o porquê se não é óbvio.
+     código (`Add duvida chip decoration`), ≤ 72; commit do app só com título, corpo com o porquê só nos `[docs]`/`[ai-workspace]`.
 3. Conserto de um commit desta branch ainda não mergeado → `git commit --fixup <sha>` e depois
    `GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash master` (o editor vazio deixa o rebase
    interativo rodar sem tela).
