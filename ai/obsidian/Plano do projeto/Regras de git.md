@@ -10,6 +10,8 @@ O histórico serve para alguém (inclusive o próprio autor, meses depois) enten
 - **Branch = uma funcionalidade = uma issue** ([[Tarefas no GitHub]]). Inglês, kebab-case, sem prefixo (`feat/`), nomeia o propósito: `add-postgres-with-migrations`.
 - Sai da `master` atualizada: `git fetch && git switch master && git pull --ff-only`.
 - Nada de várias branches mudando a mesma coisa de jeitos diferentes. Na dúvida entre dois jeitos: uma branch para cada, mergeia a escolhida e apaga a outra.
+- (2026-10-23) **Branch que mexe num serviço sobe a versão dele**: `apps/<serviço>/` mexido → a minor do `pyproject.toml` (ou `package.json`) sobe um em relação à `master` (`0.1.0` → `0.2.0`), e o lockfile vai junto (`uv lock`, `npm install`). A versão diz em qual issue o serviço está. O lint W11 confere.
+- (2026-10-25) **Versão num commit só dela**: um por serviço, depois dos commits do app da branch, com o manifesto e o lockfile e nada mais: `Update notes version to 0.2.0`. O `revert` de uma mudança não mexe na versão, e o histórico mostra quando cada serviço subiu.
 
 ## Commit
 

@@ -15,6 +15,8 @@ Regras: `CLAUDE.md`, "Tarefas, commits e branches"; completas em
    - `git diff --cached --stat`: todo arquivo é desta mudança?
    - mensagem: "If applied, this commit will <título>"; nomeia o resultado com o identificador do
      código (`Add duvida chip decoration`), ≤ 72; commit do app só com título, corpo com o porquê só nos `[docs]`/`[ai-workspace]`.
+   - (2026-10-25) subida de versão do serviço (`pyproject.toml`/`package.json` + lockfile) =
+     commit próprio, um por serviço, depois dos commits do app: `Update notes version to 0.2.0`.
 3. Conserto de um commit desta branch ainda não mergeado → `git commit --fixup <sha>` e depois
    `GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash master` (o editor vazio deixa o rebase
    interativo rodar sem tela).

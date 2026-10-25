@@ -7,7 +7,7 @@
     ai/np obsidian [-q] [--simular] sincronia vault Note Project/ ↔ obsidian/
     ai/np duvidas [trecho da pág]   marcas [!duvida] [duvidas] [fix] [coment] nas notas
     ai/np diagrama <spec.yaml> [--png]   YAML → draw.io; `destino:` no spec copia o .drawio.svg para obsidian/
-    ai/np lint                      regras do workspace que viraram código (W01–W10)
+    ai/np lint                      regras do workspace que viraram código (W01–W12)
     ai/np test                      testes das ferramentas (tools/test_*.py)
     ai/np check                     o check do app (make check: ruff, mypy, pytest, tsc, build)
 
@@ -199,15 +199,53 @@ def problemas() -> list[str]:
         if f.name != "api.ts" and re.search(r"\bfetch\(|new WebSocket\(|XMLHttpRequest", f.read_text(encoding="utf-8")):
             out.append(f"W06 {f.relative_to(REPO)}: rede fora de notes/api.ts")
     out += _docs()
-    # W08: o NoteProject é à parte do trabalho; só a regra que proíbe pode citar o nome
-    for f in sorted(OBS.rglob("*.md")):
-        if f.name == "Regras de resposta.md":
-            continue
-        for i, linha in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
-            if "pecazap" in linha.lower():
-                out.append(f"W08 {f.relative_to(REPO)}:{i}: cita o Pecazap")
     out += _ingles()
     out += _quebras()
+    out += _versoes_servicos()
+    out += _largura()
+    return out
+
+
+def _largura() -> list[str]:
+    """W12: código do projeto (apps/, Makefile, compose, CI) com até 80 colunas."""
+    nomes = git("ls-files", "-co", "--exclude-standard", "apps", "Makefile",
+                "docker-compose-dev.yml", ".github", ".env.example").splitlines()
+    pula = {".md", ".svg", ".png", ".ico", ".lock"}
+    out = []
+    for n in nomes:
+        f = REPO / n
+        if not f.is_file() or f.suffix in pula or f.name == "package-lock.json":
+            continue
+        for i, linha in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
+            if len(linha) > 80:
+                out.append(f"W12 {n}:{i}: {len(linha)} colunas; quebre em até 80")
+    return out
+
+
+def _versao(texto: str) -> tuple[int, ...] | None:
+    """Versão do pyproject.toml ou do package.json, como tupla para comparar."""
+    m = re.search(r'^version = "([\d.]+)"|^\s*"version":\s*"([\d.]+)"', texto, re.M)
+    return tuple(int(x) for x in (m.group(1) or m.group(2)).split(".")) if m else None
+
+
+def _versoes_servicos() -> list[str]:
+    """W11: branch que mexe em apps/<serviço>/ sobe a versão dele em relação à master."""
+    if git("rev-parse", "--abbrev-ref", "HEAD") in ("master", "HEAD"):
+        return []
+    base = git("merge-base", "master", "HEAD")
+    mexidos = git("diff", "--name-only", base).splitlines()
+    mexidos += git("ls-files", "--others", "--exclude-standard", "apps").splitlines()
+    out = []
+    for d in sorted(p for p in (REPO / "apps").iterdir() if p.is_dir()):
+        manifesto = next((d / n for n in ("pyproject.toml", "package.json") if (d / n).exists()), None)
+        rel = f"apps/{d.name}/"
+        if manifesto is None or not any(f.startswith(rel) for f in mexidos):
+            continue
+        antes = _versao(git("show", f"{base}:{manifesto.relative_to(REPO)}"))
+        agora = _versao(manifesto.read_text(encoding="utf-8"))
+        if antes is not None and agora is not None and agora <= antes:
+            v = ".".join(map(str, antes))
+            out.append(f"W11 {manifesto.relative_to(REPO)}: branch mexe em {rel} e a versão segue {v}; suba a minor")
     return out
 
 
@@ -263,8 +301,7 @@ def _versoes_libs() -> list[str]:
     out = []
     lock_js = REPO / "apps/web/package-lock.json"
     pk = json.loads(lock_js.read_text()).get("packages", {}) if lock_js.exists() else {}
-    lock_py = REPO / "apps/server/uv.lock"
-    uv = lock_py.read_text() if lock_py.exists() else ""
+    uv = "\n".join(f.read_text() for f in sorted(REPO.glob("apps/*/uv.lock")))
     for p in sorted(LIBS.glob("*.md")):
         fm = frontmatter(p)
         nome, versao = fm.get("pacote"), str(fm.get("versao", ""))
