@@ -26,6 +26,38 @@ default of `fastapi dev`. Both listen on localhost only and reload when a file i
 To run everything, start both commands, one per terminal, or run both in containers with
 `docker compose -f docker-compose-dev.yml up --build` (same ports, same reload).
 
+### Environment variables
+
+Passwords and connection settings live in a `.env` file at the repo root. Git ignores it, so
+each clone creates its own:
+
+```sh
+cp .env.example .env    # then replace every value
+```
+
+`.env.example` lists the variables the project uses, each with a comment and a placeholder
+value. Docker Compose loads `.env` into the `postgres` and `notes` containers (`env_file` in
+`docker-compose-dev.yml`):
+
+| Variable | Read by | Meaning |
+|---|---|---|
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | `postgres` image | user, password and database created on the first start |
+| `DATABASE_URL` | notes API and Alembic | `postgresql+psycopg://<user>:<password>@postgres:5432/<db>`, with the three values above |
+
+The host in `DATABASE_URL` is `postgres`, the service name in the compose file, which only
+resolves inside the containers. The `postgres` image reads its three variables only when the `db` volume is
+empty; after changing them, recreate the volume with
+`docker compose -f docker-compose-dev.yml down -v` (this deletes the data).
+
+### Database migrations
+
+Alembic creates and changes the tables (`apps/notes/migrations/versions/`). On a fresh
+database, and after pulling a new migration, apply them inside the `notes` container:
+
+```sh
+docker compose -f docker-compose-dev.yml exec notes uv run alembic upgrade head
+```
+
 ### Trying an API in the browser
 
 Every FastAPI service serves its own interactive docs at `/docs` (Swagger UI), built from the
