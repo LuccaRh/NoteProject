@@ -11,7 +11,7 @@ No NoteProject, **organizar é escolher onde criar a nota**. A pasta preenche ca
 
 | Peça | O que é | No schema |
 |---|---|---|
-| pasta | uma nota com `is_folder = 1`; a árvore vem de `parent_id` | `parent_id`, `is_folder` ⏳ (#6, #12) |
+| pasta | uma nota com `is_folder = 1`; a árvore vem de `parent_id` ([[Árvore no banco\|lista de adjacência]]) | `parent_id`, `is_folder` ⏳ (#6, #12) |
 | campos | parâmetros da nota em JSON: `aula`, `conteudo[]`, `tipo` | `fields` JSONB ⏳ (#7, #12) |
 | view | lista de notas filtrada por campo ("todas de estabilidade") | ⏳ |
 

@@ -10,11 +10,12 @@ nos:
   wf_pc:  {tipo: bloco, pos: [1, 1], texto: "notebook<br>192.168.0.223", cor: roxo}
   wf_rot: {tipo: bloco, pos: [1, 2], texto: "roteador<br>192.168.0.1", cor: verde}
   wifi:   {tipo: grupo, contem: [cel, wf_pc, wf_rot], texto: "wi-fi · 192.168.0.x", cor: cinza}
-  lo_pc:  {tipo: bloco, pos: [2, 1], texto: "notebook<br>127.0.0.1", cor: roxo}
-  lo:     {tipo: grupo, contem: [lo_pc], texto: "loopback · 127.x", cor: cinza}
+  nav:    {tipo: bloco, pos: [2, 0], texto: "navegador<br>(no notebook)<br>pede 127.0.0.1:8000", cor: azul}
+  lo_pc:  {tipo: bloco, pos: [2, 1], texto: "notebook<br>127.0.0.1<br>docker-proxy em :8000", cor: roxo}
+  lo:     {tipo: grupo, contem: [nav, lo_pc], texto: "loopback · 127.x", cor: cinza}
   dk_pc:  {tipo: bloco, pos: [3, 1], texto: "notebook<br>172.18.0.1", cor: roxo}
-  notes:  {tipo: bloco, pos: [4, 1], texto: "container notes<br>172.18.0.3 (ex.)<br>+ loopback próprio", cor: laranja}
-  web:    {tipo: bloco, pos: [4, 2], texto: "container web<br>172.18.0.2 (ex.)<br>+ loopback próprio", cor: azul}
+  notes:  {tipo: bloco, pos: [4, 1], texto: "container notes<br>172.18.0.4 (ex.)<br>+ loopback próprio", cor: laranja}
+  web:    {tipo: bloco, pos: [4, 2], texto: "container web<br>172.18.0.3 (ex.)<br>+ loopback próprio", cor: azul}
   dk:     {tipo: grupo, contem: [dk_pc, notes, web], texto: "rede do Docker · 172.18.0.x", cor: cinza}
   tr:     {tipo: bloco, pos: [1, 4], texto: "outras redes<br>(trânsito)", cor: cinza}
   yt:     {tipo: bloco, pos: [2, 4], texto: "YouTube<br>(rede do Google)", cor: cinza}
@@ -22,12 +23,14 @@ arestas:
   - [wf_pc, lo_pc, {tracejada: true, seta: false}]
   - [lo_pc, dk_pc, {tracejada: true, seta: false}]
   - [wf_rot, op_rot, {tracejada: true, seta: false}]
-  - [dk_pc, notes, {rotulo: "ports"}]
+  - [nav, lo_pc, {rotulo: "1"}]
+  - [dk_pc, notes, {rotulo: "2 · ports"}]
   - [op_rot, op_r]
   - [op_r.b, tr.e]
   - [tr, yt]
 legenda:
   "tracejado": "a mesma máquina; ela aparece uma vez em cada rede em que está (mesma cor), com o IP daquela rede"
-  "ports": "o docker-proxy escuta em 127.0.0.1:8000 do notebook e abre a conexão até 172.18.0.3:8000"
-  "ex.": "IP de exemplo; o real aparece com docker network inspect noteproject_default"
+  "1": "o navegador conecta na porta 8000 do próprio notebook; quem escuta nela é o docker-proxy"
+  "2 · ports": "o docker-proxy abre outra conexão, de 172.18.0.1 até 172.18.0.4:8000, e copia os bytes nos dois sentidos"
+  "ex.": "IP de 2026-10-22 (pgrep -a docker-proxy); muda a cada container criado; o real aparece com docker network inspect noteproject_default"
   "IPs do notebook": "ip -4 -br addr em 2026-10-20 (lo, wlan0, br-…)"

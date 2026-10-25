@@ -3,7 +3,7 @@ tags: [noteproject, conceito, editor]
 ---
 # CodeMirror e decorações
 
-Um editor de Markdown guarda texto puro, mas a tela precisa mostrar heading grande, chip, figura.
+Um editor de [[Markdown]] guarda texto puro, mas a tela precisa mostrar heading grande, chip, figura.
 
 - **CodeMirror 6**: editor de texto para a web, montado a partir de extensões. O documento é sempre texto.
 - **Decoração**: muda como um trecho aparece, sem mudar o texto. Quatro tipos (`@codemirror/view` 6.43.6, `index.d.ts:331-346`):

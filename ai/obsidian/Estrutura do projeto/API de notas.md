@@ -15,6 +15,18 @@ O serviço `notes` do [[Back — daemon e servidor|servidor]]: a API que o [[Nav
 
 - Rotas síncronas (`def`) até o banco entrar: sem `await`, a thread do pool é o caminho seguro ([[FastAPI]], "`async def` ou `def`").
 - O [[Postgres e migrations|Postgres]] entra na #12, com o pool aberto no `lifespan`.
+
+## Banco ⏳ #12, #46
+
+| Peça | Onde | Etapa |
+|---|---|---|
+| `DATABASE_URL` no `.env`, com o host `postgres` (nome do serviço) | raiz, injetada pelo [[Container e Docker Compose\|compose]] | ⏳ #12 |
+| [[Migrations com Alembic\|migrations]]: `alembic.ini`, `migrations/env.py` (lê a `DATABASE_URL`), `migrations/versions/` | `apps/notes` | ⏳ #12 |
+| primeira migration: `users` e `notes` | `migrations/versions/` | ⏳ #12 |
+| [[SQLAlchemy — engine e conexão\|engine]] criado com a mesma URL; `/health` faz um `SELECT 1` | `apps/notes/src/notes/` | ⏳ #12 |
+| conexão por pedido (`Depends`) e as consultas das rotas | `apps/notes/src/notes/` | ⏳ #46 |
+
+- O Alembic roda dentro do container `notes` ([[Comandos do Docker no dev|`dc exec notes uv run alembic upgrade head`]]): fora da rede do compose, o host `postgres` não resolve ([[IP, porta e rede de containers]]).
 - O proxy do Vite (`make dev`) manda `/api` para `localhost:8000`; no ar, quem repassa é o [[Reverse proxy|Caddy]].
 
 ## Estrutura dentro de `apps/notes`: `src/`

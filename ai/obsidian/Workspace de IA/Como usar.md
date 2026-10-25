@@ -15,7 +15,7 @@ O repo `~/Documents/NoteProject` tem um workspace de IA: um
 |---|---|---|
 | Contexto curto e fixo | `ai/kb/areas.yaml` + `ai/np contexto <área>` | lê 3–6 arquivos, não o repo |
 | Fonte → card → resposta | `ai/kb/libs/<lib>.md` destilado do `.d.ts` instalado, com versão | API certa sem reler a lib; o lint avisa quando a versão muda |
-| Regra vira lint | `ai/np lint` (W01–W10), `commit_msg.py`, ruff/mypy/tsc | regra que não gasta token em toda chamada |
+| Regra vira lint | `ai/np lint` (W01–W12), `commit_msg.py`, ruff/mypy/tsc | regra que não gasta token em toda chamada |
 | Ler trecho | hook `leitura` barra Read > 400 linhas; agente `leitor` | arquivo grande não entra na sessão |
 | Foco | `ai/kb/escopos/<branch>.md` + hook `foco.py` (Haiku) | branch = uma funcionalidade |
 | Aprender fazendo | áreas `aprender: true` | o código de sync, auth e infra é escrito pelo Lucca |
@@ -45,6 +45,7 @@ Ferramentas em `ai/tools/`: `np.py`, `obsidian_sync.py`, `hooks_contexto.py` (ho
 | `/foco` | escopo da branch / conferir desvio |
 | `/commit` | commits no formato do repo |
 | `/escrita` | README e PR sem cara de IA |
+| `/lacunas` | o que a conversa explicou e ainda falta no vault, numerado para escolher |
 
 Agente `leitor`: lê fonte de lib ou log grande e devolve só o trecho.
 

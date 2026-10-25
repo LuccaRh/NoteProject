@@ -18,6 +18,35 @@ Um serviço só roda numa máquina que tenha a versão certa da linguagem, das l
 
 - Em desenvolvimento, o código costuma ser montado no container para recarregar a cada mudança; em produção, a imagem já vem pronta de um registry ([[CI e CD]]).
 
+## Onde cada coisa fica
+
+- O Docker é um [[Daemon|daemon]] só por máquina e guarda tudo numa pasta só, `/var/lib/docker/`: imagens, containers e volumes de todos os projetos. O que está ali sobrevive ao reboot; volume só sai com `docker volume rm` ou `docker compose down -v`. *(geral)*
+- O compose põe o nome do projeto (por padrão, o da pasta) na frente do que cria: o volume `db` vira `noteproject_db`, e outro projeto com um `db` ganha um volume próprio. `docker volume inspect <nome>` mostra onde ele fica no disco (`Mountpoint`). *(geral)*
+
+![[docker-por-dentro.drawio.svg]]
+*Arquivos do projeto ficam no PC; imagens, containers e volumes ficam no Docker, num lugar só por máquina.*
+
+## Rodar um comando no container: `exec`
+
+`docker compose exec <serviço> <programa>` roda um programa dentro de um container que já está de pé e liga o terminal a ele; o container não é recriado. *(geral)*
+
+| Exemplo | Faz |
+|---|---|
+| `docker compose exec postgres bash` | abre um shell no container; `exit` volta |
+| `docker compose exec postgres psql -U <usuário> -d <banco>` | abre direto o [[Postgres e migrations\|psql]] |
+| `docker compose exec notes uv run alembic upgrade head` | roda as [[Migrations com Alembic\|migrations]] onde o nome do banco resolve |
+
+- O serviço é o nome no arquivo do compose; com `-f`, o mesmo `-f` do `up`.
+- Container parado: o `exec` falha. O `docker compose run <serviço> <programa>` cria um container novo só para o comando.
+- O programa roda com as variáveis do container (as do `.env`) e na rede do compose, onde os outros serviços são achados pelo nome.
+
+## Variáveis do `.env`
+
+- `env_file: .env` num serviço: quem lê o arquivo é o `docker compose`, no host. Ao criar o container, cada linha `NOME=valor` vira uma variável de ambiente dele, o mesmo que `docker run -e NOME=valor`. O arquivo não entra no container. *(geral)*
+- O mesmo `.env` em dois serviços entrega o mesmo valor aos dois: a senha que cria o usuário no [[Postgres e migrations|Postgres]] é a que a API usa para conectar.
+- O container guarda os valores de quando foi criado; mudar o `.env` só vale ao recriá-lo (`up` de novo). *(geral)*
+- O `.env` fica fora do git (`.gitignore`), porque tem segredo.
+
 ## Volume por cima da imagem
 
 O sistema de arquivos do container começa como o da imagem. Um volume é uma pasta de fora da imagem, montada **num caminho que já existe**: montar = "neste caminho, mostre outra pasta". Um caminho só mostra uma coisa por vez; o que a imagem tinha ali fica escondido, não apagado, e volta se o volume sai.
@@ -31,7 +60,7 @@ Ordem: o [[Dockerfile e camadas|Dockerfile]] roda no **build** (gera a imagem); 
 |---|---|---|---|
 | `./web:/app` (`origem:destino`) | bind mount | a pasta do host, ao vivo (nada é copiado; editar no host aparece na hora) | não |
 | `/app/node_modules` (só destino) | volume anônimo | área guardada pelo Docker | sim, **só quando vazio** |
-| `dados:/var/lib/postgresql/data` | volume nomeado | idem, com nome | idem; sobrevive a apagar o container (o banco) |
+| `dados:/var/lib/postgresql` | volume nomeado | idem, com nome | idem; sobrevive a apagar o container (o banco) |
 
 - Caminho mais fundo fica por cima: o Docker monta o pai (`/app`) antes do filho (`/app/node_modules`), seja qual for a ordem das linhas no YAML. *(geral)*
 - O Docker não procura a pasta pelo nome: olha o caminho de destino na imagem.

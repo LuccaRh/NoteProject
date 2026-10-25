@@ -1,0 +1,33 @@
+titulo: Uma conversa TCP, pacote por pacote
+tipo: blocos
+grade: [260, 95]
+destino: Conceitos/Figuras
+nos:
+  c0:  {tipo: bloco, pos: [0, 0], texto: "notebook<br>192.168.15.156:51234", cor: azul}
+  g0:  {tipo: bloco, pos: [3, 0], texto: "Google<br>142.250.79.36:443 (ex.)", cor: laranja}
+  c1:  {tipo: nota, pos: [0, 1], texto: "notebook"}
+  g1:  {tipo: nota, pos: [3, 1], texto: "Google"}
+  c2:  {tipo: nota, pos: [0, 2], texto: "notebook"}
+  g2:  {tipo: nota, pos: [3, 2], texto: "Google"}
+  c3:  {tipo: nota, pos: [0, 3], texto: "notebook"}
+  g3:  {tipo: nota, pos: [3, 3], texto: "Google"}
+  c4:  {tipo: nota, pos: [0, 4], texto: "notebook"}
+  g4:  {tipo: nota, pos: [3, 4], texto: "Google"}
+  c5:  {tipo: nota, pos: [0, 5], texto: "notebook"}
+  g5:  {tipo: nota, pos: [3, 5], texto: "Google"}
+  c6:  {tipo: nota, pos: [0, 6], texto: "notebook"}
+  g6:  {tipo: nota, pos: [3, 6], texto: "Google"}
+arestas:
+  - [c1, g1, {rotulo: "1 · :51234 → :443 · SYN · seq 100 · sem dados"}]
+  - [g2, c2, {rotulo: "2 · :443 → :51234 · SYN+ACK · seq 500 · ack 101"}]
+  - [c3, g3, {rotulo: "3 · :51234 → :443 · ACK · seq 101 · ack 501 · linha aberta"}]
+  - [c4, g4, {rotulo: "4 · :51234 → :443 · seq 101 · ack 501 · dados: 1400 bytes (o pedido)"}]
+  - [g5, c5, {rotulo: "5 · :443 → :51234 · seq 501 · ack 1501 · dados: 1400 bytes (a resposta)"}]
+  - [c6, g6, {rotulo: "6 · :51234 → :443 · FIN · seq 1501 · ack 1901"}]
+legenda:
+  "seq": "número do primeiro byte que este pacote carrega (o SYN e o FIN contam como 1 byte)"
+  "ack": "o próximo byte que espero do outro lado = recebi tudo antes dele"
+  "IPs": "todo pacote leva também os IPs de origem e destino (os da linha de cima); aqui só as portas, para caber"
+  "perda": "se o ack 1501 não volta a tempo, o notebook reenvia o pacote 4"
+  "números": "ilustrativos; o começo (100, 500) é sorteado a cada conexão; o lado do Google também manda o seu FIN"
+  "fonte": "(geral), RFC 9293 seção 3.4"

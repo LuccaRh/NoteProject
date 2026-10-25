@@ -23,6 +23,4 @@ Próprias deste projeto:
 
 - (2026-10-15) **Aprender fazendo** (versão de código do "papel primeiro"): nas áreas marcadas `aprender` (dados, sync, servidor, auth, infra), diga o conceito e **o que** escrever; o código ou o comando é dele. A sessão revisa, roda e aponta onde escorregou.
 - (2026-10-15) **Diga de onde veio**: API de lib, comportamento do código ou fato externo vêm com o arquivo:linha, a versão ou o link. Sem fonte, diga que é de memória.
-- (2026-10-15) **Projeto à parte do trabalho**: nenhuma página de `Note Project/` cita o Pecazap nem linka as notas dele (`Programing/Pecazap/`). O Pecazap pode servir de inspiração ou para tirar dúvida de qual é o jeito atual de fazer algo, mas o que entra na nota é a ideia geral, com fonte própria (doc oficial, código).
 - (2026-10-16) **Onde está no vault**: dúvida de conceito ou do projeto fecha com a linha `No vault: <página>:<linha>` ou `No vault: não tem (busquei: <termos>)`, para o Lucca ver se faltou sinônimo. Achar com **um** `grep -rn -i` em `ai/obsidian/` (saída cortada, sem abrir a página inteira); sem agente.
-- (2026-10-16) **"App desktop" = executável instalado** que roda tudo sozinho (como o Obsidian). Nunca chamar de desktop o front aberto em `localhost` no navegador.

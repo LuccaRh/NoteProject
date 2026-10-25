@@ -33,7 +33,7 @@ A [[UI otimista]] cobre a escrita; a leitura pede ao servidor só o necessário,
 | servidor | expõe as rotas `/notes` e `/search` que o front vai chamar, #46 | ⏳ |
 | `apps/web/src/notes/api.ts` | cliente da API: chama `/api` na própria origem, o proxy do Vite repassa | ⏳ |
 | front | [[UI otimista]]: estado pendente na tela, desfaz ou tenta de novo se o servidor recusar | ⏳ |
-| login | [[Autenticação\|cookie de sessão]] (httpOnly, mesma origem), #48 | ⏳ |
+| login | cookie de sessão (httpOnly, mesma origem), #48 | ⏳ |
 | busca | a busca full-text do [[Postgres e migrations\|Postgres]] ([doc](https://www.postgresql.org/docs/current/textsearch.html)) | ⏳ |
 | IA | worker da [[Fila de pedidos\|fila]] no servidor; o navegador só pede e mostra a proposta ([[Workspace no app]]) | ⏳ |
 
