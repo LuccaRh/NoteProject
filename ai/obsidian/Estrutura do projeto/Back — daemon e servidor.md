@@ -48,7 +48,7 @@ Primeiro: **persistir, servir o [[Navegador|navegador]] e autenticar** (M0–M2)
 
 ### Auth
 
-- Cada nota tem `owner_id`. No [[Navegador|navegador]], o login é por [[Autenticação|cookie de sessão]] (#48).
+- Cada nota tem `owner_id`. No [[Navegador|navegador]], o login é por cookie de sessão (#48).
 - No app desktop, depois, o [[O daemon notesd|daemon]] guarda um [[Token por dispositivo|token por dispositivo]] (#14 e #15, milestone Desktop app).
 
 > [!warning] Em aberto: onde mora o documento Yjs

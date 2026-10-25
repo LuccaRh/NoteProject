@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-app = FastAPI()
+from notes.routers import health
 
-@app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
+app = FastAPI()
+app.include_router(health.router)
+

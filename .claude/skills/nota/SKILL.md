@@ -7,9 +7,8 @@ argument-hint: "<tema ou pasta>"
 
 1. **Leia antes**: `regras.md` (nesta pasta = `Workspace de IA/Regras de página`), `ls -R ai/obsidian/`
    (não repetir página), a página vizinha mais parecida (copiar o estilo) e, para cada área
-   envolvida, `ai/np contexto <área>`. Conceitos que o texto cita: `grep -rl` nos títulos do vault
-   inteiro (`~/Documents/Obsidian Vault`) para linkar o que já existe (`Programing/Autenticação`);
-   nunca as notas do trabalho (`Programing/Pecazap/`): o projeto é à parte (lint W08).
+   envolvida, `ai/np contexto <área>`. Conceitos que o texto cita: `grep -rl` nos títulos de
+   `ai/obsidian/` para linkar o que já existe; nada de linkar página de fora do projeto.
 2. **Fonte**: estado atual sai do código; plano e porquê, das notas do vault (única fonte
    do projeto). Fato externo que muda decisão (preço, licença, lib descontinuada) → conferir na web
    e citar com data. Sem fonte → *(geral)* no trecho.

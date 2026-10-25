@@ -119,6 +119,23 @@ As duas respondem à mesma pergunta: como o `import` acha o código **do própri
 
 No modo padrão do uv (instalação editável), instalar o próprio package não copia o código: o `uv sync` deixa em `site-packages` um arquivo `api.pth` com uma linha, o caminho de `src/`, e o Python põe essa pasta na lista ao iniciar. Editar `src/` vale no próximo import, sem reinstalar. Cópia de verdade só acontece na instalação não editável, a de uma [[Container e Docker Compose|imagem Docker]]; só nela um teste pega o arquivo que o pacote deixou de fora.
 
+Por que `src/`: a pasta do script que rodou entra no começo da lista, então, na estrutura plana, `import api` acha o código da pasta atual mesmo sem nada instalado, por acaso. Com `src/`, o import só funciona pelo package instalado, e os testes rodam contra o mesmo package que vai para a imagem.
+
+### Como o uv acha a pasta do package
+
+O `uv_build` monta o caminho com duas chaves de `[tool.uv.build-backend]`; sem a seção, valem os padrões:
+
+| Chave | Padrão | Exemplo com `name = "meu-app"` |
+|---|---|---|
+| `module-root` | `src` | `src/` |
+| `module-name` | o `name` do `[project]`, com `-` trocado por `_` | `meu_app` |
+| caminho esperado | `<module-root>/<module-name>/__init__.py` | `src/meu_app/__init__.py` |
+
+- O `src/` não vira package: é só onde procurar, e é ele que o `.pth` põe na lista.
+- Pasta com outro nome: o build falha com `Expected a Python module at: src/meu_app/__init__.py` (uv 0.13.1). Saída: renomear a pasta ou declarar `module-name = "outro"`.
+
+Docs: [uv — build backend](https://docs.astral.sh/uv/concepts/build-backend/).
+
 ## Exemplo completo (`src/`)
 
 ```

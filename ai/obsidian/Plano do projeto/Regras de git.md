@@ -3,7 +3,7 @@ tags: [noteproject, plano, workspace]
 ---
 # Regras de git
 
-O histórico serve para alguém (inclusive o próprio autor, meses depois) entender o que mudou e por quê, e para dar `revert` ou `rebase` sem medo. Estas regras partem do [[Naming#Commit naming|Commit naming]] e acrescentam o que é do NoteProject (issues, `make check`).
+O histórico serve para alguém (inclusive o próprio autor, meses depois) entender o que mudou e por quê, e para dar `revert` ou `rebase` sem medo. Estas regras partem das convenções comuns de mensagem de commit e acrescentam o que é do NoteProject (issues, `make check`).
 
 ## Branch
 
@@ -46,7 +46,7 @@ Tags (2026-10-19), no começo do título dos commits fora do app:
 - **Código em inglês**: tudo em `apps/`, `Makefile`, compose, CI e README (comentário, docstring, mensagem de erro, texto da interface, dado de teste), além de commit, branch, issue e PR. Português só no workspace (`ai/`, `.claude/`, `CLAUDE.md`) e no vault. O lint W09 confere.
 - **Data real**: a data do commit é a hora em que ele foi feito. Nada de `--date` nem de `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE`; reescrever história (rebase) também usa a hora do momento (`--reset-author-date`).
 
-Checklist do [[Naming#Commit naming|Commit naming]]:
+Checklist da mensagem de commit:
 
 | Pergunta | ✗ | ✓ |
 |---|---|---|

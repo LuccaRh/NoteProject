@@ -10,7 +10,6 @@ Valem para toda página que o workspace escreve ou corrige no Obsidian (`/nota`,
 
 ## Conteúdo
 - **Fonte**: estado atual sai do código; plano e porquê, destas notas; fato externo que muda decisão (preço, licença, lib descontinuada) vem com data e link. Sem fonte → *(geral)*.
-- (2026-10-15) **O vault é a única fonte do projeto.** Nada de citar o PDF de arquitetura (era só o esboço inicial), o workspace das matérias nem outro projeto. Fora daqui, só fonte de pesquisa oficial (doc, site do fornecedor), com link.
 - **Uma ideia por página**, título que nomeia o tópico, para várias páginas citarem a mesma.
 - **Escadinha**: a página começa por de onde vem (que problema resolve) e para que serve.
 - **Página grande vira pasta** com `00 Mapa — <pasta>` (tabela Página | Ideia) e uma página por parte.
@@ -25,16 +24,16 @@ Valem para toda página que o workspace escreve ou corrige no Obsidian (`/nota`,
 - Cores fixas entre desenhos: azul front, verde back, laranja servidor, amarelo dados, roxo infra, vermelho segurança, cinza grupo.
 
 ## Links
-- **Grafo, não árvore**: linke a página de qualquer conceito que aparece no texto, de qualquer pasta do vault (`Programing/`, `Docker/`, `Git/`), menos as notas do trabalho: o projeto é à parte (2026-10-15, [[Regras de resposta]]). Antes de escrever, `grep` nos títulos.
+- **Grafo, não árvore**: linke a página de qualquer conceito que aparece no texto. Antes de escrever, `grep` nos títulos.
 - (2026-10-15) **Todo conceito com página é linkado onde aparece**, no texto e nas tabelas, não só na primeira vez. Título, código e título de callout ficam sem link.
 - (2026-10-19) **Parágrafo numa linha só**, sem quebrar a linha no meio da frase: o Obsidian mostra cada quebra (lint W10).
 - **Link passivo**: o texto usa uma palavra que é nome de página → `[[Página|palavra]]`. Nada de frase criada para linkar (`(ver [[X]])`, `Vem de [[X]]:`).
 - Sem cabeçalho de "onde é usado"; página nova é citada por pelo menos uma além do mapa.
 
 ## Dúvidas e marcas do usuário
-- `> [!duvida]`, `[duvidas]` (dúvida), `[fix]` (correção), `[coment]` (opinião/decisão dele).
+- `> [!duvida]`, `[duvidas]` (dúvida), `[fix]` (correção), `[comment]` (opinião/decisão dele).
 - Dúvida não vira callout: o texto é reescrito até responder; a pergunta vai para `## Dúvidas` no fim (lista numerada, redação dele, sem resposta; número novo no fim).
-- `[fix]` → aplica e apaga. `[coment]` → o texto passa a refletir a decisão dele; se há motivo técnico contra, responde no chat e a marca fica até ele decidir.
+- `[fix]` → aplica e apaga. `[comment]` → o texto passa a refletir a decisão dele; se há motivo técnico contra, responde no chat e a marca fica até ele decidir.
 
 ## Texto
 - Página não fala do usuário (nada de "você", nome, "seu ok"): texto impessoal.

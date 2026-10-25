@@ -9,7 +9,7 @@ A ordem segue o [[Objetivo do app]]: aprender vem primeiro, e a v1 (ler notas no
 2. **App desktop**: app instalado com o [[O daemon notesd|`notesd`]], que funciona offline.
 3. **Celular**: app do celular.
 
-Ideias sem lugar na fila: Neovim/CLI ([[Features]]) e ink. As tarefas ficam como issues no GitHub ([[Tarefas no GitHub]]), agrupadas em milestones.
+Para 2026-10-29, a [[Entrega de 2026-10-29|entrega]] puxa notas e IA em localhost para antes do M2. Ideias sem lugar na fila: Neovim/CLI ([[Features]]) e ink. As tarefas ficam como issues no GitHub ([[Tarefas no GitHub]]), agrupadas em milestones.
 
 ![[plano-roadmap.drawio.svg]]
 *Trilha principal escrita à mão (M0→M4); trilha do editor delegada, em paralelo; depois desktop e celular.*
@@ -30,7 +30,7 @@ Ideias sem lugar na fila: Neovim/CLI ([[Features]]) e ink. As tarefas ficam como
 |---|---|---|
 | **M0 Server skeleton** | #10–#13 | `apps/notes` em [[Container e Docker Compose\|compose]] com [[Postgres e migrations\|Postgres]] e migrations, `/health` respondendo |
 | **M1 Notes in the browser** | #46, #47, #6–#9 | o editor abre pela URL do servidor e cria, edita e busca notas no [[Postgres e migrations\|Postgres]]; [[Pastas, campos e views\|pastas, campos e views]] |
-| **M2 Login and TLS** | #48, #16, #17 | login por [[Autenticação\|cookie de sessão]], [[Reverse proxy\|Caddy]] com [[TLS e HTTPS\|TLS]] local, [[CI e CD\|CI]] do servidor verde |
+| **M2 Login and TLS** | #48, #16, #17 | login por cookie de sessão, [[Reverse proxy\|Caddy]] com [[TLS e HTTPS\|TLS]] local, [[CI e CD\|CI]] do servidor verde |
 | **M3 Online on AWS** | #18–#25 | domínio com [[TLS e HTTPS\|HTTPS]], deploy por merge, [[Backup e restore\|backup]] restaurado uma vez |
 | **M4 Live edits** | #26, #27, #30 | edição numa aba aparece na outra, pelo [[WebSocket]] |
 | **Desktop app** | #14, #15, #28, #29 | sem data: app instalado com o [[O daemon notesd\|`notesd`]], [[Token por dispositivo\|token por dispositivo]] e [[Sync por versão\|sync depois de offline]] |
@@ -48,7 +48,7 @@ Ideias sem lugar na fila: Neovim/CLI ([[Features]]) e ink. As tarefas ficam como
 4. #9 sidebar com pastas e views: delegada.
 
 ### M2 — login e TLS
-#48 [[Autenticação|cookie de sessão]] → #16 [[Reverse proxy|Caddy]] com [[TLS e HTTPS|TLS]] local → #17 [[CI e CD|CI]] do servidor com Postgres.
+#48 cookie de sessão → #16 [[Reverse proxy|Caddy]] com [[TLS e HTTPS|TLS]] local → #17 [[CI e CD|CI]] do servidor com Postgres.
 
 ### M3 — no ar na AWS
 #18 conta + Budget → #19 Terraform → #20 host com SSM → #21 domínio → #22 HTTPS → #23 deploy por [[OIDC]] → #24 [[Backup e restore|backup]] em [[S3 — armazenamento de objetos|S3]] → #25 alarme. Detalhe de cada peça em [[Trilha de infra]].

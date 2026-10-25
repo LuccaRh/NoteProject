@@ -1,7 +1,7 @@
 # NoteProject — workspace de IA
 
 App de notas **local-first** com sync ao vivo. Fonte única do projeto: o vault (`ai/obsidian/`).
-Projeto pessoal do Lucca (Eng. de Controle e Automação, UNICAMP; dev Python/TS no Pecazap)
+Projeto pessoal do Lucca (Eng. de Controle e Automação, UNICAMP; dev Python/TS)
 para **usar** e **aprender** engenharia de sistemas: sync, servidor, auth e infra.
 Modelo: o workspace `~/Documents/Disciplinas` (mesmas ideias, adaptadas a repo de código).
 
@@ -69,7 +69,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 - **Mensagem**: inglês, imperativo, maiúscula, sem ponto, ≤ 72, sem prefixo (`feat:`); nomeia o
   resultado, não o processo (nada de `wip`); **commit do app só com título**, corpo com o porquê só
   nos commits com tag (2026-10-21); sem número de issue (vai no PR,
-  `Closes #N`). Checklist na nota `Programing/Naming` do vault. O hook `commit-msg` (`ai/tools/commit_msg.py`) barra o resto.
+  `Closes #N`). Checklist no vault, `Plano do projeto/Regras de git`. O hook `commit-msg` (`ai/tools/commit_msg.py`) barra o resto.
 - **Tags** (2026-10-19): commit fora do app começa com a tag; o resto do título segue as regras.
   - `[docs] `: notas do vault (`ai/obsidian/`) e fontes das figuras (`ai/kb/diagramas/`).
     **Um por branch** (as notas mexidas nela); na `master`, fora de branch, **um por push**
@@ -120,6 +120,7 @@ Hooks do Claude Code em `.claude/settings.json`; do git em `ai/tools/githooks/` 
 | `/foco [branch]` | cria o escopo da branch ou confere se a conversa saiu dele |
 | `/commit` | commits atômicos no formato acima (sem push) |
 | `/escrita <arq>` | tira a cara de IA de README, PR e texto público |
+| `/lacunas` | conceitos da conversa que faltam no vault, numerados para escolher |
 
 Agente `leitor` (Sonnet): lê arquivo grande e devolve só o trecho, com linha/página.
 

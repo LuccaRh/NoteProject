@@ -6,7 +6,7 @@ effort: low
 # /commit
 
 Regras: `CLAUDE.md`, "Tarefas, commits e branches"; completas em
-`ai/obsidian/Plano do projeto/Regras de git.md`, checklist na nota `Programing/Naming`. O hook `commit-msg` barra mensagem fora do formato: escreva certo de primeira.
+`ai/obsidian/Plano do projeto/Regras de git.md`, com o checklist. O hook `commit-msg` barra mensagem fora do formato: escreva certo de primeira.
 
 1. `git status -s` e `git diff --stat`. Na `master` com mudança de funcionalidade → pare e
    proponha a branch (`/tarefa`).

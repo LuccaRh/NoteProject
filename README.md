@@ -18,13 +18,46 @@ Each service runs in its own terminal. The notes API needs [uv](https://docs.ast
 | Service | Start | Open in the browser |
 |---|---|---|
 | web (editor) | `make install` once, then `make dev` | <http://localhost:5173> |
-| notes (API) | `cd apps/notes && uv run fastapi dev src/notes/main.py` | <http://localhost:8000/docs> |
+| notes (API) + Postgres | `docker compose -f docker-compose-dev.yml up --build` | <http://localhost:8000/docs> |
 
 The ports come from each tool: 5173 is set in `apps/web/vite.config.ts`, and 8000 is the
 default of `fastapi dev`. Both listen on localhost only and reload when a file is saved.
 
-To run everything, start both commands, one per terminal, or run both in containers with
-`docker compose -f docker-compose-dev.yml up --build` (same ports, same reload).
+The API needs the database and the `.env` below, so it runs in Docker Compose, which also
+starts the editor (same ports, same reload). Postgres listens on `localhost:5432`.
+
+### Environment variables
+
+Passwords and connection settings live in a `.env` file at the repo root. Git ignores it, so
+each clone creates its own:
+
+```sh
+cp .env.example .env    # then replace every value
+```
+
+`.env.example` lists the variables the project uses, each with a comment and a placeholder
+value. Docker Compose loads `.env` into the `postgres` and `notes` containers (`env_file` in
+`docker-compose-dev.yml`):
+
+| Variable | Read by | Meaning |
+|---|---|---|
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | `postgres` image | user, password and database created on the first start |
+| `DATABASE_URL` | notes API and Alembic | `postgresql+psycopg://<user>:<password>@postgres:5432/<db>`, with the three values above |
+
+The host in `DATABASE_URL` is `postgres`, the service name in the compose file, which only
+resolves inside the containers. `make check` runs the tests on the host, so it swaps the host
+for `localhost`. The `postgres` image reads its three variables only when the `db` volume is
+empty; after changing them, recreate the volume with
+`docker compose -f docker-compose-dev.yml down -v` (this deletes the data).
+
+### Database migrations
+
+Alembic creates and changes the tables (`apps/notes/migrations/versions/`). On a fresh
+database, and after pulling a new migration, apply them inside the `notes` container:
+
+```sh
+docker compose -f docker-compose-dev.yml exec notes uv run alembic upgrade head
+```
 
 ### Trying an API in the browser
 
@@ -43,6 +76,9 @@ A `GET` route can also be opened straight in the address bar, e.g.
 ```bash
 make check     # web: tsc + vite build; notes: ruff, mypy, pytest
 ```
+
+The notes tests talk to the real database: start Postgres first
+(`docker compose -f docker-compose-dev.yml up -d postgres`).
 
 ## Next steps
 
@@ -68,5 +104,5 @@ the session at the root; `CLAUDE.md` explains the principles. First time in a cl
 | `ai/np lint` / `test` / `check` | workspace rules / `ai/tools/` tests / `make check` |
 
 Skills: `/tarefa`, `/aprender`, `/nota`, `/diagrama`, `/duvida`, `/destrinchar`, `/foco`,
-`/commit`, `/escrita`. Agent: `leitor`. Tools in `ai/tools/`: `np.py`, `obsidian_sync.py`,
+`/commit`, `/escrita`, `/lacunas`. Agent: `leitor`. Tools in `ai/tools/`: `np.py`, `obsidian_sync.py`,
 `hooks_contexto.py`, `foco.py`, `diagrama.py`, `commit_msg.py`, `estilo.py`.

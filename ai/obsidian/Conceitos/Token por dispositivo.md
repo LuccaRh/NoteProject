@@ -5,7 +5,7 @@ tags: [noteproject, conceito, auth]
 
 Um servidor que guarda dados de vários usuários precisa saber, a cada pedido, de quem ele é. Pedir a senha a cada pedido não serve, e um app sempre conectado não tem a sessão do navegador.
 
-A ideia: cada dispositivo ganha um **token** próprio no primeiro login e o manda em todo pedido. Token × sessão, em geral: [[Autenticação]].
+A ideia: cada dispositivo ganha um **token** próprio no primeiro login e o manda em todo pedido.
 
 1. Login uma vez no dispositivo → o servidor gera um token e guarda de quem e de qual dispositivo ele é.
 2. O app guarda o token e o põe em cada pedido HTTP e em cada conexão [[WebSocket]].

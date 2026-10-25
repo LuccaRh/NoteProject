@@ -1,0 +1,24 @@
+titulo: Blocos anunciados, e o pacote que sobe e desce
+tipo: blocos
+grade: [260, 125]
+destino: Conceitos/Figuras
+nos:
+  topo:  {tipo: bloco, pos: [2, 0], texto: "redes de trânsito<br>(topo, sem default)", cor: cinza}
+  op:    {tipo: bloco, pos: [1, 1], texto: "operadora<br>bloco 203.0.113.0/24", cor: cinza}
+  gnet:  {tipo: bloco, pos: [3, 1], texto: "rede do Google<br>bloco 142.250.0.0/15", cor: laranja}
+  casa:  {tipo: bloco, pos: [0, 2], texto: "roteador de casa<br>203.0.113.7", cor: roxo}
+  gdc:   {tipo: bloco, pos: [4, 2], texto: "servidor<br>142.250.79.36", cor: laranja}
+  n_topo: {tipo: nota, pos: [3, 0], texto: "ouviu do Google:<br>142.250.0.0/15 → Google<br>ouviu da operadora:<br>203.0.113.0/24 → operadora"}
+  n_op:   {tipo: nota, pos: [0, 1], texto: "ouviu do trânsito:<br>142.250.0.0/15 → trânsito<br>+ default → trânsito"}
+  n_casa: {tipo: nota, pos: [0, 3], texto: "não ouve anúncio:<br>default → operadora"}
+arestas:
+  - [casa, op, {rotulo: "1"}]
+  - [op, topo, {rotulo: "2"}]
+  - [topo, gnet, {rotulo: "3"}]
+  - [gnet, gdc, {rotulo: "4"}]
+legenda:
+  "anúncio": "antes de qualquer pacote, cada dono de bloco avisa os vizinhos (BGP: 'cheguem a 142.250.0.0/15 por mim'); cada vizinho anota de quem ouviu e repassa"
+  "1–4": "o pacote sobe só até um roteador que conhece o bloco e desce rumo ao dono; cada pulo é uma consulta à tabela, sem busca"
+  "4": "o roteador do Google entrega ao servidor pela rede local dele"
+  "IP novo": "site novo costuma pegar IP de um bloco do provedor, já anunciado; bloco novo é dado pelo registro da região (LACNIC) e anunciado"
+  "fonte": "(geral); blocos ilustrativos, salvo 142.250.0.0/15, que é do Google (de memória)"

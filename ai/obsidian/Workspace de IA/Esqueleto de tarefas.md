@@ -3,11 +3,11 @@ tags: [noteproject, workspace]
 ---
 # Esqueleto de tarefas
 
-Uma tarefa passa sempre pelas mesmas etapas: issue, branch, escopo, código, revisão, check e commit. Hoje quem conduz essas etapas é a `/tarefa`, conversando, e cada passo gasta [[Contexto e tokens|tokens]]. O esqueleto passa o que é fixo para script e [[Hooks|hook]], e deixa para a IA só o que pede julgamento.
+Uma tarefa passa sempre pelas mesmas etapas: issue, branch, escopo, código, revisão, check e commit. Hoje quem conduz essas etapas é a `/tarefa`, conversando, e cada passo gasta tokens. O esqueleto passa o que é fixo para script e hook, e deixa para a IA só o que pede julgamento.
 
 Dois limites guiam o desenho:
 - **Quem escreve o quê**: o backend e a infra são escritos à mão (áreas `aprender`); o frontend, pela sessão, com o mínimo de revisão.
-- **Poucos tokens**: cada [[Subagentes|subagente]] começa sem contexto e relê o que precisa. Agente só entra onde lê pouco e devolve pouco.
+- **Poucos tokens**: cada subagente começa sem contexto e relê o que precisa. Agente só entra onde lê pouco e devolve pouco.
 
 ## Opções
 
