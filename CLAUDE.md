@@ -58,6 +58,10 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   atualizada (`add-a-few-decorations-in-code-mirror`). Cada branch tem `ai/kb/escopos/<branch>.md`
   (Pedido / Contexto / Fora + número da issue, skill `/foco`); o hook `ai/tools/foco.py` avisa
   quando o pedido sai dele.
+- **Versão do serviço** (2026-10-23): branch que mexe em `apps/<serviço>/` sobe a minor dele
+  (`0.1.0` → `0.2.0`) com o lockfile; o lint W11 confere. (2026-10-25) A subida vai num
+  commit só dela, um por serviço, depois dos commits do app: `Update notes version to 0.2.0`
+  (manifesto + lockfile, nada mais).
 - **Commit = uma mudança nova**, atômico, cronológico, e **todo commit passa no `make check`**.
   Conserto de commit ainda não enviado ao remoto (mesmo já na `master` local) → rebase/fixup
   no original, não commit novo. Ordem na
@@ -78,6 +82,10 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 - **Código em inglês** (2026-10-15): `apps/`, `Makefile`, compose, CI e README em inglês:
   comentário, docstring, mensagem de erro, texto da interface, dado de teste. Português só no
   workspace (`ai/`, `.claude/`, `CLAUDE.md`) e no vault. O lint W09 (`ai/np lint`) barra o resto.
+- **Código com até 80 colunas** (2026-10-25): todo código do app (`apps/`, `Makefile`, compose,
+  CI, Dockerfile, `.ini`/`.toml`), em qualquer linguagem; md e workspace de IA ficam de fora.
+  Código novo já sai quebrado; linha longa achada em código existente → avisar o Lucca.
+  Python: ruff `E501` (`line-length = 80`); o resto: lint W12 (`ai/np lint`).
 - **Data real no commit** (2026-10-15): nunca mexer em `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE`
   nem passar `--date`; reescrever história usa a hora do momento (`rebase --reset-author-date`).
 - **Issue quem fecha é o Lucca** (2026-10-19): a sessão nunca roda `gh issue close`; quando
@@ -94,7 +102,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 | `ai/np contexto <área>` / `areas` | o que ler para uma área / o vocabulário |
 | `ai/np obsidian [-q]` / `duvidas [pág]` | sincronia vault ↔ `ai/obsidian/` / marcas `[!duvida]` `[fix]` `[coment]` |
 | `ai/np diagrama <spec> [--png]` | YAML → draw.io (`ai/tools/diagrama.py`, nó `banco` para BD) |
-| `ai/np lint` / `test` | regras do workspace (W01–W10) / testes das ferramentas |
+| `ai/np lint` / `test` | regras do workspace (W01–W12) / testes das ferramentas |
 
 Ambiente: Arch Linux, Python 3.14 + uv, Node 22, Docker, `drawio` CLI, poppler (`pdftotext`).
 Hooks do Claude Code em `.claude/settings.json`; do git em `ai/tools/githooks/` (`ai/tools/instalar.sh`).
