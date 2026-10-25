@@ -1,4 +1,5 @@
 services:
+
   web:
     build:
       context: ./apps/web
@@ -20,3 +21,19 @@ services:
     volumes:
       - ./apps/notes:/app
       - /app/.venv
+    env_file: .env
+    depends_on:
+      - postgres
+ 
+  postgres:
+    image: postgres:18
+    command: postgres -c log_statement=all
+    # Loopback only: lets the host run the tests and psql
+    ports:
+      - "127.0.0.1:5432:5432"
+    env_file: .env
+    volumes:
+      - db:/var/lib/postgresql
+
+volumes:
+  db:
