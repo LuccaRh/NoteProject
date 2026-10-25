@@ -7,10 +7,9 @@ argument-hint: "<conceito>"
 
 O objetivo é o Lucca **saber fazer**, não ler sobre: a página prepara, o exercício ensina.
 
-1. **O que ele já tem.** `grep -ril "<conceito>"` em `ai/obsidian/` (primeiro `Conceitos/`) e em
-   `~/Documents/Obsidian Vault/Programing/`: ele já escreveu sobre isso (ex.: `Autenticação.md`)?
-   Use as palavras de lá e não repita. Notas do trabalho servem só de inspiração: nada do
-   Pecazap entra nas páginas (regra "Projeto à parte do trabalho", lint W08).
+1. **O que ele já tem.** `grep -ril "<conceito>"` em `ai/obsidian/` (primeiro `Conceitos/`): ele já escreveu
+   sobre isso?
+   Use as palavras de lá e não repita.
 2. **Uma pergunta** ao Lucca: o que ele já sabe do pré-requisito e se quer teoria curta ou
    direto ao exercício. Espere.
 3. **Página do conceito** em `ai/obsidian/Conceitos/` (entra no `00 Mapa — Conceitos`; já

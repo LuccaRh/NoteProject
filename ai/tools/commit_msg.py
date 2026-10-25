@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Lint da mensagem de commit do NoteProject (regras em CLAUDE.md, "Tarefas, commits e branches").
 
-Formato (o mesmo da nota Programing/Naming, "Commit naming"):
+Formato (checklist no vault, Plano do projeto/Regras de git):
 - título em inglês, imperativo, com maiúscula, sem ponto final, ≤ 72 caracteres;
 - sem prefixo (`feat:`, `fix:`, `docs:`...); a única marca aceita é a tag do que não é app:
   `[docs] ` (notas do vault) ou `[ai-workspace] ` (workspace de IA), antes do imperativo;

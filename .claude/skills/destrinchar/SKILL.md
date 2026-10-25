@@ -7,7 +7,7 @@ argument-hint: "<conceito ou trecho>"
 
 Diagnóstico socrático: descubra **qual elo** falta, não despeje a explicação.
 
-1. Leia a nota do conceito (`ai/obsidian/`, `Programing/` do vault) e o código onde ele aparece
+1. Leia a nota do conceito (`ai/obsidian/`) e o código onde ele aparece
    (`ai/np contexto <área>`). Base da explicação; nada de cabeça.
 2. Monte a **corrente de elos** do conceito até o uso no projeto. Exemplos:
    - HTTP não tem memória ⇒ toda requisição precisa de prova ⇒ token ⇒ onde guardar ⇒ revogar
