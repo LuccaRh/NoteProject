@@ -5,6 +5,7 @@ from sqlalchemy import Connection, text
 
 from notes.db import get_conn
 
+
 router = APIRouter()
 
 

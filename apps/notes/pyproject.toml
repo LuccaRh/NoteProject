@@ -26,3 +26,10 @@ line-length = 80
 
 [tool.ruff.lint]
 extend-select = ["E501"]
+
+# Two blank lines between imports and the globals (CLAUDE.md, W16)
+[tool.ruff.lint.isort]
+lines-after-imports = 2
+
+[tool.mypy]
+strict = true
