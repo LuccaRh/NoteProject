@@ -10,7 +10,8 @@ O serviço `notes` do [[Back — daemon e servidor|servidor]]: a API que o [[Nav
 | Rota | O quê | Etapa |
 |---|---|---|
 | `GET /health` | responde 200 se o processo está de pé; o healthcheck do [[Container e Docker Compose\|compose]] usa ([[Observabilidade]]) | ⏳ M0 (#10) |
-| `/notes`, `/search` | as rotas que `apps/web/src/notes/api.ts` chama, com busca full-text no [[Postgres e migrations\|Postgres]] | ⏳ M1 (#46) |
+| `/notes` | CRUD das notas e pastas no [[Postgres e migrations\|Postgres]] | ⏳ M1 (#46) |
+| `/search` | busca full-text no Postgres | ⏳ M1 (#56) |
 | `/` e arquivos estáticos | o build do editor: uma URL só, nada instalado | ⏳ M1 (#47) |
 
 - Rotas síncronas (`def`) até o banco entrar: sem `await`, a thread do pool é o caminho seguro ([[FastAPI]], "`async def` ou `def`").
@@ -49,6 +50,21 @@ Escolha: **`src/`**, com o package instalado no `.venv` pelo `uv sync`.
 - Custo: um nível de pasta a mais (`src/notes/`) e um `[build-system]` no `pyproject.toml`.
 
 Revisar se o serviço virar um script de um arquivo só, sem testes, ou se o empacotamento do uv atrapalhar a imagem ([[Container e Docker Compose|Docker]], #11).
+
+## Pastas dentro de `src/notes`
+
+Uma pasta por papel, e dentro dela um arquivo por recurso (`notes.py`, depois `folders.py`, `search.py`): quem procura as notas acha a rota, o formato e o erro com o mesmo nome em três pastas.
+
+| Pasta ou arquivo | O que tem | Etapa |
+|---|---|---|
+| `main.py` | o `FastAPI()` e um `include_router` por arquivo de `routers/` | ✅ |
+| `db.py` | o [[SQLAlchemy — engine e conexão\|engine]] e o `get_conn`, a dependência da conexão por pedido | ✅ #12 |
+| `routers/` | as rotas de cada recurso, num `APIRouter` com `prefix` | ✅ `health`, `notes`; ⏳ `search` (#56) |
+| `schemas/` | os modelos Pydantic de entrada e saída (`Note`, `NoteCreate`, `NoteUpdate`): o formato do JSON, separado da tabela | ✅ `notes` (#46) |
+| `errors/` | as respostas de erro de cada recurso (`not_found` → 404) | ✅ `notes` (#46) |
+
+- Cada parâmetro das rotas vem do caminho, da query, do corpo ou de um `Depends` pela regra do [[FastAPI#De onde vem cada parâmetro|FastAPI]].
+- `schemas/` e a tabela andam juntos sem ser a mesma coisa: coluna nova na [[Migrations com Alembic|migration]] só aparece na API se entrar no modelo e na lista de colunas da consulta.
 
 ## Imagem ⏳ #11
 

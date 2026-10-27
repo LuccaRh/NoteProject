@@ -86,6 +86,7 @@ A rede pode perder, duplicar ou trocar a ordem dos pacotes. O TCP numera cada by
 *A conversa no tempo, de cima para baixo: o aperto de mão (1–3), dados com confirmação (4–5) e o fim (6).*
 
 - Uma conexão é o par (IP:porta do cliente, IP:porta do servidor). A porta do cliente é sorteada pelo sistema dele (`51234`), e é para ela que a resposta volta.
+- A conexão é só **uma linha numa tabela do sistema operacional de cada ponta** (portas, estado, até que byte foi mandado e recebido); nenhum fio nem roteador sabe dela. Cada pacote viaja sozinho, e a ponta que o recebe acha a linha pelas portas do cabeçalho e atualiza os números. Ver a tabela: `ss -tn`.
 - O aperto de mão custa uma ida e volta antes do primeiro byte útil; por isso vale manter a linha aberta e reaproveitar (o pool de conexões do [[SQLAlchemy — engine e conexão|SQLAlchemy]]).
 
 ## Muitos pacotes ao mesmo tempo

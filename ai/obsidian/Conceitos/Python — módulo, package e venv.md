@@ -27,6 +27,28 @@ Um programa Python cresce em vários arquivos e usa código pronto de outros, co
 
 Em `from fastapi import FastAPI`, `fastapi` é um package (pasta) e `FastAPI` é uma **classe**, definida em `fastapi/applications.py`. O `fastapi/__init__.py` reexporta a classe (`from .applications import FastAPI`), por isso o import não precisa citar `applications` (fastapi 0.150.0).
 
+## O que o import executa
+
+O primeiro `import` de um módulo **roda o arquivo inteiro, de cima a baixo**, uma vez; os imports seguintes do mesmo módulo reaproveitam o resultado. O Python primeiro lê e confere a sintaxe do arquivo todo, depois executa linha por linha:
+
+| Linha | Ao importar |
+|---|---|
+| `x = 5`, `router = APIRouter()` | roda: cria o objeto |
+| `def f(): ...` | roda como uma linha só: cria o objeto função e guarda o corpo; o corpo **não** roda |
+| `@X` em cima de um `def` | roda logo depois do `def`: `f = X(f)` ([[Python — decorator, with e yield\|decorator]]) |
+| `import y` | roda o arquivo de `y` inteiro, se ainda não foi importado |
+
+O corpo de uma função só roda quando alguém a chama com `()`. Numa API, isso separa dois momentos:
+
+```
+ao subir (uma vez)       o servidor importa main.py → main importa os arquivos de rotas
+                         → cada @ registra uma rota → a lista de rotas está pronta
+                         → o servidor abre a porta
+a cada pedido            o framework acha a função na lista e a chama: só o corpo roda
+```
+
+Um arquivo de rotas que nenhum outro importa nunca roda, e as rotas dele não existem: o pedido recebe 404.
+
 ## sys.path: a lista de pontos de partida
 
 `sys.path` é uma lista de pastas, cada uma com o caminho completo. No `import a.b.c`:
@@ -78,6 +100,8 @@ O `pyproject.toml` é o pedido (o que o projeto precisa) e o `.venv` é o result
 | `uv add --dev <lib>` | o mesmo, no grupo `dev` |
 | `uv sync` | deixa o `.venv` igual ao `uv.lock`: cria o `.venv` se não existe, instala o que falta, remove o que sobra e instala o próprio projeto quando há `[build-system]` |
 | `uv run <cmd>` | sincroniza e roda o comando com o Python do `.venv` |
+
+O uv (da Astral) não tem relação com o **uvicorn**: um instala libs e roda comandos; o outro é o servidor ASGI que escuta a porta de uma app [[FastAPI]]. O "uv" do uvicorn vem do uvloop, o event loop que ele usa *(geral)*.
 
 Cada linha do `pyproject.toml` que o `uv init` gera:
 

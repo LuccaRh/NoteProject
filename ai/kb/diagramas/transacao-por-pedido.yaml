@@ -1,0 +1,22 @@
+titulo: "with engine.begin() as conn: um pedido, do pool de volta ao pool"
+tipo: blocos
+grade: [250, 150]
+destino: Conceitos/Figuras
+nos:
+  pool:  {tipo: bloco, pos: [0, 0.5], texto: "pool<br>conexões abertas", cor: amarelo}
+  pega:  {tipo: bloco, pos: [1, 0], texto: "connect()<br>empresta uma conexão", cor: verde}
+  begin: {tipo: bloco, pos: [2, 0], texto: "conn.begin()<br>BEGIN", cor: verde}
+  bloco: {tipo: bloco, pos: [3, 0], texto: "bloco do with<br>INSERT / UPDATE …", cor: verde}
+  fim:   {tipo: bloco, pos: [3, 1], texto: "__exit__ da transação<br>sem erro → COMMIT<br>com erro → ROLLBACK", cor: vermelho}
+  close: {tipo: bloco, pos: [1, 1], texto: "__exit__ da conexão<br>close(): volta ao pool<br>(sempre)", cor: verde}
+  gt:    {tipo: grupo, contem: [begin, bloco, fim], texto: "with de dentro: a transação", cor: cinza}
+  gc:    {tipo: grupo, contem: [pega, gt, close], texto: "with de fora: a conexão", cor: cinza}
+  db:    {tipo: banco, pos: [4.3, 0], texto: "Postgres", cor: amarelo}
+arestas:
+  - [pool.c, pega.e, {rotulo: "empresta"}]
+  - [pega, begin, {rotulo: "enter"}]
+  - [begin, bloco, {rotulo: "yield conn"}]
+  - [bloco, db, {rotulo: "SQL"}]
+  - [bloco, fim, {rotulo: "fim do bloco"}]
+  - [fim, close, {rotulo: "depois"}]
+  - [close.e, pool.b, {rotulo: "devolve"}]

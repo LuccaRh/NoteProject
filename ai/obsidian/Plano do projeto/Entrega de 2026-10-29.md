@@ -55,3 +55,5 @@ A #32 é a primeira a sair: o worker escreve a resposta como callout `> [!respos
 ## Risco
 
 Pela regra de [[Roadmap#Duas trilhas|duas trilhas]], `backend` e `infrastructure` são escritos à mão, com o conceito antes. Em 8 dias, Postgres, rotas e worker à mão é o trecho apertado: schema, migration e rotas ficam à mão, e o esqueleto do worker e o prompt podem sair gerados e revisados no PR.
+
+mac ipv6 modem firewall
