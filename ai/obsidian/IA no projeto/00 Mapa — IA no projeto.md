@@ -12,7 +12,7 @@ Ideia central: **o app funciona inteiro sem IA**. A IA é mais um cliente das no
 | Página | Ideia |
 |---|---|
 | [[Workspace no app]] | regras, skills, scripts e hooks numa pasta do vault; núcleo do app, kits e o workspace de cada pessoa |
-| [[O daemon notesd]] | um processo é dono do [[SQLite e FTS5\|SQLite]]; todo mundo fala com ele |
+| [[O daemon notesd]] | um processo é dono do [[SQLite]]; todo mundo fala com ele |
 | [[MCP — a IA como cliente do daemon]] | o Claude Code chama funções do [[O daemon notesd\|daemon]] em vez de ler arquivos |
 | [[Edição por âncora]] | a IA nunca reescreve a nota; propõe uma operação presa a um trecho |
 

@@ -3,7 +3,7 @@ tags: [noteproject, plano, servidor]
 ---
 # #10 Scaffold the server with a health endpoint
 
-Issue do [[M0 Server skeleton]]. Cria `apps/notes`, a API com só `GET /health`, testada no `make check` e no [[CI e CD|CI]]. Passou por [[FastAPI]], Python e testes.
+Issue do [[M0 Server skeleton]]. Cria `apps/notes`, a API com só `GET /health`, testada no `make check` e no [[CI]]. Passou por [[FastAPI]], Python e testes.
 
 ## FastAPI
 
@@ -14,7 +14,7 @@ Issue do [[M0 Server skeleton]]. Cria `apps/notes`, a API com só `GET /health`,
 
 ## Python
 
-- O `import` não aceita caminho: procura o primeiro nome no primeiro nível de cada pasta do `sys.path`, e a primeira que tiver vence ([[Python — módulo, package e venv|módulo, package e venv]]).
+- O `import` não aceita caminho: procura o primeiro nome no primeiro nível de cada pasta do `sys.path`, e a primeira que tiver vence ([[Módulo Python|módulo]], [[Package Python|package]] e [[venv]]).
 - venv = um Python com `site-packages` próprio; o `uv sync` instala nele o que o `uv.lock` fixa.
 - Package é o formato; biblioteca é package feito para outros importarem; serviço é programa que roda e ninguém importa.
 - Estrutura `src/` em vez de plana: o serviço é instalado no `.venv` (um `notes.pth` aponta para `src/`), e todo import começa por `notes.` ([[API de notas]]).

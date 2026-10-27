@@ -8,7 +8,7 @@ As partes sem IA vêm antes: elas já servem sozinhas e são o que a IA usa depo
 | # | Item | IA? | Página |
 |---|---|---|---|
 | 1 | chips para `[!duvida]` e `[!fix]` (`decorations/replace.ts`): fecha a branch atual | não | [[Marcar dúvida]] |
-| 2 | `Ctrl+D` + tabela `pedidos` no [[Postgres e migrations\|Postgres]] do servidor (`apps/notes`) | não | [[Marcar dúvida]] |
+| 2 | `Ctrl+D` + tabela `pedidos` no [[Postgres]] do servidor (`apps/notes`) | não | [[Marcar dúvida]] |
 | 3 | operação por âncora + sugestão com `Tab`/`Esc` | não | [[Edição por âncora]] |
 | 4 | moldes de bloco + menu `/` | não | [[Blocos padronizados]] |
 | 5 | worker da fila em `apps/worker`, no servidor ([[Navegador]]): `claude_cli` (só o dono), depois `anthropic` e `ollama` | sim | [[Fila de pedidos]] |

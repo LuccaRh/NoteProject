@@ -34,7 +34,7 @@ A primeira versão que substitui o Obsidian no uso diário: **ler e navegar nota
 |---|---|---|---|
 | pasta local | arquivos no PC | quase nada de backend | rápido |
 | servidor em localhost | Postgres no PC | servidor e banco | fim do M1 |
-| **servidor na AWS** | Postgres na [[EC2]] | servidor, banco, login, [[TLS e HTTPS\|TLS]], deploy | fim do M3 |
+| **servidor na AWS** | Postgres na [[EC2]] | servidor, banco, login, [[TLS]], deploy | fim do M3 |
 
 Escolha: servidor na AWS, porque o motivo 1 vem antes do 2. Servidor aberto na internet exige login, então a v1 só fica pronta no fim do M3 (M0 servidor → M1 notas → M2 login e TLS → M3 AWS). Até lá, rodar em localhost é teste, não uso.
 

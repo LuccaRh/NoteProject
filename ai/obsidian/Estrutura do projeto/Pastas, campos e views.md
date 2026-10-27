@@ -22,4 +22,4 @@ No NoteProject, **organizar é escolher onde criar a nota**. A pasta preenche ca
 3. `conteudo` vem depois, por regra, por modelo pequeno ou à mão ([[Classificar a nota pelo tema]]).
 
 - A mesma nota aparece em várias views sem ser copiada: a view é uma consulta, não uma pasta.
-- As colunas entram no [[Postgres e migrations|Postgres]] do servidor (#12); pastas, campos, views e a sidebar são as issues #6–#9 do [[Roadmap]].
+- As colunas entram no [[Postgres]] do servidor (#12); pastas, campos, views e a sidebar são as issues #6–#9 do [[Roadmap]].

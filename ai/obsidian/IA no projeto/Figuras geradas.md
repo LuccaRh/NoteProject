@@ -34,5 +34,5 @@ No app seria o mesmo caminho: a IA escreve a **receita** e o [[O daemon notesd|d
 
 Script gerado pela IA é código rodando na sua máquina:
 
-- rodar em processo separado, com tempo limite e sem rede (ou no [[Container e Docker Compose|container]] do `docker-compose.yml`);
+- rodar em processo separado, com tempo limite e sem rede (ou no [[Container|container]] do `docker-compose.yml`);
 - mostrar o script antes da primeira execução.

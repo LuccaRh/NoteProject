@@ -29,8 +29,8 @@ O mesmo callout que o workspace já usa, mais um id curto depois do `|`:
 ```
 
 - O Obsidian aceita texto depois do `|` num callout. A página continua abrindo lá, e a `/duvida` de hoje continua funcionando.
-- No editor, o callout vira um **chip** com o estado (pendente, na fila, respondida). É uma [[CodeMirror e decorações|decoração do CodeMirror]], como `decorations/headings.ts`.
-- O trecho selecionado e o estado ficam no banco (tabela `pedidos`), não no texto: no [[Postgres e migrations|Postgres]] do servidor no [[Navegador|navegador]], no [[O daemon notesd|daemon]] no app desktop. No texto fica só o [[Marcador no texto, conteúdo fora|marcador curto]].
+- No editor, o callout vira um **chip** com o estado (pendente, na fila, respondida). É uma [[CodeMirror|decoração do CodeMirror]], como `decorations/headings.ts`.
+- O trecho selecionado e o estado ficam no banco (tabela `pedidos`), não no texto: no [[Postgres]] do servidor no [[Navegador|navegador]], no [[O daemon notesd|daemon]] no app desktop. No texto fica só o [[Marcador no texto, conteúdo fora|marcador curto]].
 
 ## Custo
 

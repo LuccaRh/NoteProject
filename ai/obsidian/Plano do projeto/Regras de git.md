@@ -19,7 +19,7 @@ O histórico serve para alguém (inclusive o próprio autor, meses depois) enten
 
 - **Commit = uma mudança nova.** Conserto de commit ainda não mergeado entra nele (`--fixup` + `rebase --autosquash`); a branch mostra só a versão final. "Mergeado" = já enviado ao remoto: o que só está na `master` local também é consertado no commit de origem (rebase), inclusive troca de nome, de língua ou de config. Mudar o que já está na `master` remota é mudança nova.
 - **Atômico e cronológico**: uma mudança lógica por commit, na ordem em que uma depende da outra, e **todo commit passa no `make check`** (conferir com `git rebase master --exec "make check"`).
-- **Ordem dentro da branch** (cada camada depende só das de baixo): schema/[[Postgres e migrations|migration]] → regra (`repo.py`, serviço) → rota da API → cliente/front → docs e notas.
+- **Ordem dentro da branch** (cada camada depende só das de baixo): schema/[[Migration|migration]] → regra (`repo.py`, serviço) → rota da API → cliente/front → `[ai-workspace]` → `[docs]`. (2026-10-27) O `[docs]` é sempre o último commit da branch.
 - Arquivo com duas mudanças → `git add -p`. Notas e workspace em commits próprios, separados do app.
 - Autor = git user próprio; nunca mudar `user.name`/`user.email`.
 

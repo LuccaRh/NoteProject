@@ -3,7 +3,7 @@ tags: [noteproject, infra]
 ---
 # Comandos do Docker no dev
 
-O dev do NoteProject roda no [[Container e Docker Compose|Docker Compose]], com três serviços no `docker-compose-dev.yml`: `web` (Vite), `notes` ([[API de notas]]) e `postgres` ([[Postgres e migrations]]). Todo comando passa pelo mesmo `-f`, então há um alias no `~/.bashrc`:
+O dev do NoteProject roda no [[Docker Compose]], com três serviços no `docker-compose-dev.yml`: `web` (Vite), `notes` ([[API de notas]]) e `postgres` ([[Postgres]]). Todo comando passa pelo mesmo `-f`, então há um alias no `~/.bashrc`:
 
 ```bash
 alias dc='docker compose -f docker-compose-dev.yml'
@@ -40,11 +40,11 @@ Os comandos abaixo rodam da raiz do repo, onde o arquivo está.
 | `dc exec postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "\dt"'` | roda um comando só e sai                                                     |
 | `dc exec postgres bash`                                                        | shell dentro do container                                                    |
 
-Dentro do psql: `\dt` (tabelas), `\d notes` (colunas), `SELECT * FROM notes;`, `\q` (sai). Detalhes em [[Postgres e migrations]], "Ver o banco: psql".
+Dentro do psql: `\dt` (tabelas), `\d notes` (colunas), `SELECT * FROM notes;`, `\q` (sai). Detalhes em [[Postgres#Ver o banco: psql|Postgres]].
 
 ## Migrations no `notes`
 
-O [[Migrations com Alembic|Alembic]] conecta pelo nome `postgres`, que só resolve na rede do compose ([[IP, porta e rede de containers]]): o que toca no banco roda dentro do container `notes`.
+O [[Migration|Alembic]] conecta pelo nome `postgres`, que só resolve na rede do compose ([[Rede de containers]]): o que toca no banco roda dentro do container `notes`.
 
 | Comando | Faz | Toca no banco? |
 |---|---|---|

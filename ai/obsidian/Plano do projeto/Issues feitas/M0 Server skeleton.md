@@ -3,7 +3,7 @@ tags: [noteproject, plano, servidor, infra]
 ---
 # M0 Server skeleton
 
-Etapa do [[Roadmap]] que põe a [[API de notas]] de pé no PC: projeto Python, [[Container e Docker Compose|compose]], [[Postgres e migrations|Postgres]] e `.env`, sem custo. Cada issue tem uma página com o que entregou e o que ficou aprendido, separado por tópico.
+Etapa do [[Roadmap]] que põe a [[API de notas]] de pé no PC: projeto Python, [[Docker Compose|compose]], [[Postgres]] e `.env`, sem custo. Cada issue tem uma página com o que entregou e o que ficou aprendido, separado por tópico.
 
 | Issue | Título | Estado | Tópicos |
 |---|---|---|---|

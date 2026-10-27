@@ -31,7 +31,7 @@ As tarefas do [[Roadmap]] ficam no GitHub do repo (`LuccaRh/NoteProject`). Assim
 |---|---|
 | `backend` | [[O daemon notesd\|`notesd`]], servidor, modelo de dados, auth, sync: escrita à mão, conceito antes (`/aprender`) |
 | `frontend` | editor e interface: gerado e revisado no PR |
-| `infrastructure` | [[Container e Docker Compose\|containers]], deploy, [[CI e CD\|CI]], nuvem: escrita à mão |
+| `infrastructure` | [[Container\|containers]], deploy, [[CI]], nuvem: escrita à mão |
 | `ai-workspace` | guia, skills, ferramentas de `ai/` e notas do vault |
 | `bug` | algo que não funciona como deveria |
 

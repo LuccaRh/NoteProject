@@ -13,15 +13,15 @@ O front é o que se vê: a lista de notas e o editor. A regra que manda nele: **
 | Módulo | Faz |
 |---|---|
 | `main.ts` | monta o editor no `#editor` (`main.ts:4-7`) |
-| `editor.ts` | [[CodeMirror e decorações\|CodeMirror 6]] com Markdown |
+| `editor.ts` | [[CodeMirror\|CodeMirror 6]] com Markdown |
 | `decorations/headings.ts` | headings com tamanho; `replace.ts` (chips de `[!duvida]`) está vazio |
 
-- Stack: TypeScript + Vite + [[CodeMirror e decorações|CodeMirror 6]], sem framework de UI.
+- Stack: TypeScript + Vite + [[CodeMirror|CodeMirror 6]], sem framework de UI.
 - Nada é salvo ainda: lista de notas e cliente da API vêm com o servidor (M1).
 
 ### Decorações
 
-| O quê | [[CodeMirror e decorações\|Tipo]] | Estado |
+| O quê | [[CodeMirror\|Tipo]] | Estado |
 |---|---|---|
 | headings com tamanho | `line` (`decorations/headings.ts:8`) | ✅ |
 | chip de `[!duvida]` e `[fix]` | `replace` (`decorations/replace.ts`, #5) | ⏳ |
@@ -37,13 +37,13 @@ O front é o que se vê: a lista de notas e o editor. A regra que manda nele: **
 | cliente da API (`api.ts`) | única porta do front para a rede; trocar HTTP por Tauri mexe só nele |
 | proxy do Vite `/api` | [[Reverse proxy\|reverse proxy]] no desenvolvimento: repassa ao servidor `:8000` |
 | Tauri | casca desktop leve (5–15 MB × 150–200 MB do Electron) |
-| [[CRDT e Yjs\|Yjs]] + `y-codemirror.next` | o editor gera updates de [[CRDT e Yjs\|CRDT]] para o sync |
+| [[Yjs]] + `y-codemirror.next` | o editor gera updates de [[CRDT]] para o sync |
 | KaTeX | fórmulas `$$…$$` |
 | índice fuzzy em memória | `Ctrl+P` em < 1 ms |
 | Svelte ou React | palette, abas, outline; **em aberto** |
 | React Native | app do celular, [[Local-first\|local-first]] (milestone Mobile app) |
 
-- Busca em 4 níveis: `Ctrl+F` no [[CodeMirror e decorações|CodeMirror]], `Ctrl+J` outline, `Ctrl+P` fuzzy, `Ctrl+Shift+F` na busca full-text do servidor (no desktop, o [[SQLite e FTS5|FTS5]] do [[O daemon notesd|daemon]]).
+- Busca em 4 níveis: `Ctrl+F` no [[CodeMirror]], `Ctrl+J` outline, `Ctrl+P` fuzzy, `Ctrl+Shift+F` na busca full-text do servidor (no desktop, o [[FTS5]] do [[O daemon notesd|daemon]]).
 
 ## Fronteira com o back
 

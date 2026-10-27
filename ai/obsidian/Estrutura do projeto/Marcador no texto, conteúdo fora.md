@@ -5,7 +5,7 @@ tags: [noteproject, editor]
 
 O editor relê o Markdown para decidir o que pintar (headings, listas). Figura, desenho à mão ou o estado de uma dúvida não precisam estar no texto para aparecer na tela, e só pesariam nessa leitura.
 
-A regra: **no texto fica um marcador curto; o conteúdo pesado mora em outra estrutura** (uma tabela do banco, um arquivo). Na tela, uma [[CodeMirror e decorações|decoração]] troca o marcador pela coisa.
+A regra: **no texto fica um marcador curto; o conteúdo pesado mora em outra estrutura** (uma tabela do banco, um arquivo). Na tela, uma [[CodeMirror|decoração]] troca o marcador pela coisa.
 
 | Coisa | No texto | Fora do texto |
 |---|---|---|
