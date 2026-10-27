@@ -69,7 +69,8 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 - **Commit = uma mudança nova**, atômico, cronológico, e **todo commit passa no `make check`**.
   Conserto de commit ainda não enviado ao remoto (mesmo já na `master` local) → rebase/fixup
   no original, não commit novo. Ordem na
-  branch: schema → regra → rota → front → docs.
+  branch: schema → regra → rota → front → `[ai-workspace]` → `[docs]` (2026-10-27: o `[docs]` é
+  sempre o último commit da branch, mesmo quando um lint do workspace avisa entre eles).
 - **Mensagem**: inglês, imperativo, maiúscula, sem ponto, ≤ 72, sem prefixo (`feat:`); nomeia o
   resultado, não o processo (nada de `wip`); **commit do app só com título**, corpo com o porquê só
   nos commits com tag (2026-10-21); sem número de issue (vai no PR). Checklist no vault, `Plano do projeto/Regras de git`. O hook `commit-msg` (`ai/tools/commit_msg.py`) barra o resto na sessão do Claude; no commit do Lucca, avisa e pergunta.

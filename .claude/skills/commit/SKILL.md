@@ -10,7 +10,8 @@ Regras: `CLAUDE.md`, "Tarefas, commits e branches"; completas em
 
 1. `git status -s` e `git diff --stat`. Na `master` com mudança de funcionalidade → pare e
    proponha a branch (`/tarefa`).
-2. **Separe por mudança lógica**, na ordem em que uma depende da outra. Cada grupo:
+2. **Separe por mudança lógica**, na ordem em que uma depende da outra; o `[docs]` é sempre o
+   último commit da branch, depois dos `[ai-workspace]`. Cada grupo:
    - `git add <arquivos>` (nunca `-A` às cegas; `build/` e segredos fora);
    - `git diff --cached --stat`: todo arquivo é desta mudança?
    - mensagem: "If applied, this commit will <título>"; nomeia o resultado com o identificador do
