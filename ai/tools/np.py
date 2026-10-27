@@ -7,7 +7,7 @@
     ai/np obsidian [-q] [--simular] sincronia vault Note Project/ ↔ obsidian/
     ai/np duvidas [trecho da pág]   marcas [!duvida] [duvidas] [fix] [coment] nas notas
     ai/np diagrama <spec.yaml> [--png]   YAML → draw.io; `destino:` no spec copia o .drawio.svg para obsidian/
-    ai/np lint                      regras do workspace que viraram código (W01–W12)
+    ai/np lint                      regras do workspace que viraram código (W01–W16)
     ai/np test                      testes das ferramentas (tools/test_*.py)
     ai/np check                     o check do app (make check: ruff, mypy, pytest, tsc, build)
 
@@ -15,6 +15,7 @@ Só stdlib + PyYAML.
 """
 from __future__ import annotations
 
+import ast
 import json
 import re
 import shutil
@@ -203,7 +204,32 @@ def problemas() -> list[str]:
     out += _quebras()
     out += _versoes_servicos()
     out += _largura()
+    out += _blocos()
+    out += _branch_servico()
     return out
+
+
+# Prefixos de branch fora de apps/: o postgres (container do compose) e, sem serviço,
+# infra (label infrastructure sem container: CI, Terraform, AWS) e workspace (ai-workspace).
+_PREFIXOS_FIXOS = {"postgres", "infra", "workspace"}
+
+
+def _branch_servico() -> list[str]:
+    """W13: branch = <serviço>/<kebab>, e mexe só em apps/<serviço>/ (ou em nenhum)."""
+    br = git("rev-parse", "--abbrev-ref", "HEAD")
+    if br in ("master", "HEAD"):
+        return []
+    servicos = {p.name for p in (REPO / "apps").iterdir() if p.is_dir()} | _PREFIXOS_FIXOS
+    m = re.fullmatch(r"([a-z]+)/[a-z0-9]+(?:-[a-z0-9]+)*", br)
+    if not m or m.group(1) not in servicos:
+        return [f"W13 branch {br}: use <serviço>/<kebab>, serviço em {', '.join(sorted(servicos))}"]
+    base = git("merge-base", "master", "HEAD")
+    mexidos = git("diff", "--name-only", base).splitlines()
+    mexidos += git("ls-files", "--others", "--exclude-standard", "apps").splitlines()
+    outros = sorted({f.split("/")[1] for f in mexidos if f.startswith("apps/") and f.count("/") > 1} - {m.group(1)})
+    if outros:
+        return [f"W13 branch {br}: mexe em apps/{', apps/'.join(outros)}; um serviço por branch (outro PR na mesma issue)"]
+    return []
 
 
 def _largura() -> list[str]:
@@ -219,6 +245,109 @@ def _largura() -> list[str]:
         for i, linha in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
             if len(linha) > 80:
                 out.append(f"W12 {n}:{i}: {len(linha)} colunas; quebre em até 80")
+    return out
+
+
+# Comando que abre um bloco ou sai dele: pede linha em branco antes (e, se for bloco, depois).
+_BLOCO_PY = (ast.If, ast.For, ast.While, ast.Try, ast.With, ast.Match, ast.Return, ast.Raise)
+
+
+def checar_blocos(texto: str) -> list[int]:
+    """Linhas de comandos grudados no de cima quando um dos dois é bloco ou return/raise,
+    e a primeira do corpo de um def grudada na assinatura."""
+    linhas = texto.splitlines()
+    out = []
+    for no in ast.walk(ast.parse(texto)):
+        if isinstance(no, (ast.FunctionDef, ast.AsyncFunctionDef)) and no.body[0].lineno > no.lineno:
+            if not any(not x.strip() for x in linhas[no.lineno:no.body[0].lineno - 1]):
+                out.append(no.body[0].lineno)
+        for campo in ("body", "orelse", "finalbody"):
+            corpo = getattr(no, campo, None)
+            if not isinstance(corpo, list):
+                continue
+            for a, b in zip(corpo, corpo[1:]):
+                if not (isinstance(a, _BLOCO_PY) or isinstance(b, _BLOCO_PY)):
+                    continue
+                inicio = min([b.lineno] + [d.lineno for d in getattr(b, "decorator_list", [])])
+                entre = linhas[a.end_lineno:inicio - 1]  # type: ignore[misc]
+                if not any(not x.strip() for x in entre):
+                    out.append(inicio)
+    return sorted(out)
+
+
+def checar_atributos(texto: str) -> list[int]:
+    """Linhas de atributos de classe sem tipo (`x = 1` em vez de `x: int = 1`)."""
+    return sorted(
+        b.lineno
+        for no in ast.walk(ast.parse(texto)) if isinstance(no, ast.ClassDef)
+        for b in no.body if isinstance(b, ast.Assign)
+    )
+
+
+def _parte(b: ast.stmt) -> int:
+    """0 = import, 1 = variável global (ou chamada solta), 2 = código (def, class, if...)."""
+    if isinstance(b, (ast.Import, ast.ImportFrom)):
+        return 0
+    return 1 if isinstance(b, (ast.Assign, ast.AnnAssign, ast.AugAssign, ast.Expr)) else 2
+
+
+_TITULO_PARTE = {0: "# Imports", 1: "# Global variables", 2: "# Code"}
+
+
+def checar_layout(texto: str) -> list[int]:
+    """Arquivo em três partes, nessa ordem: imports, variáveis globais, código; duas linhas em
+    branco entre uma parte e a outra, e o comentário da parte em cima do primeiro comando dela.
+    Devolve as linhas que quebram a ordem, a separação ou o comentário."""
+    linhas = texto.splitlines()
+    corpo = ast.parse(texto).body
+    if corpo and isinstance(corpo[0], ast.Expr) and isinstance(corpo[0].value, ast.Constant):
+        corpo = corpo[1:]  # docstring do módulo
+    out = []
+    for i, b in enumerate(corpo):
+        inicio = min([b.lineno] + [d.lineno for d in getattr(b, "decorator_list", [])])
+        a = corpo[i - 1] if i else None
+        if a is not None and _parte(b) < _parte(a):
+            out.append(inicio)
+            continue
+        if a is not None and _parte(b) == _parte(a):
+            if _parte(b) == 1 and b.lineno > a.end_lineno + 1:  # type: ignore[operator]
+                out.append(inicio)  # globais seguidas, sem linha em branco entre elas
+            continue
+        acima = [x.strip() for x in linhas[:inicio - 1] if x.strip()]
+        # Comentário do próprio comando (o que a função faz) pode vir entre o título e ele
+        topo = inicio - 1
+        while topo > 0 and linhas[topo - 1].strip().startswith("#") \
+                and linhas[topo - 1].strip() != _TITULO_PARTE[_parte(b)]:
+            topo -= 1
+        if topo > 0 and linhas[topo - 1].strip() == _TITULO_PARTE[_parte(b)]:
+            acima = [x.strip() for x in linhas[:topo] if x.strip()]
+        if not acima or acima[-1] != _TITULO_PARTE[_parte(b)]:
+            out.append(inicio)
+        elif a is not None:
+            entre = linhas[a.end_lineno:inicio - 1]  # type: ignore[misc]
+            if sum(not x.strip() for x in entre) < 2:
+                out.append(inicio)
+    return out
+
+
+def _blocos() -> list[str]:
+    """W14–W16 no Python do app criado na branch; código antigo só segue a regra quando o Lucca
+    mexer nele de propósito (CLAUDE.md)."""
+    base = git("merge-base", "master", "HEAD")
+    mexidos = git("diff", "--name-only", "--diff-filter=A", base, "--", "apps").splitlines()
+    mexidos += git("ls-files", "--others", "--exclude-standard", "apps").splitlines()
+    out = []
+    for n in sorted(set(mexidos)):
+        f = REPO / n
+        if f.suffix != ".py" or not f.is_file() or "/migrations/" in n:
+            continue
+        for i in checar_blocos(f.read_text(encoding="utf-8")):
+            out.append(f"W14 {n}:{i}: bloco grudado no de cima; pule uma linha")
+        for i in checar_atributos(f.read_text(encoding="utf-8")):
+            out.append(f"W15 {n}:{i}: atributo de classe sem tipo; escreva `nome: tipo = ...`")
+        for i in checar_layout(f.read_text(encoding="utf-8")):
+            out.append(f"W16 {n}:{i}: partes imports → globais → código, cada uma com o comentário"
+                       " dela (# Imports, # Global variables, # Code) e duas linhas entre elas")
     return out
 
 
@@ -345,7 +474,7 @@ def cmd_lint(_a) -> int:
 
 def cmd_test(_a) -> int:
     r = subprocess.run([sys.executable, "-m", "unittest", "-q", "test_commit_msg", "test_foco",
-                        "test_hooks_contexto", "test_estilo"], cwd=RAIZ / "tools")
+                        "test_hooks_contexto", "test_estilo", "test_blocos"], cwd=RAIZ / "tools")
     r2 = subprocess.run([sys.executable, "test_obsidian_sync.py"], cwd=RAIZ / "tools")
     r3 = subprocess.run([sys.executable, "test_diagrama.py"], cwd=RAIZ / "tools")
     return r.returncode or r2.returncode or r3.returncode

@@ -1,0 +1,21 @@
+titulo: "@get(\"/health\"): o que roda no import e o que roda a cada pedido"
+tipo: blocos
+grade: [260, 150]
+destino: Conceitos/Figuras
+nos:
+  le:    {tipo: bloco, pos: [0, 0], texto: "Python lê o arquivo<br>de cima a baixo", cor: verde}
+  fab:   {tipo: bloco, pos: [1, 0], texto: "get(\"/health\")<br>fabrica anota", cor: verde}
+  def:   {tipo: bloco, pos: [2, 0], texto: "def health<br>cria a função<br>(corpo não roda)", cor: verde}
+  chama: {tipo: bloco, pos: [3, 0], texto: "anota(health)<br>rotas[GET /health] = health", cor: verde}
+  lista: {tipo: bloco, pos: [4, 0], texto: "dicionário rotas<br>(memória)<br>GET /health → health", cor: amarelo}
+  gi:    {tipo: grupo, contem: [le, fab, def, chama], texto: "uma vez: ao importar", cor: cinza}
+  ped:   {tipo: bloco, pos: [2, 1.5], texto: "pedido<br>GET /health", cor: azul}
+  busca: {tipo: bloco, pos: [3, 1.5], texto: "rotas[GET /health]()<br>o corpo roda agora", cor: verde}
+  gp:    {tipo: grupo, contem: [ped, busca], texto: "a cada pedido", cor: cinza}
+arestas:
+  - [le, fab, {rotulo: "linha do @"}]
+  - [fab, def]
+  - [def, chama, {rotulo: "o @ chama"}]
+  - [chama, lista, {rotulo: "append"}]
+  - [ped, busca]
+  - [busca.d, lista.b, {rotulo: "procura", tracejada: true}]

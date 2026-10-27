@@ -20,6 +20,19 @@ FastAPI é um framework web que monta essas peças a partir das **type hints** d
 
 Flask e Django nasceram no WSGI: cada pedido ocupa uma thread enquanto espera o banco ou a rede. ASGI troca isso por `async`/`await`: enquanto um pedido espera o [[Postgres e migrations|Postgres]], o mesmo processo atende outro. FastAPI (2018) é uma camada sobre o **Starlette**, um framework ASGI pequeno, e usa o **Pydantic** para validar e serializar.
 
+ASGI (Asynchronous Server Gateway Interface) é o combinado entre o servidor e a app: a app é uma função `async` que o servidor chama a cada pedido.
+
+```python
+async def app(scope, receive, send):
+    # scope = o pedido já lido: {"method": "GET", "path": "/notes/7", ...}
+    await send({"type": "http.response.start", "status": 200, ...})
+    await send({"type": "http.response.body", "body": b'{"id": 7}'})
+```
+
+- O `FastAPI()` é um objeto que segue esse formato; qualquer servidor ASGI (uvicorn, Hypercorn, Granian, Daphne) consegue rodá-lo sem mudar a app.
+- Servidor e app ficam **no mesmo processo Python**: a conversa entre eles é uma chamada de função, sem rede. O [[TCP e pacotes|TCP]] só existe entre o cliente e o servidor.
+- O servidor não conhece as rotas: entrega o caminho como texto (`"/notes/7"`). Achar a rota e converter o `"7"` em `int` é trabalho da app.
+
 ## As camadas de um pedido
 
 ```mermaid
@@ -38,12 +51,15 @@ flowchart LR
 4. A **função da rota** recebe os valores já convertidos (`note_id: int` chega como `int`) e devolve um objeto Python: `dict`, modelo Pydantic, lista.
 5. FastAPI converte o retorno em JSON, filtrando pelo `response_model` quando há um, e o uvicorn manda a resposta.
 
+![[caminho-de-um-pedido.drawio.svg]]
+*Um `curl` até a resposta: o TCP só aparece entre processos (host ⇄ container, API ⇄ Postgres); entre uvicorn e FastAPI é uma chamada de função (ASGI).*
+
 ## As peças
 
 | Peça                 | O que faz                                                                                | Exemplo                                             |
 | -------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------- |
 | `FastAPI()`          | o objeto da app: guarda rotas, middlewares e o ciclo de vida                             | `app = FastAPI()`                                   |
-| rota                 | decorator que liga método + caminho a uma função                                         | `@app.get("/health")`                               |
+| rota                 | [[Python — decorator, with e yield\|decorator]] que liga método + caminho a uma função                                         | `@app.get("/health")`                               |
 | parâmetro de caminho | nome que aparece no caminho                                                              | `def get(note_id: int)` em `/notes/{note_id}`       |
 | parâmetro de query   | nome que não está no caminho, tipo simples                                               | `def search(q: str, limit: int = 20)`               |
 | corpo                | parâmetro do tipo de um modelo Pydantic                                                  | `def create(note: NoteIn)`                          |
@@ -55,6 +71,82 @@ flowchart LR
 
 - `Depends` é o que mais muda o desenho de um serviço: autenticação, sessão do banco e paginação viram dependências, e o teste troca uma dependência por outra (`app.dependency_overrides`) sem mexer na rota.
 - O `TestClient` usa o `httpx` e fala ASGI direto com a app: o teste exercita roteamento, validação e serialização inteiros, sem subir servidor.
+- O `@app.get(...)` registra a rota **ao importar o arquivo**, uma vez; a cada pedido só o corpo da função roda ([[Python — decorator, with e yield#Decorator com argumento: a fábrica|a fábrica de decorator]]). Arquivo de rotas sem `include_router` não entra na lista: o pedido recebe 404.
+
+## De onde vem cada parâmetro
+
+A função da rota só declara nomes e tipos; quem decide se o valor sai do caminho, da query, do corpo ou de uma dependência é o FastAPI, olhando a assinatura **uma vez, ao registrar a rota** (no import do arquivo). A cada pedido ele só segue o que decidiu.
+
+Primeiro, lê os nomes do caminho: `"/notes/{note_id}"` passa por uma regex que pega o que está entre chaves e guarda `{"note_id"}`. Depois, para cada parâmetro da função, a primeira regra que vale ganha:
+
+| Ordem | Regra | De onde vem | Exemplo |
+|---|---|---|---|
+| 1 | tem `Depends(...)` (direto ou no `Annotated`) | roda a função e entrega o resultado | `conn: Annotated[Connection, Depends(get_conn)]` |
+| 2 | o nome está entre as chaves do caminho | caminho | `note_id: UUID` em `/notes/{note_id}` |
+| 3 | o tipo não é simples (modelo Pydantic, lista de modelos) | corpo JSON | `note: NoteCreate` |
+| 4 | tipo simples (`str`, `int`, `UUID`, `bool`, …) | query string | `parent_id: UUID \| None = None` → `?parent_id=...` |
+
+- Marcar à mão (`Query()`, `Path()`, `Body()`, `Header()`) passa por cima das regras 2–4: `Body()` num `int` faz o valor vir do corpo.
+- Parâmetro de caminho não aceita valor padrão: o caminho só casa se o pedaço existe, então ele está sempre lá.
+- Tipo `Request` ou `Response` não vem do pedido como dado: o FastAPI entrega o próprio objeto.
+
+Depois de achar o valor, a **type hint** converte e valida. Na URL tudo é texto: `"01a1787d-..."` vira `UUID`, `"7"` vira `int`. O que não converte vira **422** com o campo e o motivo, sem a função rodar. Valor padrão (`= None`, `= ""`) torna o parâmetro opcional; sem padrão, faltar também é 422.
+
+Fonte: FastAPI 0.150.0, `fastapi/utils.py` (`get_path_param_names`) e `fastapi/dependencies/utils.py` (`get_dependant`, `analyze_param`).
+
+> [!example] Uso
+> As rotas de notas usam as quatro regras numa função só, como em `update_note(conn, note_id, patch)`: [[API de notas#Pastas dentro de `src/notes`|API de notas]].
+
+## Corpo com Pydantic
+
+O corpo de um `POST` ou `PUT` é um JSON. Uma classe que herda de `BaseModel` descreve o formato dele, e um parâmetro com esse tipo diz ao FastAPI que o valor vem do corpo:
+
+```python
+from pydantic import BaseModel
+
+class NoteIn(BaseModel):
+    title: str              # obrigatório: sem valor padrão
+    content: str = ""       # opcional: falta no JSON → ""
+
+@app.post("/notes")
+def create(note: NoteIn):   # note.title, note.content
+    ...
+```
+
+| Corpo mandado | `content: str` | `content: str = ""` |
+|---|---|---|
+| `{"title": "Ideias", "content": "x"}` | roda, `content = "x"` | roda, `content = "x"` |
+| `{"title": "Ideias"}` | **422**, a função não roda | roda, `content = ""` |
+| `{"title": 5}` | 422 (`title` não é texto) | 422 |
+
+O 422 sai antes da função: o FastAPI confere o JSON contra a classe e devolve a lista dos campos errados. Erro **dentro** da função vira 500.
+
+## `Depends` com `yield`
+
+```python
+def get_conn():
+    with engine.begin() as conn:
+        yield conn
+
+@app.get("/health")
+def health(conn: Annotated[Connection, Depends(get_conn)]):
+    conn.execute(text("SELECT 1"))
+```
+
+| Parte | Quem lê | O que diz |
+|---|---|---|
+| `conn` | ninguém em especial | nome livre; `db` funcionaria igual |
+| `Connection` | o mypy e quem lê o código | a type hint: o que chega |
+| `Annotated[..., ...]` | Python | o tipo, mais uma etiqueta para o framework |
+| `Depends(get_conn)` | FastAPI | não procurar no pedido: rodar `get_conn` e usar o que ele der |
+
+A cada pedido, o FastAPI trata a dependência como um [[Python — decorator, with e yield|context manager]]:
+
+1. roda `get_conn` até o `yield`: pega uma conexão do pool e abre a transação;
+2. chama a rota com `conn` = o valor do `yield`;
+3. a rota terminou: continua `get_conn` depois do `yield`, e o `with` faz `COMMIT` ou `ROLLBACK` e devolve a conexão ([[SQLAlchemy — engine e conexão#Transação|transação]]).
+
+A rota nunca abre nem fecha a conexão; trocar `get_conn` por outra função no teste (`app.dependency_overrides`) não mexe na rota.
 
 ## Muitos clientes ao mesmo tempo
 

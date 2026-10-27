@@ -18,6 +18,7 @@ Valem para toda página que o workspace escreve ou corrige no Obsidian (`/nota`,
 - **Decisão = opções + critério + escolha + o que faria mudar de ideia.** Tabela das opções lado a lado; a escolha com o porquê; "revisar se..." no fim.
 - (2026-10-17) **Página de decisão descreve o que será feito**, sem `Decidido (data)` no título nem como funciona hoje. A alternativa descartada entra breve: um parágrafo, a tabela lado a lado e o porquê da escolha.
 - **Estado vs plano**: diga o que já existe no código (✅) e o que é plano (⏳). Página de plano não descreve como pronto o que não está.
+- (2026-10-26) **Página de issue** (`Plano do projeto/Issues feitas/<milestone>/Issue N — <título>`): título `# #N <título da issue>`; primeiro parágrafo diz de qual milestone é, o que entregou e termina em "Passou por <tópicos>"; depois uma seção por tópico (FastAPI, Python, Postgres e banco, Docker, Rede e TCP, Linux, Testes…), com bullets do que ficou aprendido e o link para a página do conceito; por último `## Notas do vault`, com o que mudou no plano, no workspace e nos conceitos. Fonte: o diff da branch em `ai/obsidian/` (`git diff master...<branch> -- ai/obsidian`) e o código, não só o escopo. A página da milestone ganha a linha Issue | Título | Estado | Tópicos.
 
 ## Desenhos
 - Fluxo, camadas, sequência e deploy viram **desenho draw.io** (`/diagrama`), em `Figuras/` da pasta, embutido com `![[nome.drawio.svg]]` e legenda de uma linha. Mermaid só para o pequeno.

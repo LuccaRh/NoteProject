@@ -29,7 +29,7 @@ Para 2026-10-29, a [[Entrega de 2026-10-29|entrega]] puxa notas e IA em localhos
 | Milestone | Issues | Fecha quando |
 |---|---|---|
 | **M0 Server skeleton** | #10–#13 | `apps/notes` em [[Container e Docker Compose\|compose]] com [[Postgres e migrations\|Postgres]] e migrations, `/health` respondendo |
-| **M1 Notes in the browser** | #46, #47, #6–#9 | o editor abre pela URL do servidor e cria, edita e busca notas no [[Postgres e migrations\|Postgres]]; [[Pastas, campos e views\|pastas, campos e views]] |
+| **M1 Notes in the browser** | #46, #56, #47, #6–#9 | o editor abre pela URL do servidor e cria, edita e busca notas no [[Postgres e migrations\|Postgres]]; [[Pastas, campos e views\|pastas, campos e views]] |
 | **M2 Login and TLS** | #48, #16, #17 | login por cookie de sessão, [[Reverse proxy\|Caddy]] com [[TLS e HTTPS\|TLS]] local, [[CI e CD\|CI]] do servidor verde |
 | **M3 Online on AWS** | #18–#25 | domínio com [[TLS e HTTPS\|HTTPS]], deploy por merge, [[Backup e restore\|backup]] restaurado uma vez |
 | **M4 Live edits** | #26, #27, #30 | edição numa aba aparece na outra, pelo [[WebSocket]] |
@@ -42,7 +42,7 @@ Para 2026-10-29, a [[Entrega de 2026-10-29|entrega]] puxa notas e IA em localhos
 #10 `apps/notes` com `/health` → #11 [[Container e Docker Compose|compose]] → #12 [[Postgres e migrations|Postgres + migrations]] (`users`, `notes` com `parent_id`, `fields`, `version`) → #13 `.env` fora do git.
 
 ### M1 — notas no navegador
-1. #46 rotas `/notes` e `/search`, com a busca full-text do [[Postgres e migrations|Postgres]]; no front, o cliente da API e a lista de notas, com o proxy do Vite apontando para o servidor (`:8000`).
+1. #46 rotas `/notes` no [[Postgres e migrations|Postgres]], e #56 `/search` com a busca full-text; no front, o cliente da API e a lista de notas, com o proxy do Vite apontando para o servidor (`:8000`).
 2. #47 o servidor serve o build do front: uma URL só, nada instalado.
 3. #6 pastas, #7 campos (JSONB), #8 [[Pastas, campos e views|views]]: modelo de dados, à mão.
 4. #9 sidebar com pastas e views: delegada.

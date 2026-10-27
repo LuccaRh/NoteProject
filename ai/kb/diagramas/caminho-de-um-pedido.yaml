@@ -1,0 +1,24 @@
+titulo: "curl GET /notes/7: ida (em cima) e volta (embaixo)"
+tipo: blocos
+grade: [300, 150]
+destino: Conceitos/Figuras
+nos:
+  curl:  {tipo: bloco, pos: [0, 0], texto: "curl no host<br>127.0.0.1:51234<br>(porta sorteada)", cor: azul}
+  porta: {tipo: bloco, pos: [1, 0], texto: "porta 127.0.0.1:8000<br>do host<br>Docker repassa<br>ao container :8000", cor: roxo}
+  uv1:   {tipo: bloco, pos: [2, 0], texto: "uvicorn<br>lê os bytes do TCP<br>monta o pedido em dict<br>(path = '/notes/7')", cor: laranja}
+  fa1:   {tipo: bloco, pos: [3, 0], texto: "FastAPI<br>acha a rota<br>'7' (texto) → 7 (int)<br>roda Depends(get_conn)", cor: verde}
+  fn:    {tipo: bloco, pos: [4, 0], texto: "sua função<br>get(note_id=7, conn)<br>conn.execute(SELECT …)", cor: verde}
+  db:    {tipo: banco, pos: [5, 0], texto: "Postgres<br>postgres:5432<br>(172.18.0.x)", cor: amarelo}
+  fa2:   {tipo: bloco, pos: [3, 1], texto: "FastAPI<br>dict → JSON<br>status 200", cor: verde}
+  uv2:   {tipo: bloco, pos: [2, 1], texto: "uvicorn<br>escreve o texto HTTP<br>no TCP", cor: laranja}
+  gn:    {tipo: grupo, contem: [uv1, fa1, fn, fa2, uv2], texto: "container da API (172.18.0.x): um processo Python", cor: cinza}
+  n1:    {tipo: nota, pos: [1, 2], texto: "TCP 1: a mesma conexão<br>leva o pedido e a resposta"}
+arestas:
+  - [curl, porta, {rotulo: "TCP 1 (HTTP)"}]
+  - [porta, uv1, {rotulo: "TCP 1"}]
+  - [uv1, fa1, {rotulo: "ASGI"}]
+  - [fa1, fn, {rotulo: "chama"}]
+  - [fn.d, db.e, {rotulo: "TCP 2 (protocolo<br>Postgres), do pool"}]
+  - [fn.b, fa2.d, {rotulo: "return dict"}]
+  - [fa2, uv2, {rotulo: "send()"}]
+  - [uv2.e, curl.b, {rotulo: "TCP 1: 200 + JSON"}]

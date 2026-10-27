@@ -35,6 +35,7 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Como
 | Página | Ideia |
 |---|---|
 | [[Python — módulo, package e venv]] | o `import` procura numa lista de pastas; cada projeto tem as suas libs |
+| [[Python — decorator, with e yield]] | o `@` registra a função ao importar; o `with` garante a saída; o `yield` divide entrada e saída |
 | [[FastAPI]] | a função tipada vira rota validada e documentada |
 | [[Token por dispositivo]] | um [[Token por dispositivo\|token por dispositivo]], mandado em todo pedido |
 | [[IP, porta e rede de containers]] | IP acha a máquina, porta acha o programa; containers se acham pelo nome |
