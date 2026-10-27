@@ -72,8 +72,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   branch: schema → regra → rota → front → docs.
 - **Mensagem**: inglês, imperativo, maiúscula, sem ponto, ≤ 72, sem prefixo (`feat:`); nomeia o
   resultado, não o processo (nada de `wip`); **commit do app só com título**, corpo com o porquê só
-  nos commits com tag (2026-10-21); sem número de issue (vai no PR,
-  `Closes #N`). Checklist no vault, `Plano do projeto/Regras de git`. O hook `commit-msg` (`ai/tools/commit_msg.py`) barra o resto.
+  nos commits com tag (2026-10-21); sem número de issue (vai no PR). Checklist no vault, `Plano do projeto/Regras de git`. O hook `commit-msg` (`ai/tools/commit_msg.py`) barra o resto.
 - **Tags** (2026-10-19): commit fora do app começa com a tag; o resto do título segue as regras.
   - `[docs] `: notas do vault (`ai/obsidian/`) e fontes das figuras (`ai/kb/diagramas/`).
     **Um por branch** (as notas mexidas nela); na `master`, fora de branch, **um por push**
@@ -106,7 +105,8 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 - **Data real no commit** (2026-10-15): nunca mexer em `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE`
   nem passar `--date`; reescrever história usa a hora do momento (`rebase --reset-author-date`).
 - **Issue quem fecha é o Lucca** (2026-10-19): a sessão nunca roda `gh issue close`; quando
-  a issue estiver pronta, avise. O `Closes #N` do PR vale, porque o merge é dele.
+  a issue estiver pronta, avise.
+- **Corpo do PR** (2026-10-26): só `Issue #N`, nada mais (sem resumo, sem `Closes`).
 - **Push e PR só com o ok do Lucca.** Force nunca sem ele pedir, sempre `--force-with-lease`.
   Merge do PR com merge commit (não squash).
 
