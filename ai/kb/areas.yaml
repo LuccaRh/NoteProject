@@ -15,7 +15,7 @@ editor:
   lado: front
   codigo: [apps/web/src/editor.ts, apps/web/src/decorations/]
   libs: [codemirror-view]
-  notas: ["Conceitos/CodeMirror e decorações.md", "Estrutura do projeto/Marcador no texto, conteúdo fora.md"]
+  notas: ["Conceitos/Editor/CodeMirror.md", "Estrutura do projeto/Marcador no texto, conteúdo fora.md"]
 
 ui:
   nome: Moldura da interface (sidebar, palette, abas)
@@ -30,34 +30,34 @@ cliente-api:
 dados:
   nome: Modelo de dados (Postgres, pastas, campos, views)
   lado: back
-  notas: ["Conceitos/Postgres e migrations.md", "Estrutura do projeto/Pastas, campos e views.md"]
+  notas: ["Conceitos/Banco de dados/Postgres.md", "Estrutura do projeto/Pastas, campos e views.md"]
   aprender: true
   futuro: true
 
 sync:
   nome: Sync local-first (Yjs no cliente, CRDT no servidor, version incremental)
-  notas: ["Conceitos/Local-first.md", "Conceitos/CRDT e Yjs.md", "Conceitos/WebSocket.md", "Conceitos/Sync por versão.md"]
+  notas: ["Conceitos/Sync/Local-first.md", "Conceitos/Sync/CRDT.md", "Conceitos/Sync/Yjs.md", "Conceitos/Sync/WebSocket.md", "Conceitos/Sync/Sync por versão.md"]
   lado: back
   aprender: true
   futuro: true
 
 servidor:
   nome: Servidor (FastAPI + Postgres; WebSocket e blobs depois)
-  notas: ["Conceitos/FastAPI.md", "Conceitos/Python — módulo, package e venv.md", "Estrutura do projeto/API de notas.md", "Conceitos/Postgres e migrations.md", "Conceitos/S3 — armazenamento de objetos.md", "Conceitos/Redis pub-sub.md"]
+  notas: ["Conceitos/Python/FastAPI.md", "Conceitos/Python/Package Python.md", "Estrutura do projeto/API de notas.md", "Conceitos/Banco de dados/Postgres.md", "Conceitos/AWS/S3.md", "Conceitos/Sync/Redis pub-sub.md"]
   lado: back
   aprender: true
   futuro: true
 
 auth:
   nome: Autenticação (cookie de sessão no navegador, TLS)
-  notas: ["Conceitos/Token por dispositivo.md", "Conceitos/TLS e HTTPS.md"]
+  notas: ["Conceitos/Auth/Token por dispositivo.md", "Conceitos/Rede/TLS.md"]
   lado: back
   aprender: true
   futuro: true
 
 infra:
   nome: Containers, CI, deploy, proxy/TLS, backup, monitoramento
-  notas: ["Conceitos/00 Mapa — Conceitos.md", "Conceitos/Container e Docker Compose.md", "Conceitos/Reverse proxy.md", "Conceitos/CI e CD.md"]
+  notas: ["Conceitos/00 Mapa — Conceitos.md", "Conceitos/Docker/Docker Compose.md", "Conceitos/Rede/Reverse proxy.md", "Conceitos/Deploy/CI.md"]
   lado: infra
   codigo: [docker-compose-dev.yml, Makefile, .github/workflows/, apps/web/Dockerfile.dev]
   aprender: true
@@ -65,7 +65,7 @@ infra:
 ia:
   nome: IA dentro do produto (MCP, fila de pedidos, edição por âncora)
   lado: back
-  notas: ["IA no projeto/00 Mapa — IA no projeto.md", "IA no projeto/Ordem de implementação.md", "Conceitos/MCP.md"]
+  notas: ["IA no projeto/00 Mapa — IA no projeto.md", "IA no projeto/Ordem de implementação.md", "Conceitos/IA/MCP.md"]
   futuro: true
 
 workspace:
