@@ -44,4 +44,4 @@ O [[O daemon notesd|daemon]] escreve:
 - **Continua Markdown**: são callouts do Obsidian. A nota abre no Obsidian e exporta sem o app.
 - **Funciona sem IA**: `/` no editor abre um menu (estilo Notion) que insere o molde vazio.
 
-No editor, cada tipo de callout ganha [[CodeMirror e decorações|decoração]] própria (cor, ícone), do mesmo jeito que `decorations/headings.ts`.
+No editor, cada tipo de callout ganha [[CodeMirror|decoração]] própria (cor, ícone), do mesmo jeito que `decorations/headings.ts`.

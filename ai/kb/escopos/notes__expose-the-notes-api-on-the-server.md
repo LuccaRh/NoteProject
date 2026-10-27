@@ -8,7 +8,7 @@ areas: [servidor, dados]
 2. Testes das rotas contra o Postgres; `make check` passa.
 
 ## Contexto (pode tocar só o mínimo para o Pedido funcionar)
-- Notas `Estrutura do projeto/Navegador`, `Estrutura do projeto/API de notas`, `Conceitos/Postgres e migrations`.
+- Notas `Estrutura do projeto/Navegador`, `Estrutura do projeto/API de notas`, `Conceitos/Banco de dados/Postgres`.
 - Regra nova de branch por serviço (W13, `CLAUDE.md`, `Regras de git`) e as notas de issues feitas trazidas unstaged.
 
 ## Fora (vira outra branch)

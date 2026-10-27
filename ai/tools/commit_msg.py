@@ -13,11 +13,13 @@ Merge, revert e fixup!/squash! gerados pelo git passam (o fixup some no rebase -
     python3 tools/commit_msg.py <arquivo>   # hook commit-msg (tools/githooks/commit-msg)
     python3 tools/commit_msg.py -m "msg"
 
-Sai com 1 e lista os erros se a mensagem quebrar alguma regra.
+Sai com 1 e lista os erros se a mensagem quebrar alguma regra. Só barra a sessão do Claude Code
+(`CLAUDECODE` no ambiente); commit do Lucca vira aviso com "commitar mesmo assim? [y/N]" no terminal.
 """
 from __future__ import annotations
 
 import argparse
+import os
 import pathlib
 import re
 import sys
@@ -84,11 +86,25 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     texto = a.m if a.m is not None else (
         pathlib.Path(a.arquivo).read_text(errors="replace") if a.arquivo else sys.stdin.read())
-    if e := erros(texto):
-        print("commit bloqueado (CLAUDE.md, 'Tarefas, commits e branches'):", *(f"  - {x}" for x in e),
-              sep="\n", file=sys.stderr)
+    if not (e := erros(texto)):
+        return 0
+    lista = "\n".join(f"  - {x}" for x in e)
+    if os.environ.get("CLAUDECODE"):
+        print(f"commit bloqueado (CLAUDE.md, 'Tarefas, commits e branches'):\n{lista}", file=sys.stderr)
         return 1
-    return 0
+    print(f"aviso (CLAUDE.md, 'Tarefas, commits e branches'):\n{lista}", file=sys.stderr)
+    return 0 if confirma("commitar mesmo assim? [y/N] ") else 1
+
+
+def confirma(pergunta: str) -> bool:
+    """Pergunta no terminal (o hook não tem stdin); sem terminal (IDE, script), deixa passar."""
+    try:
+        with open("/dev/tty", "r+") as tty:
+            tty.write(pergunta)
+            tty.flush()
+            return tty.readline().strip().lower() in {"y", "yes"}
+    except OSError:
+        return True
 
 
 if __name__ == "__main__":

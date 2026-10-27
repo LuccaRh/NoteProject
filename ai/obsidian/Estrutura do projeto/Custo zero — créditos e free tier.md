@@ -34,7 +34,7 @@ Para o servidor de [[AWS ou infra própria]] sair de graça no primeiro ano, jun
 | [[EC2]] `t4g.micro` (1 GB) | ~6,13 | [Holori](https://calculator.holori.com/aws/ec2/t4g.micro/us-east-1) |
 | IPv4 público | ~3,65 (US$0,005/h) | [Classmethod](https://dev.classmethod.jp/en/articles/ec2-t4g-small-free-tier-2026/) |
 | [[EC2\|EBS]] 20 GB gp3 | ~1,60 *(de memória)* | — |
-| [[S3 — armazenamento de objetos\|S3]] | US$0,023/GB; bucket vazio não custa nada | [Upstash](https://upstash.com/blog/aws-s3-pricing-explained-2026) |
+| [[S3]] | US$0,023/GB; bucket vazio não custa nada | [Upstash](https://upstash.com/blog/aws-s3-pricing-explained-2026) |
 | **total** | **~US$10–18** | — |
 
 - Com a `t4g.small` grátis até dezembro, os ~US$200 cobrem o resto dos 12 meses.
@@ -51,7 +51,7 @@ Para o servidor de [[AWS ou infra própria]] sair de graça no primeiro ano, jun
 | DigitalOcean US$200 | **acabou** em 31/07/2026 | [Capital & Compute](https://capitalandcompute.net/blog/github-student-developer-pack-2026/) |
 | crédito AWS | não está no pack | [devhunt](https://devhunt.org/blog/github-student-pack-essentials) |
 | Copilot Student | inscrições novas pausadas desde 20/04/2026 | [perkstack](https://perkstack.co/blog/github-student-pack-guide) |
-| [[CI e CD\|GitHub Actions + GHCR]] | grátis em repositório público, com cota em privado *(de memória)* | — |
+| [[CI\|GitHub Actions]] + [[CD\|GHCR]] | grátis em repositório público, com cota em privado *(de memória)* | — |
 
 - Domínio: o grátis do pack serve no primeiro ano. Para algo que dure, `.com.br` no registro.br sai por ~R$40/ano *(de memória)*.
 - A lista do pack muda: conferir em [education.github.com/pack](https://education.github.com/pack).

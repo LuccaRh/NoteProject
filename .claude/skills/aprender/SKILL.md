@@ -12,7 +12,7 @@ O objetivo é o Lucca **saber fazer**, não ler sobre: a página prepara, o exer
    Use as palavras de lá e não repita.
 2. **Uma pergunta** ao Lucca: o que ele já sabe do pré-requisito e se quer teoria curta ou
    direto ao exercício. Espere.
-3. **Página do conceito** em `ai/obsidian/Conceitos/` (entra no `00 Mapa — Conceitos`; já
+3. **Página do conceito** em `ai/obsidian/Conceitos/<pasta>/` (entra no `00 Mapa — Conceitos`, na seção da pasta; já
    existe → amplie em vez de criar outra), seguindo `.claude/skills/nota/regras.md`:
    de onde vem → para que serve → como funciona (com figura `/diagrama` se tem fluxo) → onde
    aparece (mercado) → erros comuns. Fonte: doc oficial ou código; marque *(geral)* o que

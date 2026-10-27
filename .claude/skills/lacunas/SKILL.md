@@ -26,7 +26,7 @@ Mensagens do Lucca nesta sessão:
 
    | # | Conceito / pergunta | Status | Hoje no vault | Página sugerida |
    |---|---|---|---|---|
-   | 1 | Por que a URL do banco usa o nome do serviço, não o IP | parcial | `Conceitos/IP, porta e rede de containers.md:47` | mesma página |
+   | 1 | Por que a URL do banco usa o nome do serviço, não o IP | parcial | `Conceitos/Docker/Rede de containers.md:8` | mesma página |
 
    - "Conceito / pergunta" em palavras do Lucca, uma linha.
    - "Página sugerida": página existente de `Conceitos/` ou `Estrutura do projeto/` quando cabe nela;

@@ -34,7 +34,7 @@ A [[UI otimista]] cobre a escrita; a leitura pede ao servidor só o necessário,
 | `apps/web/src/notes/api.ts` | cliente da API: chama `/api` na própria origem, o proxy do Vite repassa | ⏳ |
 | front | [[UI otimista]]: estado pendente na tela, desfaz ou tenta de novo se o servidor recusar | ⏳ |
 | login | cookie de sessão (httpOnly, mesma origem), #48 | ⏳ |
-| busca | a busca full-text do [[Postgres e migrations\|Postgres]] ([doc](https://www.postgresql.org/docs/current/textsearch.html)) | ⏳ |
+| busca | a busca full-text do [[Postgres]] ([doc](https://www.postgresql.org/docs/current/textsearch.html)) | ⏳ |
 | IA | worker da [[Fila de pedidos\|fila]] no servidor; o navegador só pede e mostra a proposta ([[Workspace no app]]) | ⏳ |
 
 - O `api.ts` será a única fronteira de rede do front: quando o app desktop vier, o [[O daemon notesd|`notesd`]] responde o mesmo contrato e a tela não muda.
@@ -42,7 +42,7 @@ A [[UI otimista]] cobre a escrita; a leitura pede ao servidor só o necessário,
 
 ## Por que não SQLite em WASM
 
-A outra saída é o navegador virar um dispositivo [[Local-first|local-first]]: um "`notesd` em TS" dentro da página, com o [[SQLite e FTS5|SQLite]] compilado em [[WebAssembly|WASM]] guardando as notas no navegador.
+A outra saída é o navegador virar um dispositivo [[Local-first|local-first]]: um "`notesd` em TS" dentro da página, com o [[SQLite]] compilado em [[WebAssembly|WASM]] guardando as notas no navegador.
 
 | | [[UI otimista]] | SQLite em WASM |
 |---|---|---|
@@ -52,10 +52,10 @@ A outra saída é o navegador virar um dispositivo [[Local-first|local-first]]: 
 | fechar a aba com edição pendente | perde o que não subiu | guarda |
 | custo | estado pendente + desfazer no erro | lógica local escrita duas vezes (Python e TS) + Service Worker + sync no navegador |
 
-A [[UI otimista]] é bem mais simples de implementar, e o navegador funcionar sem internet não é requisito: o uso offline fica no app desktop. A IA reforça a escolha: o worker roda no servidor e lê as notas do [[Postgres e migrations|Postgres]]; com WASM, haveria duas cópias para manter iguais já na v1.
+A [[UI otimista]] é bem mais simples de implementar, e o navegador funcionar sem internet não é requisito: o uso offline fica no app desktop. A IA reforça a escolha: o worker roda no servidor e lê as notas do [[Postgres]]; com WASM, haveria duas cópias para manter iguais já na v1.
 
 > [!warning] Em aberto com o sync (#26)
-> Com o [[CRDT e Yjs|Yjs]], a nota no servidor vira um documento CRDT. Um `PATCH` com o texto inteiro vindo do navegador pode apagar o que outro dispositivo acabou de mandar. Saídas: o navegador editar pelo [[WebSocket]] do sync (online, sem guardar nada) ou o servidor transformar o `PATCH` em update [[CRDT e Yjs|Yjs]]. Decidir junto com onde mora o documento ([[Back — daemon e servidor]]).
+> Com o [[Yjs]], a nota no servidor vira um documento CRDT. Um `PATCH` com o texto inteiro vindo do navegador pode apagar o que outro dispositivo acabou de mandar. Saídas: o navegador editar pelo [[WebSocket]] do sync (online, sem guardar nada) ou o servidor transformar o `PATCH` em update [[Yjs]]. Decidir junto com onde mora o documento ([[Back — daemon e servidor]]).
 
 ## Revisar se...
 

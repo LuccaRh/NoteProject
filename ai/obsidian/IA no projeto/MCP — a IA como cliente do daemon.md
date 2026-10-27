@@ -28,7 +28,7 @@ sequenceDiagram
 ```
 
 - `notesd-mcp` seria um módulo do próprio `apps/notesd` (`python -m notesd.mcp`), feito com o SDK `mcp` de Python.
-- Ele **não** abre o [[SQLite e FTS5|SQLite]]: chama o [[O daemon notesd|daemon]] por HTTP. O [[O daemon notesd|daemon]] continua sendo o dono único.
+- Ele **não** abre o [[SQLite]]: chama o [[O daemon notesd|daemon]] por HTTP. O [[O daemon notesd|daemon]] continua sendo o dono único.
 - No repo onde a IA roda, um `.mcp.json` diz ao Claude Code como iniciar o servidor:
 
 ```json
@@ -49,7 +49,7 @@ O nome, a descrição e os parâmetros de cada ferramenta entram no contexto da 
 
 | Ferramenta | Devolve |
 |---|---|
-| `buscar(q, materia?)` | títulos + a linha que bateu ([[SQLite e FTS5\|FTS5]]), não a nota |
+| `buscar(q, materia?)` | títulos + a linha que bateu ([[FTS5]]), não a nota |
 | `ler_secao(nota, heading)` | só a seção pedida |
 | `listar_pedidos(materia?)` | dúvidas e fix pendentes, cada um com a seção em volta |
 | `propor(pedido, operacao)` | grava uma [[Edição por âncora\|operação]], que você aceita no editor |

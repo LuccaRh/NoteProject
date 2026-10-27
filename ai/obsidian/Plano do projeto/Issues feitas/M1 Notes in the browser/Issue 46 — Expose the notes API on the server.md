@@ -3,7 +3,7 @@ tags: [noteproject, plano, servidor, dados]
 ---
 # #46 Expose the notes API on the server
 
-Issue do [[M1 Notes in the browser]]. Uma branch por serviço: o PR do `notes` põe as rotas `/notes` na [[API de notas]], gravando no [[Postgres e migrations|Postgres]]; o PR do `web` (⏳) faz o front novo, do zero, com cliente da API e proxy `/api` do Vite. O `notes` sobe para `0.5.0`. Passou por [[FastAPI]], Python, Postgres, rede e [[TCP e pacotes|TCP]], testes e as notas do vault.
+Issue do [[M1 Notes in the browser]]. Uma branch por serviço: o PR do `notes` põe as rotas `/notes` na [[API de notas]], gravando no [[Postgres]]; o PR do `web` (⏳) faz o front novo, do zero, com cliente da API e proxy `/api` do Vite. O `notes` sobe para `0.5.0`. Passou por [[FastAPI]], Python, Postgres, rede e [[TCP]], testes e as notas do vault.
 
 ## Rotas
 
@@ -26,29 +26,29 @@ Issue do [[M1 Notes in the browser]]. Uma branch por serviço: o PR do `notes` p
 
 ## Python
 
-- O primeiro `import` roda o arquivo inteiro uma vez: `def` só cria o objeto função, e o `@` em cima roda logo depois (`f = X(f)`). Por isso `@router.get(...)` registra a rota ao subir, e arquivo de rotas sem `include_router` dá 404 ([[Python — módulo, package e venv|módulo, package e venv]]).
-- [[Python — decorator, with e yield|Decorator]]: função que recebe uma função e devolve outra; com argumento (`@router.get("/x")`) é uma fábrica que devolve o decorator.
-- `with`: `__enter__` na entrada e `__exit__` na saída, sempre, com ou sem erro; `@contextmanager` monta os dois a partir de uma função com `yield` ([[Python — decorator, with e yield|with e yield]]).
+- O primeiro `import` roda o arquivo inteiro uma vez: `def` só cria o objeto função, e o `@` em cima roda logo depois (`f = X(f)`). Por isso `@router.get(...)` registra a rota ao subir, e arquivo de rotas sem `include_router` dá 404 ([[Módulo Python|módulo]], [[Package Python|package]] e [[venv]]).
+- [[Decorator]]: função que recebe uma função e devolve outra; com argumento (`@router.get("/x")`) é uma fábrica que devolve o decorator.
+- `with`: `__enter__` na entrada e `__exit__` na saída, sempre, com ou sem erro; `@contextmanager` monta os dois a partir de uma função com `yield` ([[Context manager|with e yield]]).
 - uv e uvicorn não têm relação: um instala libs e roda comandos, o outro é o servidor ASGI; o "uv" do uvicorn vem do uvloop.
 
 ## Postgres e banco
 
-- Transação: `BEGIN` abre, `COMMIT` grava tudo de uma vez, `ROLLBACK` desfaz tudo; apagar uma pasta e as notas de dentro só vale junto ([[SQLAlchemy — engine e conexão#Transação|transação]]).
+- Transação: `BEGIN` abre, `COMMIT` grava tudo de uma vez, `ROLLBACK` desfaz tudo; apagar uma pasta e as notas de dentro só vale junto ([[Transação|transação]]).
 - `engine.begin()` é um `with` dentro de outro: o de dentro faz `COMMIT` sem erro e `ROLLBACK` com erro; o de fora devolve a conexão ao pool sempre.
-- Schema Pydantic e tabela andam juntos sem ser a mesma coisa: coluna nova na [[Migrations com Alembic|migration]] só aparece na API se entrar no modelo e na consulta.
+- Schema Pydantic e tabela andam juntos sem ser a mesma coisa: coluna nova na [[Migration|migration]] só aparece na API se entrar no modelo e na consulta.
 
 ## Rede e TCP
 
-- A conexão TCP é só uma linha numa tabela do sistema operacional de cada ponta; nenhum fio nem roteador sabe dela, e cada pacote viaja sozinho ([[TCP e pacotes]]).
-- O TCP só aparece entre processos: `curl` ⇄ container e API ⇄ Postgres; entre uvicorn e FastAPI é chamada de função ([[IP, porta e rede de containers|rede de containers]]).
+- A conexão TCP é só uma linha numa tabela do sistema operacional de cada ponta; nenhum fio nem roteador sabe dela, e cada pacote viaja sozinho ([[TCP]]).
+- O TCP só aparece entre processos: `curl` ⇄ container e API ⇄ Postgres; entre uvicorn e FastAPI é chamada de função ([[Rede de containers|rede de containers]]).
 
 ## Testes
 
-- Cada teste roda dentro de uma transação que volta no fim (`rollback`), sobre o banco migrado uma vez por sessão: o [[SQLAlchemy — engine e conexão|SQLAlchemy]] abre um savepoint por pedido, e o banco fica limpo entre testes.
+- Cada teste roda dentro de uma transação que volta no fim (`rollback`), sobre o banco migrado uma vez por sessão: o [[SQLAlchemy]] abre um savepoint por pedido, e o banco fica limpo entre testes.
 - Os testes falam com o Postgres do compose pelo `localhost:5432`: sem o container de pé, todos caem com `Connection refused`.
 
 ## Notas do vault
 
 - Plano: o [[Roadmap]] ganhou a busca `/search` (#56) na M1; o [[Navegador]] e a [[API de notas]] separam as rotas `/notes` (#46) e `/search` (#56), com ✅/⏳; [[Features]] recebeu ideias novas (modo de leitura, links dentro das imagens e para um ponto da página, segurança, erros), e a [[Entrega de 2026-10-29]], a linha `mac ipv6 modem firewall`.
 - Workspace: branch `<serviço>/<kebab>` e um serviço por branch, com o lint W13, e corpo do PR só `Issue #N` ([[Regras de git]], [[Tarefas no GitHub]]); [[Como usar]] cita os lints W01–W16.
-- Conceitos novos ou crescidos: [[Python — decorator, with e yield]] (página nova), [[FastAPI]], [[SQLAlchemy — engine e conexão]], [[Python — módulo, package e venv]] e [[TCP e pacotes]], com as figuras do caminho de um pedido, do decorator no import e da transação por pedido.
+- Conceitos novos ou crescidos: [[Decorator]] e [[Context manager]] (página nova), [[FastAPI]], [[SQLAlchemy]], [[Módulo Python|módulo]], [[Package Python|package]], [[venv]] e [[TCP]], com as figuras do caminho de um pedido, do decorator no import e da transação por pedido.

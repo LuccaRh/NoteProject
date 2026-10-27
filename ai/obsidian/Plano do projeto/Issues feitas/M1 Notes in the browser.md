@@ -3,7 +3,7 @@ tags: [noteproject, plano, servidor, dados]
 ---
 # M1 Notes in the browser
 
-Etapa do [[Roadmap]] que leva as notas do [[Postgres e migrations|Postgres]] ao navegador: rotas `/notes` na [[API de notas]], o [[Navegador|front]] lendo e editando por elas, e depois pastas, campos e views. Cada issue tem uma página com o que entregou, separado por tópico.
+Etapa do [[Roadmap]] que leva as notas do [[Postgres]] ao navegador: rotas `/notes` na [[API de notas]], o [[Navegador|front]] lendo e editando por elas, e depois pastas, campos e views. Cada issue tem uma página com o que entregou, separado por tópico.
 
 | Issue | Título | Estado | Tópicos |
 |---|---|---|---|

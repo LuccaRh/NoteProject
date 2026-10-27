@@ -31,7 +31,7 @@ No editor, a sugestão aparece destacada no lugar: `Tab` aceita e `Esc` recusa. 
 
 ## Por que
 
-- Ninguém perde texto, e isso não depende do [[CRDT e Yjs|Yjs]] (M4).
+- Ninguém perde texto, e isso não depende do [[Yjs]] (M4).
 - A IA escreve só o pedaço novo, e a saída é a parte mais cara por token ([[Gastar poucos tokens]]).
 - É o "checkpoint humano" do workspace: a IA propõe e você aprova.
 - Dá para testar sem IA: uma operação escrita à mão passa pelo mesmo caminho.

@@ -5,7 +5,7 @@ tags: [noteproject, daemon, dados]
 
 Desenho do daemon do **app desktop** (milestone Desktop app, depois do [[Navegador|navegador]]; ordem no [[Roadmap]]).
 
-O app desktop precisa salvar as notas no disco, para funcionar offline. O `notesd` vai ser o [[Daemon|daemon]] dono do [[SQLite e FTS5|SQLite]] local: o único processo que mexe no banco. Editor, CLI, o worker de IA e agentes de fora pedem a ele por HTTP.
+O app desktop precisa salvar as notas no disco, para funcionar offline. O `notesd` vai ser o [[Daemon|daemon]] dono do [[SQLite]] local: o único processo que mexe no banco. Editor, CLI, o worker de IA e agentes de fora pedem a ele por HTTP.
 
 ```mermaid
 flowchart LR
@@ -27,8 +27,8 @@ Pasta planejada: `apps/notesd/notesd/`.
 |---|---|
 | `__main__.py` | `python -m notesd` sobe o uvicorn em `127.0.0.1:8787` (`NOTESD_HOST`, `NOTESD_PORT`) |
 | `config.py` | caminho do banco: `NOTESD_DB` ou `~/.local/share/notesd/notes.db` |
-| `db.py` | abre o [[SQLite e FTS5\|SQLite]] em WAL (leitura e escrita juntas) e aplica o `schema.sql`; `transaction()` faz commit ou rollback |
-| `schema.sql` | tabela `notes` + índice [[SQLite e FTS5\|FTS5]] |
+| `db.py` | abre o [[SQLite]] em WAL (leitura e escrita juntas) e aplica o `schema.sql`; `transaction()` faz commit ou rollback |
+| `schema.sql` | tabela `notes` + índice [[FTS5]] |
 | `models.py` | formatos Pydantic que cruzam o HTTP; título derivado do texto |
 | `repo.py` | todo o SQL; as rotas nunca escrevem query |
 | `app.py` | rotas finas; CORS só para localhost e Tauri |
@@ -51,7 +51,7 @@ O mesmo contrato do servidor, que o cliente da API do front vai chamar: o editor
 | `GET/PATCH/DELETE /notes/{id}` | lê, salva, apaga; 404 se não existe |
 | `GET /notes?parent_id=` | filhos diretos de uma pasta, pastas primeiro |
 | `GET /notes/recent` | as últimas editadas, sem o conteúdo, ignorando a árvore |
-| `GET /search?q=` | busca [[SQLite e FTS5\|FTS5]] com trecho marcado por `<mark>` |
+| `GET /search?q=` | busca [[FTS5]] com trecho marcado por `<mark>` |
 
 ## Busca (⏳)
 
