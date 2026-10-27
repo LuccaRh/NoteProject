@@ -72,7 +72,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   branch: schema → regra → rota → front → docs.
 - **Mensagem**: inglês, imperativo, maiúscula, sem ponto, ≤ 72, sem prefixo (`feat:`); nomeia o
   resultado, não o processo (nada de `wip`); **commit do app só com título**, corpo com o porquê só
-  nos commits com tag (2026-10-21); sem número de issue (vai no PR). Checklist no vault, `Plano do projeto/Regras de git`. O hook `commit-msg` (`ai/tools/commit_msg.py`) barra o resto.
+  nos commits com tag (2026-10-21); sem número de issue (vai no PR). Checklist no vault, `Plano do projeto/Regras de git`. O hook `commit-msg` (`ai/tools/commit_msg.py`) barra o resto na sessão do Claude; no commit do Lucca, avisa e pergunta.
 - **Tags** (2026-10-19): commit fora do app começa com a tag; o resto do título segue as regras.
   - `[docs] `: notas do vault (`ai/obsidian/`) e fontes das figuras (`ai/kb/diagramas/`).
     **Um por branch** (as notas mexidas nela); na `master`, fora de branch, **um por push**
