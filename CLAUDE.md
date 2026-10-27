@@ -54,8 +54,12 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 
 - **Tarefa = issue no GitHub**, na milestone da etapa (M0–M4, Editor, AI in the app, Desktop, Mobile); label = lado (`backend`, `frontend`,
   `infrastructure`, `ai-workspace`); `backend`/`infrastructure` o Lucca escreve, `frontend` a sessão escreve e ele revisa. Próxima tarefa: `gh issue list -m "<milestone>"`.
-- **Branch = uma issue**, em inglês, kebab-case, sem prefixo, saindo da `master`
-  atualizada (`add-a-few-decorations-in-code-mirror`). Cada branch tem `ai/kb/escopos/<branch>.md`
+- **Branch = uma issue**, em inglês, kebab-case, saindo da `master`
+  atualizada. (2026-10-25) Nome `<serviço>/<kebab>` (`notes/expose-the-notes-api-on-the-server`):
+  serviço = pasta de `apps/` ou `postgres` (container do compose; config dele em pasta
+  própria); sem serviço, `infra/` (label `infrastructure` sem container: CI, Terraform,
+  AWS) ou `workspace/` (label `ai-workspace`). **Um serviço por branch**: issue que mexe em vários →
+  um PR por serviço, na mesma issue. Alembic e migrations são do `notes`. O lint W13 confere. Cada branch tem `ai/kb/escopos/<branch>.md`
   (Pedido / Contexto / Fora + número da issue, skill `/foco`); o hook `ai/tools/foco.py` avisa
   quando o pedido sai dele.
 - **Versão do serviço** (2026-10-23): branch que mexe em `apps/<serviço>/` sobe a minor dele
@@ -86,6 +90,19 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   CI, Dockerfile, `.ini`/`.toml`), em qualquer linguagem; md e workspace de IA ficam de fora.
   Código novo já sai quebrado; linha longa achada em código existente → avisar o Lucca.
   Python: ruff `E501` (`line-length = 80`); o resto: lint W12 (`ai/np lint`).
+- **Linha em branco em volta de cada bloco** (2026-10-26): no código do app, `if`, `for`,
+  `while`, `try`, `with`, `match`, `return` e `raise` têm uma linha em branco antes (salvo
+  quando abrem o corpo) e o comando depois de um bloco também; a primeira linha do corpo de
+  um `def` também fica separada da assinatura. Vale para código novo; arquivo antigo só quando
+  for mexido. Python: lint W14 (`ai/np lint`).
+- **Função e classe tipadas** (2026-10-26): todo parâmetro e retorno com tipo, e atributo de
+  classe com `nome: tipo`. Python: mypy `strict = true` no `pyproject.toml` do serviço e lint
+  W15 (atributo de classe sem tipo).
+- **Arquivo em três partes** (2026-10-26): `# Imports`, duas linhas em branco, `# Global
+  variables` (objetos criados uma vez no import: router, alias de tipo, constante), duas
+  linhas em branco, `# Code` (`def`, `class`); cada parte com o comentário em cima, e as
+  globais seguidas, sem linha em branco entre elas. Python:
+  lint W16 e ruff isort `lines-after-imports = 2`.
 - **Data real no commit** (2026-10-15): nunca mexer em `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE`
   nem passar `--date`; reescrever história usa a hora do momento (`rebase --reset-author-date`).
 - **Issue quem fecha é o Lucca** (2026-10-19): a sessão nunca roda `gh issue close`; quando
@@ -102,7 +119,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 | `ai/np contexto <área>` / `areas` | o que ler para uma área / o vocabulário |
 | `ai/np obsidian [-q]` / `duvidas [pág]` | sincronia vault ↔ `ai/obsidian/` / marcas `[!duvida]` `[fix]` `[coment]` |
 | `ai/np diagrama <spec> [--png]` | YAML → draw.io (`ai/tools/diagrama.py`, nó `banco` para BD) |
-| `ai/np lint` / `test` | regras do workspace (W01–W12) / testes das ferramentas |
+| `ai/np lint` / `test` | regras do workspace (W01–W16) / testes das ferramentas |
 
 Ambiente: Arch Linux, Python 3.14 + uv, Node 22, Docker, `drawio` CLI, poppler (`pdftotext`).
 Hooks do Claude Code em `.claude/settings.json`; do git em `ai/tools/githooks/` (`ai/tools/instalar.sh`).
