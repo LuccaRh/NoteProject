@@ -64,6 +64,8 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[Domínio]] | nome fixo, alugado, que segue valendo quando a máquina muda |
 | [[TLS]] | conexão cifrada e servidor comprovado; HTTPS é HTTP por dentro dele |
 | [[Reverse proxy]] | uma porta na frente de todos os serviços |
+| [[CORS]] | o navegador só deixa a página ler respostas da mesma origem, salvo se o servidor liberar |
+| [[Proxy de desenvolvimento]] | o servidor do front repassa `/api` à api, e tudo fica na mesma origem |
 
 ## Docker
 
