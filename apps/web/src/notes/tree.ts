@@ -8,6 +8,7 @@ import type { Note } from './api.ts'
 type Handlers = {
     open: (note: Note) => void
     rename: (note: Note, title: string) => void
+    remove: (note: Note) => void
 }
 
 // Key of the top level in the children cache
@@ -22,6 +23,11 @@ const PENCIL = '<svg aria-hidden="true" width="14" height="14"'
     + ' viewBox="0 0 24 24" fill="none" stroke="currentColor"'
     + ' stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
     + '<path d="M4 20h4L19 9l-4-4L4 16zM13 7l4 4"/></svg>'
+
+const TRASH = '<svg aria-hidden="true" width="14" height="14"'
+    + ' viewBox="0 0 24 24" fill="none" stroke="currentColor"'
+    + ' stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>'
 
 
 // Code
@@ -72,6 +78,20 @@ export class Tree {
         }
 
         return titles
+    }
+
+    /** True when id is the folder itself or somewhere below it. */
+    isInside(id: string, folderId: string): boolean {
+
+        let note = this.find(id)
+
+        while (note) {
+            if (note.id === folderId) return true
+
+            note = note.parent_id ? this.find(note.parent_id) : undefined
+        }
+
+        return false
     }
 
     /** Folder where a new item goes: the selected one or its parent. */
@@ -125,6 +145,20 @@ export class Tree {
         }
     }
 
+    /** Remove a note from the tree; unselect it if it was inside. */
+    delete(note: Note): void {
+
+        const key = note.parent_id ?? ROOT
+        const notes = this.children.get(key) ?? []
+        this.children.set(key, notes.filter(n => n.id !== note.id))
+
+        if (this.selected && this.isInside(this.selected.id, note.id)) {
+            this.selected = null
+        }
+
+        this.render()
+    }
+
     /** Turn the row of a note into a name input. */
     startRename(note: Note): void {
 
@@ -154,7 +188,7 @@ export class Tree {
         return items
     }
 
-    /** Build the row of a note: name and rename button. */
+    /** Build the row of a note: name, rename and delete buttons. */
     row(note: Note, depth: number): HTMLLIElement {
 
         const item = document.createElement('li')
@@ -190,7 +224,10 @@ export class Tree {
         const rename = iconButton(PENCIL, `Rename ${note.title}`)
         rename.addEventListener('click', () => this.startRename(note))
 
-        item.append(open, rename)
+        const remove = iconButton(TRASH, `Delete ${note.title}`)
+        remove.addEventListener('click', () => this.handlers.remove(note))
+
+        item.append(open, rename, remove)
 
         return item
     }

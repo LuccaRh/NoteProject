@@ -75,3 +75,9 @@ export function updateNote(id: string, fields: NoteUpdate): Promise<Note> {
         keepalive: true,
     })
 }
+
+/** Delete a note; a folder goes with everything inside it. */
+export function deleteNote(id: string): Promise<void> {
+
+    return request(`/${id}`, { method: 'DELETE' })
+}

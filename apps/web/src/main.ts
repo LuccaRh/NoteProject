@@ -1,6 +1,6 @@
 // Imports
 import './style.css'
-import { createNote, updateNote } from './notes/api.ts'
+import { createNote, deleteNote, updateNote } from './notes/api.ts'
 import { Page } from './notes/page.ts'
 import { Tree } from './notes/tree.ts'
 
@@ -27,6 +27,7 @@ const tree = new Tree(
         {
                 open: note => void page.open(note.id, tree.path(note)),
                 rename: (note, title) => void rename(note, title),
+                remove: note => void remove(note),
         }
 )
 
@@ -53,6 +54,22 @@ async function rename(note: Note, title: string): Promise<void> {
     }
 
     tree.update(await updateNote(note.id, { title }))
+}
+
+/** Ask, delete a note or folder, and close it if it was open. */
+async function remove(note: Note): Promise<void> {
+
+    const what = note.is_folder
+        ? 'this folder and everything in it'
+        : 'this note'
+
+    if (!confirm(`Delete ${what}? "${note.title}"`)) return
+
+    await deleteNote(note.id)
+
+    if (page.note && tree.isInside(page.note.id, note.id)) page.close()
+
+    tree.delete(note)
 }
 
 /** Create a note (and open it) or a folder (and rename it). */

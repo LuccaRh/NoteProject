@@ -79,6 +79,18 @@ export class Page {
         this.els.empty.hidden = true
     }
 
+    /** Hide the note and show the empty page. */
+    close(): void {
+
+        clearTimeout(this.timer)
+        this.note = null
+        this.dirty = {}
+        this.els.path.textContent = ''
+        this.els.status.textContent = ''
+        this.els.page.hidden = true
+        this.els.empty.hidden = false
+    }
+
     /** Rename from the sidebar while the note is open. */
     rename(title: string): void {
 
