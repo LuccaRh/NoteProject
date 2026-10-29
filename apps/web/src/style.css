@@ -1,8 +1,57 @@
-body { margin: 0; }
+/* Minimal dark: one ground, a lighter sidebar, serif headings */
+:root {
+    --ground: #1c1f22;
+    --panel: #25292d;
+    --line: #30353a;
+    --hover: #2c3135;
+    --active: #353b40;
+    --selection: #3a4248;
+    --text: #edebe6;
+    --body: #d6d3cd;
+    --soft: #c9cccf;
+    --muted: #a3a8ad;
+    --faint: #858c93;
+    --sans: Jost, system-ui, sans-serif;
+    --serif: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+    --mono: ui-monospace, 'JetBrains Mono', monospace;
+    color-scheme: dark;
+}
 
-.cm-editor { height: 100vh; font-size: 15px; }
-.cm-editor.cm-focused { outline: none; }
+body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font: 14px/1.5 var(--sans);
+}
 
-.md-h1 { font-size: 1.8em; font-weight: 700; }
-.md-h2 { font-size: 1.4em; font-weight: 700; }
-.md-h3 { font-size: 1.2em; font-weight: 600; }
+.cm-editor {
+    font-size: 16px;
+    line-height: 1.75;
+}
+
+.cm-editor.cm-focused {
+    outline: none;
+}
+
+.md-h1,
+.md-h2,
+.md-h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+.md-h1 {
+    font-size: 30px;
+    padding-top: 20px !important;
+}
+
+.md-h2 {
+    font-size: 26px;
+    padding-top: 16px !important;
+}
+
+.md-h3 {
+    font-size: 21px;
+    padding-top: 10px !important;
+}
