@@ -17,6 +17,7 @@ O front é o que se vê: a lista de notas e o editor. A regra que manda nele: **
 | `decorations/headings.ts` | headings com tamanho; `replace.ts` (chips de `[!duvida]`) está vazio |
 
 - Stack: TypeScript + Vite + [[CodeMirror|CodeMirror 6]], sem framework de UI.
+- Ordem para ler o código: [[Como ler o front]].
 - Nada é salvo ainda: lista de notas e cliente da API vêm com o servidor (M1).
 
 ### Decorações
@@ -33,9 +34,9 @@ O front é o que se vê: a lista de notas e o editor. A regra que manda nele: **
 
 | Peça | Para quê |
 |---|---|
-| lista de notas (sidebar) | abrir, criar e apagar notas (M1, #46) |
+| lista de notas (sidebar) | abrir, criar e apagar notas (M1, #62) |
 | cliente da API (`api.ts`) | única porta do front para a rede; trocar HTTP por Tauri mexe só nele |
-| proxy do Vite `/api` | [[Reverse proxy\|reverse proxy]] no desenvolvimento: repassa ao servidor `:8000` |
+| proxy do Vite `/api` | [[Proxy de desenvolvimento\|proxy de desenvolvimento]]: repassa ao serviço `notes:8000` na rede do compose, sem [[CORS]] |
 | Tauri | casca desktop leve (5–15 MB × 150–200 MB do Electron) |
 | [[Yjs]] + `y-codemirror.next` | o editor gera updates de [[CRDT]] para o sync |
 | KaTeX | fórmulas `$$…$$` |

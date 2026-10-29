@@ -38,17 +38,6 @@
           }
         ]
       }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/ai/tools/foco.py",
-            "timeout": 30
-          }
-        ]
-      }
     ]
   }
 }

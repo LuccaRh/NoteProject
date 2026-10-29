@@ -8,7 +8,19 @@ argument-hint: "<o que fazer>"
 1. **Onde estamos.** `ai/np status`. Branch atual já é desta tarefa → pule para o 3. Sem tarefa
    dita → próxima issue aberta da milestone atual (`gh issue list -m "<milestone>"`).
 2. **Branch + escopo.** Da `master` atualizada: `git switch -c <nome-em-inglês-kebab>`. Nome da branch = título da issue
-   em kebab-case. Crie o escopo pela `/foco` (parte A, com o número da issue) e espere o ok do Pedido.
+   em kebab-case. Escreva `ai/kb/escopos/<branch>.md` (`/` no nome vira `__`), com o número da
+   issue no `nome`, e espere o ok do Pedido:
+   ```
+   ---
+   id: web/show-chips-for-duvida-and-fix-markers
+   nome: Chips de [!duvida] e [fix] no editor (issue #5)
+   areas: [editor]
+   ---
+   ## Pedido (o que a branch entrega; cada item verificável)
+   ## Contexto (pode tocar só o mínimo para o Pedido funcionar)
+   ## Fora (vira outra branch)
+   ```
+   Pedido só o que foi pedido, nada inferido; áreas de `ai/kb/areas.yaml`.
 3. **Contexto.** Para cada área do escopo: `ai/np contexto <área>`. Leia só o que ele lista, por
    trecho; API de lib → card `ai/kb/libs/` ou o `.d.ts`/fonte instalada (`grep -n`), nunca de cabeça.
    Lib nova sem card → escreva o card ao descobrir (frontmatter `pacote`, `versao`, `fonte`).
@@ -23,4 +35,4 @@ argument-hint: "<o que fazer>"
 6. **Fecho.** `/commit` (sem push). Atualize "Estado" do `CLAUDE.md` se a etapa mudou. Algo
    aprendido que vale nota → ofereça `/nota` ou `/aprender` (uma linha).
 
-Fora do Pedido (aviso do foco ou percebido) → anote em **Fora** do escopo e siga; vira outra branch.
+Fora do Pedido → anote em **Fora** do escopo e siga; vira outra branch.

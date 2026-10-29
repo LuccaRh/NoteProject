@@ -81,7 +81,7 @@ def cmd_status(_a) -> int:
         if pedido:
             print("  " + pedido.group(1).strip().replace("\n", "\n  "))
     elif br not in ("master", "main"):
-        print(f"{AMARELO}escopo: falta {esc.relative_to(REPO)} (/foco){RESET}")
+        print(f"{AMARELO}escopo: falta {esc.relative_to(REPO)} (/tarefa){RESET}")
     st = git("status", "-s")
     print(f"mudanças: {len(st.splitlines())} arquivo(s)" + (f"\n  {st.replace(chr(10), chr(10) + '  ')}" if st else ""))
     claude = (REPO / "CLAUDE.md").read_text(encoding="utf-8")
@@ -473,7 +473,7 @@ def cmd_lint(_a) -> int:
 
 
 def cmd_test(_a) -> int:
-    r = subprocess.run([sys.executable, "-m", "unittest", "-q", "test_commit_msg", "test_foco",
+    r = subprocess.run([sys.executable, "-m", "unittest", "-q", "test_commit_msg",
                         "test_hooks_contexto", "test_estilo", "test_blocos"], cwd=RAIZ / "tools")
     r2 = subprocess.run([sys.executable, "test_obsidian_sync.py"], cwd=RAIZ / "tools")
     r3 = subprocess.run([sys.executable, "test_diagrama.py"], cwd=RAIZ / "tools")

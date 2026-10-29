@@ -3,7 +3,7 @@ tags: [noteproject, plano, servidor, dados]
 ---
 # #46 Expose the notes API on the server
 
-Issue do [[M1 Notes in the browser]]. Uma branch por serviço: o PR do `notes` põe as rotas `/notes` na [[API de notas]], gravando no [[Postgres]]; o PR do `web` (⏳) faz o front novo, do zero, com cliente da API e proxy `/api` do Vite. O `notes` sobe para `0.5.0`. Passou por [[FastAPI]], Python, Postgres, rede e [[TCP]], testes e as notas do vault.
+Issue do [[M1 Notes in the browser]]: o PR do `notes` põe as rotas `/notes` na [[API de notas]], gravando no [[Postgres]]. O front (cliente da API e proxy `/api` do Vite) é a #62. O `notes` sobe para `0.5.0`. Passou por [[FastAPI]], Python, Postgres, rede e [[TCP]], testes e as notas do vault.
 
 ## Rotas
 
@@ -49,6 +49,6 @@ Issue do [[M1 Notes in the browser]]. Uma branch por serviço: o PR do `notes` p
 
 ## Notas do vault
 
-- Plano: o [[Roadmap]] ganhou a busca `/search` (#56) na M1; o [[Navegador]] e a [[API de notas]] separam as rotas `/notes` (#46) e `/search` (#56), com ✅/⏳; [[Features]] recebeu ideias novas (modo de leitura, links dentro das imagens e para um ponto da página, segurança, erros), e a [[Entrega de 2026-10-29]], a linha `mac ipv6 modem firewall`.
+- Plano: o [[Roadmap]] ganhou a busca `/search` (#56) na M1; o [[Navegador]] e a [[API de notas]] separam as rotas `/notes` (#46) e `/search` (#56), com ✅/⏳; [[Features]] recebeu ideias novas (modo de leitura, links dentro das imagens e para um ponto da página, segurança, erros), e a [[Entrega de 2026-11-06]], a linha `mac ipv6 modem firewall`.
 - Workspace: branch `<serviço>/<kebab>` e um serviço por branch, com o lint W13, e corpo do PR só `Issue #N` ([[Regras de git]], [[Tarefas no GitHub]]); [[Como usar]] cita os lints W01–W16.
 - Conceitos novos ou crescidos: [[Decorator]] e [[Context manager]] (página nova), [[FastAPI]], [[SQLAlchemy]], [[Módulo Python|módulo]], [[Package Python|package]], [[venv]] e [[TCP]], com as figuras do caminho de um pedido, do decorator no import e da transação por pedido.

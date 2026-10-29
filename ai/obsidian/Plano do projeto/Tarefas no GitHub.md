@@ -30,12 +30,12 @@ As tarefas do [[Roadmap]] ficam no GitHub do repo (`LuccaRh/NoteProject`). Assim
 | Label | Uso |
 |---|---|
 | `backend` | [[O daemon notesd\|`notesd`]], servidor, modelo de dados, auth, sync: escrita à mão, conceito antes (`/aprender`) |
-| `frontend` | editor e interface: gerado e revisado no PR |
+| `frontend` | editor e interface: a sessão escreve direto (2026-10-29); o "front-back" (chamadas à API, comunicação com o servidor, proxy do Vite) é escrito à mão |
 | `infrastructure` | [[Container\|containers]], deploy, [[CI]], nuvem: escrita à mão |
 | `ai-workspace` | guia, skills, ferramentas de `ai/` e notas do vault |
 | `bug` | algo que não funciona como deveria |
 
-- Quem escreve sai do lado: `backend` e `infrastructure` são das áreas de aprender.
+- Quem escreve sai do lado: `backend`, `infrastructure` e o front-back (área `cliente-api`) são das áreas de aprender.
 - Issue sem milestone = ideia (o antigo `Features.md`), fora do roadmap por enquanto.
 
 ## Comandos

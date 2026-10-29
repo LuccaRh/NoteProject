@@ -9,7 +9,7 @@ A ordem segue o [[Objetivo do app]]: aprender vem primeiro, e a v1 (ler notas no
 2. **App desktop**: app instalado com o [[O daemon notesd|`notesd`]], que funciona offline.
 3. **Celular**: app do celular.
 
-Para 2026-10-29, a [[Entrega de 2026-10-29|entrega]] puxa notas e IA em localhost para antes do M2. Ideias sem lugar na fila: Neovim/CLI ([[Features]]) e ink. As tarefas ficam como issues no GitHub ([[Tarefas no GitHub]]), agrupadas em milestones.
+Para 2026-11-06, a [[Entrega de 2026-11-06|entrega]] puxa notas e IA em localhost para antes do M2. Ideias sem lugar na fila: Neovim/CLI ([[Features]]) e ink. As tarefas ficam como issues no GitHub ([[Tarefas no GitHub]]), agrupadas em milestones.
 
 ![[plano-roadmap.drawio.svg]]
 *Trilha principal escrita à mão (M0→M4); trilha do editor delegada, em paralelo; depois desktop e celular.*
@@ -29,7 +29,7 @@ Para 2026-10-29, a [[Entrega de 2026-10-29|entrega]] puxa notas e IA em localhos
 | Milestone | Issues | Fecha quando |
 |---|---|---|
 | **M0 Server skeleton** | #10–#13 | `apps/notes` em [[Docker Compose\|compose]] com [[Postgres]] e migrations, `/health` respondendo |
-| **M1 Notes in the browser** | #46, #56, #47, #6–#9 | o editor abre pela URL do servidor e cria, edita e busca notas no [[Postgres]]; [[Pastas, campos e views\|pastas, campos e views]] |
+| **M1 Notes in the browser** | #46, #62, #56, #47, #6–#9 | o editor abre pela URL do servidor e cria, edita e busca notas no [[Postgres]]; [[Pastas, campos e views\|pastas, campos e views]] |
 | **M2 Login and TLS** | #48, #16, #17 | login por cookie de sessão, [[Reverse proxy\|Caddy]] com [[TLS]] local, [[CI]] do servidor verde |
 | **M3 Online on AWS** | #18–#25 | domínio com [[TLS\|HTTPS]], deploy por merge, [[Backup\|backup]] restaurado uma vez |
 | **M4 Live edits** | #26, #27, #30 | edição numa aba aparece na outra, pelo [[WebSocket]] |
@@ -42,7 +42,7 @@ Para 2026-10-29, a [[Entrega de 2026-10-29|entrega]] puxa notas e IA em localhos
 #10 `apps/notes` com `/health` → #11 [[Docker Compose|compose]] → #12 [[Postgres]] + [[Migration|migrations]] (`users`, `notes` com `parent_id`, `fields`, `version`) → #13 `.env` fora do git.
 
 ### M1 — notas no navegador
-1. #46 rotas `/notes` no [[Postgres]], e #56 `/search` com a busca full-text; no front, o cliente da API e a lista de notas, com o proxy do Vite apontando para o servidor (`:8000`).
+1. #46 rotas `/notes` no [[Postgres]], e #56 `/search` com a busca full-text; no front, #62 o cliente da API e a lista de notas, com o proxy do Vite apontando para o servidor (`:8000`).
 2. #47 o servidor serve o build do front: uma URL só, nada instalado.
 3. #6 pastas, #7 campos (JSONB), #8 [[Pastas, campos e views|views]]: modelo de dados, à mão.
 4. #9 sidebar com pastas e views: delegada.
@@ -58,7 +58,7 @@ Para 2026-10-29, a [[Entrega de 2026-10-29|entrega]] puxa notas e IA em localhos
 
 ## Por que essa ordem
 
-- **Servidor antes da tela**: o editor e a sidebar já existem e chamam `/api`; falta quem responda. O banco vem cedo porque pastas e campos mudam o schema.
+- **Servidor antes da tela**: a lista de notas só tem o que mostrar quando o servidor responde `/notes`. O banco vem cedo porque pastas e campos mudam o schema.
 - **Login antes da AWS**: nada vai ao ar sem auth e sem [[TLS]].
 - **AWS (M3) antes da edição ao vivo (M4)**: um servidor pequeno vai ao ar cedo, e problemas de rede, [[TLS]] e deploy aparecem com pouco código *(geral: "walking skeleton")*. A `t4g.small` é grátis até 31/12/2026 ([[Custo zero — créditos e free tier]]).
 - **Navegador → desktop → celular**: o navegador não instala nada e já exercita servidor, login e infra. O desktop soma o uso offline: o [[O daemon notesd|`notesd`]] é um cliente a mais do mesmo servidor. O celular vem por último, reaproveitando o sync do desktop.

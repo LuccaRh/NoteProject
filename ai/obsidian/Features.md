@@ -25,3 +25,10 @@ links para um ponto especifico da pag
 Segurança do app
 
 Lidar com erros 
+
+Versionamento de notas
+
+https://www.figma.com/resource-library/web-design-trends/
+https://www.designrush.com/agency/website-design-development/trends/web-design-trends
+https://claude.ai/artifact/J1zxf5yrPvuFBS4ZunhBX1#play-b5870ad06ee7
+Trocar o icone do site em abas do navegador (esta o do vite atualmente)

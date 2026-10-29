@@ -9,7 +9,7 @@ Como o projeto anda: em que ordem, onde ficam as tarefas e como cada mudança en
 | --------------------- | --------------------------------------------------------------------------------------------------------- |
 | [[Objetivo do app]]   | aprender > uso diário com IA > vários aparelhos > várias pessoas; v1 = ler notas no navegador, servidor na AWS |
 | [[Roadmap]]           | navegador → app desktop → celular; no navegador, M0 servidor → M1 notas → M2 login → M3 AWS → M4 ao vivo; editor em paralelo |
-| [[Entrega de 2026-10-29]] | notas e IA em localhost em 8 dias: sequência das issues, o que a IA faz, o que fica fora |
+| [[Entrega de 2026-11-06]] | notas e IA em localhost até 2026-11-06: sequência das issues, o que a IA faz, o que fica fora |
 | [[Tarefas no GitHub]] | issue = branch = PR; milestone = etapa; labels por lado (backend, frontend, infrastructure, ai-workspace) |
 | [[Regras de git]]     | branch, commit, mensagem, PR e merge                                                                      |
 | [[Um repo ou vários]] | monorepo com `apps/` e `infra/`, e não um repo por serviço                                                |

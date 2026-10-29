@@ -14,6 +14,14 @@ Enquanto tudo roda no notebook, infra é só o [[Docker Compose|`docker compose`
 | `Makefile` | `make dev` sem [[Container\|Docker]]; `make check` |
 | `.github/workflows/ci.yml` | tsc + build do web; testes de `ai/tools/`; ruff, mypy e pytest entram com o servidor (#17) |
 
+Os serviços do compose de desenvolvimento são programas separados, cada um na sua [[Porta|porta]]. O front é só o `web`; a "api" é o `notes`, o back.
+
+| Serviço | Pasta | Porta | Faz |
+|---|---|---|---|
+| `web` | `apps/web/` | 5173 | entrega o HTML e o JS do editor ao navegador; repassa `/api` ao `notes` ([[Proxy de desenvolvimento\|proxy de desenvolvimento]]) |
+| `notes` | `apps/notes/` | 8000 | a api: rotas `/notes` em [[FastAPI]], lê e grava no [[Postgres]] |
+| `postgres` | — | 5432 | o banco |
+
 A ideia de partida: um [[Docker Compose|compose]] com FastAPI, sync, [[Postgres]], armazenamento de objetos e reverse proxy numa máquina só, que para uso pessoal custa pouco. O plano usa uma [[EC2]] e o [[S3]] ([[AWS ou infra própria]]); [[TLS]], domínio, [[Backup|backup]] e [[Observabilidade|monitoramento]] entram abaixo.
 
 ## O que falta (⏳)

@@ -23,9 +23,10 @@ ui:
   codigo: [apps/web/src/main.ts, apps/web/src/style.css]
 
 cliente-api:
-  nome: Fronteira de rede do front (única)
+  nome: Fronteira de rede do front (única) — chamadas à API, proxy do Vite
   lado: front
-  futuro: true
+  codigo: [apps/web/src/notes/api.ts, apps/web/vite.config.ts]
+  aprender: true
 
 dados:
   nome: Modelo de dados (Postgres, pastas, campos, views)

@@ -6,8 +6,72 @@
         <link rel="icon" href="/favicon.svg" />
         <title>Notes</title>
     </head>
+
     <body>
-        <main id="editor"></main>
+        <div class="app">
+
+            <!-- Sidebar: buttons, tree of notes and server status -->
+            <aside class="sidebar" aria-label="Notes">
+
+                <!-- Buttons to create a note or a folder -->
+                <div class="toolbar">
+                    <button id="new-note" class="icon" aria-label="New note"
+                        title="New note">
+                        <svg aria-hidden="true" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path
+                                d="M14 3H6v18h12V7zM14 3v4h4M12 11v6M9 14h6" />
+                        </svg>
+                    </button>
+
+                    <button id="new-folder" class="icon" aria-label="New folder"
+                        title="New folder">
+                        <svg aria-hidden="true" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M3 6h6l2 2h10v11H3zM12 11v5M9.5 13.5h5" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Tree of notes, filled by notes/tree.ts -->
+                <ul id="tree" class="tree" role="tree" aria-label="Notes"></ul>
+
+                <!-- Whether the notes service answered -->
+                <p id="server-status" class="status" role="status">Loading</p>
+
+            </aside>
+
+            <!-- Page: the open note, driven by notes/page.ts -->
+            <main class="page">
+                <div class="column">
+
+                    <!-- Path of the open note and save status -->
+                    <div class="topbar">
+                        <span id="path"></span>
+                        <span id="save-status" role="status"></span>
+                    </div>
+
+                    <!-- Shown while no note is open -->
+                    <p id="empty" class="empty">Open a note or create one.</p>
+
+                    <!-- The open note: title and CodeMirror editor -->
+                    <div id="note" hidden>
+                        <input id="title" class="title" aria-label="Title"
+                            placeholder="Untitled" />
+                        <div id="editor"></div>
+                    </div>
+
+                </div>
+            </main>
+
+        </div>
+
         <script type="module" src="/src/main.ts"></script>
     </body>
 </html>
