@@ -24,6 +24,116 @@ body {
     font: 14px/1.5 var(--sans);
 }
 
+button,
+input {
+    font: inherit;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.app {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+
+.sidebar {
+    flex: 0 0 250px;
+    box-sizing: border-box;
+    padding: 18px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    overflow-y: auto;
+}
+
+.tree {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.node {
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+
+.node:hover,
+.node:focus-within {
+    background: var(--hover);
+}
+
+.node[aria-selected='true'] {
+    background: var(--active);
+}
+
+.node-open {
+    flex: 1;
+    min-width: 0;
+    height: 30px;
+    border: 0;
+    /* notes sit past the folder chevron */
+    padding: 0 8px 0 calc(26px + var(--depth) * 16px);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    text-align: left;
+    color: var(--soft);
+}
+
+.folder .node-open {
+    padding-left: calc(8px + var(--depth) * 16px);
+    color: var(--text);
+}
+
+.node[aria-selected='true'] .node-open {
+    color: var(--text);
+    font-weight: 500;
+}
+
+.node-open svg {
+    flex: none;
+    transition: transform 0.15s;
+}
+
+.node[aria-expanded='true'] .node-open svg {
+    transform: rotate(90deg);
+}
+
+.node-open span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.status {
+    margin: auto 0 0;
+    padding: 0 10px;
+    font-size: 12.5px;
+    color: var(--muted);
+}
+
 .cm-editor {
     font-size: 16px;
     line-height: 1.75;
@@ -54,4 +164,25 @@ body {
 .md-h3 {
     font-size: 21px;
     padding-top: 10px !important;
+}
+
+@media (max-width: 640px) {
+    .app {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        flex-basis: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .node,
+    .node-open svg {
+        transition: none;
+    }
 }

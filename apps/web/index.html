@@ -6,8 +6,23 @@
         <link rel="icon" href="/favicon.svg" />
         <title>Notes</title>
     </head>
+
     <body>
-        <main id="editor"></main>
+        <div class="app">
+
+            <!-- Sidebar: tree of notes and server status -->
+            <aside class="sidebar" aria-label="Notes">
+
+                <!-- Tree of notes, filled by notes/tree.ts -->
+                <ul id="tree" class="tree" role="tree" aria-label="Notes"></ul>
+
+                <!-- Whether the notes service answered -->
+                <p id="server-status" class="status" role="status">Loading</p>
+
+            </aside>
+
+        </div>
+
         <script type="module" src="/src/main.ts"></script>
     </body>
 </html>
