@@ -1,8 +1,10 @@
 // Imports
 import './style.css'
-import { createNote } from './notes/api.ts'
+import { createNote, updateNote } from './notes/api.ts'
 import { Page } from './notes/page.ts'
 import { Tree } from './notes/tree.ts'
+
+import type { Note } from './notes/api.ts'
 
 
 // Global variables
@@ -24,6 +26,7 @@ const tree = new Tree(
         byId('tree'), 
         {
                 open: note => void page.open(note.id, tree.path(note)),
+                rename: (note, title) => void rename(note, title),
         }
 )
 
@@ -39,7 +42,20 @@ function byId<T extends HTMLElement>(id: string): T {
     return el as T
 }
 
-/** Create a note (and open it) or a folder. */
+/** Rename a note; the open one goes through the page. */
+async function rename(note: Note, title: string): Promise<void> {
+
+    // The open note saves through the page, with its pending edits
+    if (page.note?.id === note.id) {
+        page.rename(title)
+
+        return
+    }
+
+    tree.update(await updateNote(note.id, { title }))
+}
+
+/** Create a note (and open it) or a folder (and rename it). */
 async function create(isFolder: boolean): Promise<void> {
 
     const note = await createNote({
@@ -49,7 +65,11 @@ async function create(isFolder: boolean): Promise<void> {
     })
     await tree.add(note)
 
-    if (isFolder) return
+    if (isFolder) {
+        tree.startRename(note)
+
+        return
+    }
 
     await page.open(note.id, tree.path(note))
     byId<HTMLInputElement>('title').select()

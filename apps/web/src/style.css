@@ -69,7 +69,8 @@ button {
     padding: 0 4px;
 }
 
-.icon {
+.icon,
+.node-action {
     border: 0;
     border-radius: 6px;
     background: transparent;
@@ -84,7 +85,8 @@ button {
     height: 32px;
 }
 
-.icon:hover {
+.icon:hover,
+.node-action:hover {
     background: var(--hover);
     color: var(--text);
 }
@@ -152,6 +154,31 @@ button {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* Rename shows on hover or keyboard focus */
+.node-action {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    opacity: 0;
+}
+
+.node:hover .node-action,
+.node:focus-within .node-action {
+    opacity: 1;
+}
+
+.node-rename {
+    flex: 1;
+    min-width: 0;
+    height: 30px;
+    box-sizing: border-box;
+    margin-left: calc(8px + var(--depth) * 16px);
+    padding: 0 8px;
+    border: 1px solid var(--muted);
+    border-radius: 6px;
+    background: var(--ground);
 }
 
 .status {

@@ -79,6 +79,14 @@ export class Page {
         this.els.empty.hidden = true
     }
 
+    /** Rename from the sidebar while the note is open. */
+    rename(title: string): void {
+
+        this.els.title.value = title
+        this.change({ title })
+        this.showPath()
+    }
+
     /** Mark fields as changed and save after a pause in typing. */
     change(fields: NoteUpdate): void {
 

@@ -7,6 +7,7 @@ import type { Note } from './api.ts'
 // Global variables
 type Handlers = {
     open: (note: Note) => void
+    rename: (note: Note, title: string) => void
 }
 
 // Key of the top level in the children cache
@@ -17,6 +18,11 @@ const CHEVRON = '<svg aria-hidden="true" width="12" height="12"'
     + ' stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">'
     + '<path d="M9 6l6 6-6 6"/></svg>'
 
+const PENCIL = '<svg aria-hidden="true" width="14" height="14"'
+    + ' viewBox="0 0 24 24" fill="none" stroke="currentColor"'
+    + ' stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M4 20h4L19 9l-4-4L4 16zM13 7l4 4"/></svg>'
+
 
 // Code
 /** Sidebar: folders open on demand, one GET per folder the first time. */
@@ -24,6 +30,7 @@ export class Tree {
     children: Map<string, Note[]> = new Map()
     expanded: Set<string> = new Set()
     selected: Note | null = null
+    editing: string | null = null
     list: HTMLUListElement
     handlers: Handlers
 
@@ -118,6 +125,13 @@ export class Tree {
         }
     }
 
+    /** Turn the row of a note into a name input. */
+    startRename(note: Note): void {
+
+        this.editing = note.id
+        this.render()
+    }
+
     /** Redraw the whole list from the loaded folders. */
     render(): void {
 
@@ -140,7 +154,7 @@ export class Tree {
         return items
     }
 
-    /** Build the row of a note: a button with its name. */
+    /** Build the row of a note: name and rename button. */
     row(note: Note, depth: number): HTMLLIElement {
 
         const item = document.createElement('li')
@@ -155,6 +169,12 @@ export class Tree {
             item.ariaExpanded = String(this.expanded.has(note.id))
         }
 
+        if (this.editing === note.id) {
+            item.append(this.renameInput(note))
+
+            return item
+        }
+
         const open = document.createElement('button')
         open.className = 'node-open'
 
@@ -165,8 +185,12 @@ export class Tree {
         name.textContent = note.title || 'Untitled'
         open.append(name)
         open.addEventListener('click', () => void this.click(note))
+        open.addEventListener('dblclick', () => this.startRename(note))
 
-        item.append(open)
+        const rename = iconButton(PENCIL, `Rename ${note.title}`)
+        rename.addEventListener('click', () => this.startRename(note))
+
+        item.append(open, rename)
 
         return item
     }
@@ -193,6 +217,46 @@ export class Tree {
 
         this.render()
     }
+
+    /** Name input: Enter or blur saves, Escape gives up. */
+    renameInput(note: Note): HTMLInputElement {
+
+        const input = document.createElement('input')
+        input.className = 'node-rename'
+        input.value = note.title
+        input.ariaLabel = 'Name'
+        let done = false
+
+        // Enter and blur save, Escape gives up; done stops a second call
+        const finish = (save: boolean): void => {
+
+            if (done) return
+
+            done = true
+            this.editing = null
+            const title = input.value.trim()
+
+            if (save && title && title !== note.title) {
+                this.handlers.rename(note, title)
+            }
+
+            this.render()
+        }
+
+        input.addEventListener('keydown', event => {
+
+            if (event.key === 'Enter') finish(true)
+
+            if (event.key === 'Escape') finish(false)
+        })
+        input.addEventListener('blur', () => finish(true))
+        requestAnimationFrame(() => {
+            input.focus()
+            input.select()
+        })
+
+        return input
+    }
 }
 
 /** Sort like the server: folders first, then by title. */
@@ -201,4 +265,16 @@ function sorted(notes: Note[]): Note[] {
     return notes.sort((a, b) =>
         Number(b.is_folder) - Number(a.is_folder)
         || a.title.localeCompare(b.title))
+}
+
+/** Small row button with an icon and an accessible label. */
+function iconButton(svg: string, label: string): HTMLButtonElement {
+
+    const button = document.createElement('button')
+    button.className = 'node-action'
+    button.ariaLabel = label
+    button.title = label
+    button.innerHTML = svg
+
+    return button
 }
