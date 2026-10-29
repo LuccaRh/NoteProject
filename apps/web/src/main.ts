@@ -1,12 +1,30 @@
 // Imports
 import './style.css'
+import { Page } from './notes/page.ts'
 import { Tree } from './notes/tree.ts'
 
 
 // Global variables
 const serverStatus = byId<HTMLElement>('server-status')
 
-const tree = new Tree(byId('tree'))
+const page = new Page(
+    {
+        page: byId('note'),
+        empty: byId('empty'),
+        path: byId('path'),
+        status: byId('save-status'),
+        title: byId('title'),
+        editor: byId('editor'),
+    }, 
+    saved => tree.update(saved)
+)
+
+const tree = new Tree(
+        byId('tree'), 
+        {
+                open: note => void page.open(note.id, tree.path(note)),
+        }
+)
 
 
 // Code
@@ -24,6 +42,12 @@ function byId<T extends HTMLElement>(id: string): T {
 window.addEventListener('unhandledrejection', event => {
     serverStatus.textContent = 'Server unreachable'
     console.error(event.reason)
+})
+
+// Leaving the tab: send what is still waiting for the pause
+document.addEventListener('visibilitychange', () => {
+
+    if (document.visibilityState === 'hidden') void page.flush()
 })
 
 void tree.load(null).then(() => {

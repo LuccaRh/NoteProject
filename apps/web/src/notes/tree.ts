@@ -5,6 +5,10 @@ import type { Note } from './api.ts'
 
 
 // Global variables
+type Handlers = {
+    open: (note: Note) => void
+}
+
 // Key of the top level in the children cache
 const ROOT = 'root'
 
@@ -21,11 +25,13 @@ export class Tree {
     expanded: Set<string> = new Set()
     selected: Note | null = null
     list: HTMLUListElement
+    handlers: Handlers
 
-    /** Keep the list element the tree draws into. */
-    constructor(list: HTMLUListElement) {
+    /** Keep the list element and the actions main.ts handles. */
+    constructor(list: HTMLUListElement, handlers: Handlers) {
 
         this.list = list
+        this.handlers = handlers
     }
 
     /** Fetch the children of a folder (null = root) and redraw. */
@@ -33,6 +39,52 @@ export class Tree {
 
         this.children.set(parentId ?? ROOT, await listNotes(parentId))
         this.render()
+    }
+
+    /** Look up a note among the folders already loaded. */
+    find(id: string): Note | undefined {
+
+        for (const notes of this.children.values()) {
+            const note = notes.find(n => n.id === id)
+
+            if (note) return note
+        }
+
+        return undefined
+    }
+
+    /** Titles of the folders above a note, top first. */
+    path(note: Note): string[] {
+
+        const titles: string[] = []
+        let parent = note.parent_id ? this.find(note.parent_id) : undefined
+
+        while (parent) {
+            titles.unshift(parent.title || 'Untitled')
+            parent = parent.parent_id ? this.find(parent.parent_id) : undefined
+        }
+
+        return titles
+    }
+
+    /** Swap in the saved version of a note; re-sort on a new title. */
+    update(note: Note): void {
+
+        const key = note.parent_id ?? ROOT
+        const notes = this.children.get(key) ?? []
+        const index = notes.findIndex(n => n.id === note.id)
+
+        if (index === -1) return
+
+        const titleChanged = notes[index].title !== note.title
+        notes[index] = note
+
+        if (this.selected?.id === note.id) this.selected = note
+
+        if (titleChanged) {
+            this.children.set(key, sorted(notes))
+            this.render()
+        }
     }
 
     /** Redraw the whole list from the loaded folders. */
@@ -88,12 +140,13 @@ export class Tree {
         return item
     }
 
-    /** Select a note, or open or close a folder (fetching it once). */
+    /** Open a note, or open or close a folder (fetching it once). */
     async click(note: Note): Promise<void> {
 
         this.selected = note
 
         if (!note.is_folder) {
+            this.handlers.open(note)
             this.render()
 
             return
@@ -109,4 +162,12 @@ export class Tree {
 
         this.render()
     }
+}
+
+/** Sort like the server: folders first, then by title. */
+function sorted(notes: Note[]): Note[] {
+
+    return notes.sort((a, b) =>
+        Number(b.is_folder) - Number(a.is_folder)
+        || a.title.localeCompare(b.title))
 }

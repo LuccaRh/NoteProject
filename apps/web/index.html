@@ -21,6 +21,29 @@
 
             </aside>
 
+            <!-- Page: the open note, driven by notes/page.ts -->
+            <main class="page">
+                <div class="column">
+
+                    <!-- Path of the open note and save status -->
+                    <div class="topbar">
+                        <span id="path"></span>
+                        <span id="save-status" role="status"></span>
+                    </div>
+
+                    <!-- Shown while no note is open -->
+                    <p id="empty" class="empty">Open a note or create one.</p>
+
+                    <!-- The open note: title and CodeMirror editor -->
+                    <div id="note" hidden>
+                        <input id="title" class="title" aria-label="Title"
+                            placeholder="Untitled" />
+                        <div id="editor"></div>
+                    </div>
+
+                </div>
+            </main>
+
         </div>
 
         <script type="module" src="/src/main.ts"></script>

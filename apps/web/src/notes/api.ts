@@ -12,6 +12,12 @@ export type Note = {
     updated_at: string
 }
 
+export type NoteUpdate = {
+    title?: string
+    body?: string
+    parent_id?: string | null
+}
+
 
 // Code
 /** Call the notes API through the /api proxy; throw on error. */
@@ -33,4 +39,23 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export function listNotes(parentId: string | null): Promise<Note[]> {
 
     return request(parentId ? `?parent_id=${parentId}` : '')
+}
+
+/** Fetch one note by id. */
+export function getNote(id: string): Promise<Note> {
+
+    return request(`/${id}`)
+}
+
+/**
+ * Change only the given fields of a note.
+ * keepalive: the save still goes out if the tab closes.
+ */
+export function updateNote(id: string, fields: NoteUpdate): Promise<Note> {
+
+    return request(`/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(fields),
+        keepalive: true,
+    })
 }
