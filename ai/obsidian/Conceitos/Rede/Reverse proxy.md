@@ -22,7 +22,7 @@ flowchart LR
 ```
 
 - Ele cuida do [[TLS]]: os serviços atrás falam HTTP simples, dentro da máquina.
-- Servidores de desenvolvimento como o Vite têm um proxy parecido, para o front chamar a api pela mesma origem.
+- Servidores de desenvolvimento como o Vite têm um [[Proxy de desenvolvimento|proxy parecido]], para o front chamar a api pela mesma origem.
 
 ## Sem reverse proxy
 
@@ -39,7 +39,7 @@ flowchart LR
 - O cliente chama `https://site.com:8443/...` e `wss://site.com:9443/sync`.
 - Cada serviço carrega o certificado e faz o [[TLS]] sozinho (no uvicorn, `--ssl-keyfile`/`--ssl-certfile`), e alguém renova o certificado e reinicia cada um.
 - O firewall abre uma porta por serviço; cada uma é um lugar a mais para atacar.
-- Porta diferente é **origem** diferente: o navegador passa a exigir CORS entre front, api e sync.
+- Porta diferente é **origem** diferente: o navegador passa a exigir [[CORS]] entre front, api e sync.
 - Redes de empresa, hotel e universidade costumam bloquear portas fora da 80/443.
 
 **2. Um programa só, que faz tudo na 443**
@@ -53,7 +53,7 @@ flowchart LR
 |---|---|---|---|
 | Portas abertas | uma por serviço | 443 | 443 |
 | Quem faz [[TLS]] e renova certificado | cada serviço | a aplicação | o proxy |
-| CORS no navegador | sim | não | não |
+| [[CORS]] no navegador | sim | não | não |
 | Serviços separados | sim | não | sim |
 | Peças a mais | nenhuma | nenhuma | o proxy |
 
