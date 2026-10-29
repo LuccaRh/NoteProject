@@ -60,8 +60,8 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   própria); sem serviço, `infra/` (label `infrastructure` sem container: CI, Terraform,
   AWS) ou `workspace/` (label `ai-workspace`). **Um serviço por branch**: issue que mexe em vários →
   um PR por serviço, na mesma issue. Alembic e migrations são do `notes`. O lint W13 confere. Cada branch tem `ai/kb/escopos/<branch>.md`
-  (Pedido / Contexto / Fora + número da issue, skill `/foco`); o hook `ai/tools/foco.py` avisa
-  quando o pedido sai dele.
+  (Pedido / Contexto / Fora + número da issue, criado pela `/tarefa`); as áreas dele dizem
+  o que ler (`ai/np contexto`).
 - **Versão do serviço** (2026-10-23): branch que mexe em `apps/<serviço>/` sobe a minor dele
   (`0.1.0` → `0.2.0`) com o lockfile; o lint W11 confere. (2026-10-25) A subida vai num
   commit só dela, um por serviço, depois dos commits do app: `Update notes version to 0.2.0`
@@ -135,7 +135,6 @@ Hooks do Claude Code em `.claude/settings.json`; do git em `ai/tools/githooks/` 
 | `/diagrama <nome>` | desenho draw.io a partir de YAML, embutido na nota |
 | `/duvida [pág]` | trata `[!duvida]`, `[duvidas]`, `[fix]`, `[coment]` nas notas |
 | `/destrinchar <conceito>` | acha o elo que falta, com perguntas |
-| `/foco [branch]` | cria o escopo da branch ou confere se a conversa saiu dele |
 | `/commit` | commits atômicos no formato acima (sem push) |
 | `/escrita <arq>` | tira a cara de IA de README, PR e texto público |
 | `/lacunas` | conceitos da conversa que faltam no vault, numerados para escolher |
@@ -154,7 +153,7 @@ ai/                todo o resto do workspace de IA:
   kb/areas.yaml    vocabulário de áreas          kb/escopos/  um escopo por branch
   kb/libs/         cards de API das libs         kb/diagramas/ YAML dos desenhos (+ .drawio)
   obsidian/        cópia do vault "Note Project/" (sincronizada; .sync.json) + obsidian.yaml
-  tools/           np, obsidian_sync, hooks_contexto, foco, diagrama, commit_msg, estilo (+ test_*)
+  tools/           np, obsidian_sync, hooks_contexto, diagrama, commit_msg, estilo (+ test_*)
   build/           gerado (estado dos hooks, png de diagrama), fora do git
 ```
 
