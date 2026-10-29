@@ -53,7 +53,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 `Regras de git`). Aqui fica o que não pode falhar.
 
 - **Tarefa = issue no GitHub**, na milestone da etapa (M0–M4, Editor, AI in the app, Desktop, Mobile); label = lado (`backend`, `frontend`,
-  `infrastructure`, `ai-workspace`); `backend`/`infrastructure` o Lucca escreve, `frontend` a sessão escreve e ele revisa. Próxima tarefa: `gh issue list -m "<milestone>"`.
+  `infrastructure`, `ai-workspace`); `backend`/`infrastructure` o Lucca escreve; `frontend` (2026-10-29) a sessão escreve direto, menos o "front-back" (área `cliente-api`: chamadas à API, comunicação com o servidor, proxy do Vite), que é do Lucca. Próxima tarefa: `gh issue list -m "<milestone>"`.
 - **Branch = uma issue**, em inglês, kebab-case, saindo da `master`
   atualizada. (2026-10-25) Nome `<serviço>/<kebab>` (`notes/expose-the-notes-api-on-the-server`):
   serviço = pasta de `apps/` ou `postgres` (container do compose; config dele em pasta
@@ -158,21 +158,22 @@ ai/                todo o resto do workspace de IA:
   build/           gerado (estado dos hooks, png de diagrama), fora do git
 ```
 
-## Estado (2026-10-20)
+## Estado (2026-10-29)
 
-- Editor (CodeMirror com headings) + `apps/notes` só com `GET /health` (uv, estrutura `src/`,
-  padrão de todo serviço Python; `make check-notes` e job `notes` no CI). Branch
-  `scaffold-the-basic-of-the-notes-service` (#10) pronta, sem push. Sidebar, cliente da API e proxy `/api` saíram da
-  história em 2026-10-19 (tag local `backup-before-drop-sidebar`); voltam com o M1.
+- M0 e #46 (rotas `/notes` no `apps/notes`, Postgres + Alembic) mergeados.
+- Branch `web/indent-the-web-code-with-4-spaces` (issue #65): `.editorconfig` e
+  4 espaços no web; primeira da fila, sem PR.
+- Branch `web/proxy-api-requests-to-the-notes-service` (#64, sai da de indent): proxy `/api` do Vite, sem PR.
+- Branch `web/list-create-and-edit-notes-in-the-editor` (#62, sai da #64): cliente da API,
+  árvore de notas/pastas, editor com autosave; testado no navegador, sem PR.
 - Branch `show-chips-for-duvida-and-fix-markers` (#5): `decorations/replace.ts` fora do git.
 
 ## O que fazer a seguir
 
 Plano: vault `Plano do projeto/Roadmap` (navegador → app desktop → celular) + issues/milestones no GitHub.
 
-1. M0 Server skeleton: #10 (PR a abrir) → #11 compose (antes: pergunta `fastapi dev` × `run` em `API de notas`) → #12 Postgres +
-   migrations → #13 `.env`.
-2. M1 Notes in the browser: #46 rotas de notas → #47 servir o build → #6–#9 pastas, campos, views.
+1. PR da indentação (#65), depois PRs da #64 e da #62 (depois de o Lucca revisar os commits).
+2. M1 Notes in the browser: #47 servir o build → #56 busca → #6–#9 pastas, campos, views.
 3. M2 login e TLS (#48, #16, #17) → M3 AWS (#18–#25) → M4 edição ao vivo (#26, #27, #30).
 - v1 = ler notas no navegador com o servidor na AWS, sem IA (vault `Plano do projeto/Objetivo do app`).
 - Depois da v1: milestone AI in the app (#35 worker em `apps/worker`, #42 workspace, #36, #34).
