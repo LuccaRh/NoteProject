@@ -1,5 +1,6 @@
 // Imports
 import './style.css'
+import { createNote } from './notes/api.ts'
 import { Page } from './notes/page.ts'
 import { Tree } from './notes/tree.ts'
 
@@ -38,6 +39,22 @@ function byId<T extends HTMLElement>(id: string): T {
     return el as T
 }
 
+/** Create a note (and open it) or a folder. */
+async function create(isFolder: boolean): Promise<void> {
+
+    const note = await createNote({
+        title: isFolder ? 'New folder' : 'Untitled',
+        parent_id: tree.target(),
+        is_folder: isFolder,
+    })
+    await tree.add(note)
+
+    if (isFolder) return
+
+    await page.open(note.id, tree.path(note))
+    byId<HTMLInputElement>('title').select()
+}
+
 // Any request that failed and nobody caught ends up here
 window.addEventListener('unhandledrejection', event => {
     serverStatus.textContent = 'Server unreachable'
@@ -49,6 +66,9 @@ document.addEventListener('visibilitychange', () => {
 
     if (document.visibilityState === 'hidden') void page.flush()
 })
+
+byId('new-note').addEventListener('click', () => void create(false))
+byId('new-folder').addEventListener('click', () => void create(true))
 
 void tree.load(null).then(() => {
     serverStatus.textContent = ''

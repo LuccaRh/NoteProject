@@ -67,6 +67,37 @@ export class Tree {
         return titles
     }
 
+    /** Folder where a new item goes: the selected one or its parent. */
+    target(): string | null {
+
+        if (!this.selected) return null
+
+        return this.selected.is_folder
+            ? this.selected.id
+            : this.selected.parent_id
+    }
+
+    /** Put a new note in the tree, open its folder and select it. */
+    async add(note: Note): Promise<void> {
+
+        const parentId = note.parent_id
+
+        // Fetching an unopened folder already brings the new note
+        if (parentId && !this.children.has(parentId)) {
+            this.expanded.add(parentId)
+            await this.load(parentId)
+        } else {
+            const key = parentId ?? ROOT
+            const notes = [...(this.children.get(key) ?? []), note]
+            this.children.set(key, sorted(notes))
+        }
+
+        if (parentId) this.expanded.add(parentId)
+
+        this.selected = note
+        this.render()
+    }
+
     /** Swap in the saved version of a note; re-sort on a new title. */
     update(note: Note): void {
 

@@ -12,6 +12,13 @@ export type Note = {
     updated_at: string
 }
 
+export type NoteCreate = {
+    title: string
+    body?: string
+    parent_id?: string | null
+    is_folder?: boolean
+}
+
 export type NoteUpdate = {
     title?: string
     body?: string
@@ -45,6 +52,15 @@ export function listNotes(parentId: string | null): Promise<Note[]> {
 export function getNote(id: string): Promise<Note> {
 
     return request(`/${id}`)
+}
+
+/** Create a note or folder on the server. */
+export function createNote(note: NoteCreate): Promise<Note> {
+
+    return request('', {
+        method: 'POST',
+        body: JSON.stringify(note),
+    })
 }
 
 /**

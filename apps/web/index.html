@@ -10,8 +10,34 @@
     <body>
         <div class="app">
 
-            <!-- Sidebar: tree of notes and server status -->
+            <!-- Sidebar: buttons, tree of notes and server status -->
             <aside class="sidebar" aria-label="Notes">
+
+                <!-- Buttons to create a note or a folder -->
+                <div class="toolbar">
+                    <button id="new-note" class="icon" aria-label="New note"
+                        title="New note">
+                        <svg aria-hidden="true" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path
+                                d="M14 3H6v18h12V7zM14 3v4h4M12 11v6M9 14h6" />
+                        </svg>
+                    </button>
+
+                    <button id="new-folder" class="icon" aria-label="New folder"
+                        title="New folder">
+                        <svg aria-hidden="true" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M3 6h6l2 2h10v11H3zM12 11v5M9.5 13.5h5" />
+                        </svg>
+                    </button>
+                </div>
 
                 <!-- Tree of notes, filled by notes/tree.ts -->
                 <ul id="tree" class="tree" role="tree" aria-label="Notes"></ul>
