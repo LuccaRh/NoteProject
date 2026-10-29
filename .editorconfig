@@ -1,0 +1,15 @@
+# Indentation for every editor: 4 spaces, Tab inserts 4 spaces
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+
+# YAML and the JSON npm writes keep 2 spaces
+[*.{yml,yaml,json}]
+indent_size = 2
+
+# make requires a real tab
+[Makefile]
+indent_style = tab
