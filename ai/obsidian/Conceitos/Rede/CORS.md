@@ -25,7 +25,14 @@ Origem = esquema + host + [[Porta|porta]]. Basta uma das três mudar para a orig
 3. O servidor responde. Se a resposta traz `Access-Control-Allow-Origin: http://localhost:5173` (ou `*`), o navegador entrega a resposta ao código.
 4. Sem esse cabeçalho, o navegador **joga a resposta fora** e o `fetch` falha com erro de CORS no console.
 
+| Quem | Papel |
+|---|---|
+| servidor de destino | **define** quem pode ler, com `Access-Control-Allow-Origin` |
+| navegador | **aplica**: confere o cabeçalho e entrega a resposta ao código ou a joga fora |
+
+- Mesma origem: o navegador não confere nada.
 - Quem bloqueia é o navegador, não o servidor: o pedido chegou e foi atendido. `curl` e Python não têm essa regra e leem tudo.
+- O pedido para outra origem sai; o que fica barrado é o código **ler** a resposta. Por isso uma página chama outras origens o tempo todo: as APIs públicas respondem com `*`, e um banco não libera ninguém.
 - Pedido que pode mudar algo (`PATCH`, `DELETE`, JSON no corpo) vai antes com um **preflight**: um `OPTIONS` perguntando se pode. O pedido de verdade só sai se o servidor responder que sim.
 
 ```http

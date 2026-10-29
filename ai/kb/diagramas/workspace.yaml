@@ -4,7 +4,7 @@ grade: [270, 100]
 destino: Workspace de IA
 nos:
   p:      {tipo: entrada, pos: [0, 1], texto: "pedido"}
-  foco:   {tipo: bloco, pos: [1, 1], texto: "hook foco<br>(escopo da branch)", cor: vermelho}
+  esc:    {tipo: bloco, pos: [1, 1], texto: "escopo da branch<br>(Pedido + áreas)", cor: vermelho}
   s:      {tipo: bloco, pos: [2, 1], texto: "sessão<br>CLAUDE.md + regras", cor: verde}
   leitor: {tipo: bloco, pos: [2, 0], texto: "agente leitor<br>(arquivo grande)", cor: cinza}
   chk:    {tipo: bloco, pos: [2, 2], texto: "./np check<br>(prova)", cor: roxo}
@@ -13,8 +13,8 @@ nos:
   lib:    {tipo: banco, pos: [4, 1], texto: "kb/libs<br>(cards)", cor: amarelo}
   obs:    {tipo: banco, pos: [4, 2], texto: "obsidian/<br>(notas)", cor: amarelo}
 arestas:
-  - [p, foco]
-  - [foco, s, {rotulo: "avisa se sai"}]
+  - [p, esc]
+  - [esc, s, {rotulo: "o que fazer"}]
   - [s, leitor]
   - [s, chk]
   - [s, ctx]

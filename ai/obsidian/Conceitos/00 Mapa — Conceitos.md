@@ -65,7 +65,20 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[TLS]] | conexão cifrada e servidor comprovado; HTTPS é HTTP por dentro dele |
 | [[Reverse proxy]] | uma porta na frente de todos os serviços |
 | [[CORS]] | o navegador só deixa a página ler respostas da mesma origem, salvo se o servidor liberar |
+| [[URL relativa]] | o código escreve só o caminho; o navegador completa com a origem da página |
 | [[Proxy de desenvolvimento]] | o servidor do front repassa `/api` à api, e tudo fica na mesma origem |
+| [[Servidor de desenvolvimento]] | quem responde `/` com o `index.html` e converte o `.ts` na hora; o `Content-Type` diz o que o navegador faz |
+
+## TypeScript
+
+| Página | Ideia |
+|---|---|
+| [[DOM]] | o HTML vira uma árvore de objetos; o JS mexe nela e a tela acompanha |
+| [[Arrow function]] | `x => ...` é o `lambda` do JS, e usa o `this` de fora |
+| [[Spread]] | `...lista` desmonta a lista em argumentos (`*lista`); no parâmetro, junta (rest) |
+| [[Nullish coalescing]] | `a ?? b`: `b` só quando `a` é `null` ou `undefined`, diferente do `\|\|` |
+| [[Promise]] | o valor que chega depois; `await` espera, `void` ignora de propósito |
+| [[Callback]] | a peça recebe uma função e a chama no acontecimento; quem cria decide o que fazer |
 
 ## Docker
 

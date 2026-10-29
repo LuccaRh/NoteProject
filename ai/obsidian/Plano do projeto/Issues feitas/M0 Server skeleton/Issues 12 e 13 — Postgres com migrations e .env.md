@@ -34,6 +34,6 @@ Issue do [[M0 Server skeleton]]. Põe o banco na [[API de notas]]: Postgres no c
 
 ## Notas do vault
 
-- Plano: a [[Entrega de 2026-10-29]] pede notas no navegador e a IA no app antes do login, o que mexeu no [[Roadmap]], no [[00 Mapa — Plano do projeto|mapa do plano]] e nas ideias em [[Features]]. O login virou cookie de sessão (#48) no [[Navegador]] e em [[Back — daemon e servidor]], e o token ficou só para app ([[Token por dispositivo]]); a [[Trilha de infra]] ganhou links para os conceitos de cada etapa.
+- Plano: a [[Entrega de 2026-11-06]] pede notas no navegador e a IA no app antes do login, o que mexeu no [[Roadmap]], no [[00 Mapa — Plano do projeto|mapa do plano]] e nas ideias em [[Features]]. O login virou cookie de sessão (#48) no [[Navegador]] e em [[Back — daemon e servidor]], e o token ficou só para app ([[Token por dispositivo]]); a [[Trilha de infra]] ganhou links para os conceitos de cada etapa.
 - Workspace: versão do serviço sobe na branch, num commit só dela ([[Regras de git]]); a skill `/lacunas` e o lint W12 entraram em [[Como usar]]; o [[Esqueleto de tarefas]] pesa o custo de tokens dos subagentes; [[Regras de página]] e [[Regras de resposta]] foram revistas (grafo de links, marcas `[fix]` e `[comment]`).
 - Os mapas [[00 Mapa — Conceitos]] e [[00 Mapa — Estrutura do projeto]] ganharam as páginas novas.
