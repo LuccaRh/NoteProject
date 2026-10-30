@@ -56,7 +56,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   `infrastructure`, `ai-workspace`); `backend`/`infrastructure` o Lucca escreve; `frontend` (2026-10-29) a sessão escreve direto, menos o "front-back" (área `cliente-api`: chamadas à API, comunicação com o servidor, proxy do Vite), que é do Lucca. Próxima tarefa: `gh issue list -m "<milestone>"`.
 - **Branch = uma issue**, em inglês, kebab-case, saindo da `master`
   atualizada. (2026-10-25) Nome `<serviço>/<kebab>` (`notes/expose-the-notes-api-on-the-server`):
-  serviço = pasta de `apps/` ou `postgres` (container do compose; config dele em pasta
+  serviço = pasta de `apps/`, `postgres` ou `caddy` (2026-10-30) (container do compose; config em pasta
   própria); sem serviço, `infra/` (label `infrastructure` sem container: CI, Terraform,
   AWS) ou `workspace/` (label `ai-workspace`). **Um serviço por branch**: issue que mexe em vários →
   um PR por serviço, na mesma issue. Alembic e migrations são do `notes`. O lint W13 confere. Cada branch tem `ai/kb/escopos/<branch>.md`
