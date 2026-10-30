@@ -1,0 +1,15 @@
+# *.localhost resolves to 127.0.0.1 without /etc/hosts
+notes.localhost {
+    # Certificate from Caddy's own local CA (kept in the caddy_data volume)
+    tls internal
+
+    # /api/notes -> notes:8000/notes; the API routes have no /api prefix
+    handle_path /api/* {
+        reverse_proxy notes:8000
+    }
+
+    # Everything else is the front, served by the Vite dev server
+    handle {
+        reverse_proxy web:5173
+    }
+}
