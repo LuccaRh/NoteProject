@@ -20,6 +20,7 @@ O histórico serve para alguém (inclusive o próprio autor, meses depois) enten
 - **Commit = uma mudança nova.** Conserto de commit ainda não mergeado entra nele (`--fixup` + `rebase --autosquash`); a branch mostra só a versão final. "Mergeado" = já enviado ao remoto: o que só está na `master` local também é consertado no commit de origem (rebase), inclusive troca de nome, de língua ou de config. Mudar o que já está na `master` remota é mudança nova.
 - **Atômico e cronológico**: uma mudança lógica por commit, na ordem em que uma depende da outra, e **todo commit passa no `make check`** (conferir com `git rebase master --exec "make check"`).
 - **Ordem dentro da branch** (cada camada depende só das de baixo): schema/[[Migration|migration]] → regra (`repo.py`, serviço) → rota da API → cliente/front → `[ai-workspace]` → `[docs]`. (2026-10-27) O `[docs]` é sempre o último commit da branch.
+- (2026-10-30) **README vai no `[docs]` da branch**, junto com as notas: o commit do app fica só com o código e a config.
 - Arquivo com duas mudanças → `git add -p`. Notas e workspace em commits próprios, separados do app.
 - Autor = git user próprio; nunca mudar `user.name`/`user.email`.
 
@@ -36,9 +37,9 @@ Tags (2026-10-19), no começo do título dos commits fora do app:
 
 | Tag | O que entra | Regra |
 |---|---|---|
-| `[docs] ` | notas do vault e fontes das figuras (`ai/kb/diagramas/`) | um por branch; na `master`, um por push |
+| `[docs] ` | notas do vault, fontes das figuras (`ai/kb/diagramas/`) e o `README.md` | um por branch; na `master`, um por push |
 | `[ai-workspace] ` | `CLAUDE.md`, `.claude/`, o resto de `ai/` | as normais |
-| sem tag | código do app, README, Makefile | as normais |
+| sem tag | código do app, Makefile | as normais |
 
 - `[docs]` não segue o "uma mudança, um commit": é o que mudou nas notas durante a branch. Título `[docs] Add <assuntos>` ou `[docs] Update <assuntos>`.
 - Só os commits com tag levam `Co-Authored-By: Claude`; os do app, nunca.

@@ -26,6 +26,40 @@ Os serviços do compose de desenvolvimento são programas separados, cada um na 
 
 A ideia de partida: um [[Docker Compose|compose]] com FastAPI, sync, [[Postgres]], armazenamento de objetos e reverse proxy numa máquina só, que para uso pessoal custa pouco. O plano usa uma [[EC2]] e o [[S3]] ([[AWS ou infra própria]]); [[TLS]], domínio, [[Backup|backup]] e [[Observabilidade|monitoramento]] entram abaixo.
 
+### O Caddyfile de desenvolvimento
+
+```
+notes.localhost {
+    tls internal
+
+    handle_path /api/* {
+        reverse_proxy notes:8000
+    }
+
+    handle {
+        reverse_proxy web:5173
+    }
+}
+```
+
+| Linha | Faz |
+|---|---|
+| `notes.localhost {` | bloco do site: vale para pedidos com esse nome no SNI e no `Host` ([[Reverse proxy#Vários sites e várias rotas\|vários sites]]); `*.localhost` dá a loopback do notebook sem `/etc/hosts` ([[DNS]]). Com um nome, o Caddy liga o HTTPS na 443 e redireciona a 80 para ela |
+| `tls internal` | certificado assinado pela CA local que o Caddy cria ([[TLS]]); o navegador avisa até confiar nela (passo no README) |
+| `handle_path /api/* { reverse_proxy notes:8000 }` | `/api/notes` → `notes:8000/notes`, sem o `/api`: as rotas do [[FastAPI]] não têm o prefixo |
+| `handle { reverse_proxy web:5173 }` | o resto (HTML, JS, CSS) vai ao Vite |
+
+O serviço `caddy` no `docker-compose-dev.yml`:
+
+| Linha | Faz |
+|---|---|
+| `image: caddy:2.11` | imagem oficial, versão fixa, sem Dockerfile próprio |
+| `ports: 127.0.0.1:80:80` e `127.0.0.1:443:443` | só a loopback do notebook alcança ([[Rede de containers]]) |
+| `./caddy/Caddyfile:/etc/caddy/Caddyfile` | o arquivo do repo no lugar onde a imagem procura; editar e reiniciar o container, sem build |
+| `caddy_data:/data` | [[Volume do Docker\|volume]] com a CA local e os certificados; apagado, nasce outra CA e o navegador precisa confiar de novo |
+| `caddy_config:/config` | a última configuração carregada; nada que precise guardar |
+| `depends_on: web, notes` | só a ordem de subida ([[Docker Compose]]): nos primeiros segundos o Caddy pode responder 502 |
+
 ## O que falta (⏳)
 
 ![[estrutura-infra-aws-ec2.drawio.svg]]

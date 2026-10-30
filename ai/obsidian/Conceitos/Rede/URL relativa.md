@@ -19,6 +19,6 @@ URL relativa é a URL sem o começo: o código escreve só o caminho (`/api/note
 - Como herda a origem, o pedido relativo é sempre da mesma origem: o navegador não confere [[CORS]].
 
 > [!example] No NoteProject
-> O cliente da api chama `/api/notes`; no desenvolvimento quem atende é o [[Proxy de desenvolvimento|proxy do Vite]].
+> O cliente da api chama `/api/notes`; no desenvolvimento e em produção quem atende é o [[Reverse proxy|Caddy]].
 
 Docs: [MDN — What is a URL (absolute vs relative)](https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Web_mechanics/What_is_a_URL#absolute_urls_vs._relative_urls).

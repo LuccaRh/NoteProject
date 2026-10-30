@@ -6,7 +6,10 @@ tags: [noteproject, plano]
 Diário das issues do [[Tarefas no GitHub|GitHub]]: uma página por milestone do [[Roadmap]], com a tabela das issues, e uma página por issue com o que ela entregou e o que ficou aprendido. A página entra quando a primeira issue da milestone começa.
 
 ![[o-que-ja-foi-feito.drawio.svg]]
-*O projeto em 2026-10-26 por rede: a loopback do PC liga à rede do Docker pelo docker-proxy; ✅ entregue, ⏳ em andamento.*
+*O projeto em 2026-10-30 por rede (dev): o navegador entra só pelo Caddy em `notes.localhost`, que manda `/api/*` à API e o resto ao Vite; ✅ entregue, ⏳ em andamento.*
+
+![[caddy-em-producao.drawio.svg]]
+*Plano (M3), para comparar: o mesmo caminho na AWS, com domínio real, certificado da Let's Encrypt e o `dist/` no lugar do Vite.*
 
 | Página | Ideia |
 |---|---|

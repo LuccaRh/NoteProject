@@ -20,7 +20,7 @@ O código de `apps/web/` tem ~1000 linhas, e a maior parte é CSS. A ordem abaix
 - **HTML → `main.ts`**: o `index.html` carrega o `main.ts` pela última linha (`<script type="module">`); o [[Servidor de desenvolvimento|Vite]] converte o TypeScript para JS. O `main.ts` acha cada pedaço da tela no [[DOM]] pelo `id`, com `byId`, que para tudo com `missing #<id>` se o HTML perder um.
 - **`main.ts` → `Page` e `Tree`**: o `main.ts` cria os dois e é o único que conhece ambos; a `Tree` avisa os cliques por `Handlers`, três [[Callback|callbacks]] (abrir, renomear, apagar), e o `Page` avisa quando salvou, para a lista atualizar o título.
 - **A lista aparece**: `tree.load(null)` busca só o que está direto na raiz e guarda em `children`; o `render` troca os `<li>` de dentro do `<ul id="tree">` pelos que o `rows` monta a partir de `children`.
-- **`Page` e `Tree` → `api.ts`**: toda chamada à rede passa por `request`, que manda para `/api/notes`; no dev, o [[Proxy de desenvolvimento|proxy do Vite]] repassa ao serviço `notes`.
+- **`Page` e `Tree` → `api.ts`**: toda chamada à rede passa por `request`, que manda para `/api/notes`; o [[Reverse proxy|Caddy]] repassa ao serviço `notes`.
 - **Salvar sozinho**: cada tecla junta o campo mudado em `dirty` e reinicia um timer de 600 ms; quando o timer vence, `flush` põe o `save` numa fila de [[Promise|Promises]] (um por vez) e manda um `PATCH`; se falhar, os campos voltam para `dirty` e tenta de novo em 3 s.
 - **Sintaxe**: os cliques viram [[Arrow function|arrow functions]] (`note => page.open(...)`), e o `void` antes de uma chamada `async` diz que ninguém espera aquela [[Promise]] ali.
 

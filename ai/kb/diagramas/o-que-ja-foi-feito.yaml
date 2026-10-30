@@ -1,29 +1,30 @@
-titulo: "NoteProject em 2026-10-26 por rede: feito (✅) e em andamento (⏳)"
+titulo: "NoteProject em 2026-10-30 por rede (dev): feito (✅) e em andamento (⏳)"
 tipo: blocos
-grade: [380, 160]
+grade: [330, 160]
 destino: Plano do projeto/Issues feitas/Figuras
 nos:
-  nav:   {tipo: bloco, pos: [0, 0], texto: "navegador<br>http://localhost:5173", cor: azul}
-  term:  {tipo: bloco, pos: [0, 2], texto: "terminal<br>curl 127.0.0.1:8000<br>pytest e psql :5432", cor: cinza}
-  proxy: {tipo: bloco, pos: [1, 1], texto: "docker-proxy (processo do PC)<br>escuta 127.0.0.1:5173 · 8000 · 5432<br>✅ #11 (ports: no compose)", cor: roxo}
+  nav:   {tipo: bloco, pos: [0, 0], texto: "navegador<br>https://notes.localhost<br>(*.localhost = loopback)", cor: azul}
+  term:  {tipo: bloco, pos: [0, 2], texto: "terminal<br>pytest e psql :5432", cor: cinza}
+  proxy: {tipo: bloco, pos: [1, 1], texto: "docker-proxy (processo do PC)<br>escuta 127.0.0.1:80 · 443 · 5432<br>(ports: no compose)", cor: roxo}
   gw:    {tipo: bloco, pos: [2, 1], texto: "PC na rede Docker<br>br-9964… 172.18.0.1<br>(gateway)", cor: roxo}
-  web:   {tipo: bloco, pos: [3, 0], texto: "web 172.18.0.2:5173<br>Vite + CodeMirror 6<br>headings ✅ · chips #5 ⏳", cor: azul}
-  api:   {tipo: bloco, pos: [3, 1], texto: "notes 172.18.0.4:8000<br>FastAPI · /health ✅ #10<br>/notes ⏳ #46 · /search #56", cor: verde}
-  db:    {tipo: banco, pos: [3, 2], texto: "postgres 172.18.0.3:5432<br>Alembic ✅ #12<br>volume db", cor: amarelo}
+  cad:   {tipo: bloco, pos: [3, 0], texto: "caddy 172.18.0.5:443<br>tls internal (CA local)<br>⏳ #16", cor: vermelho}
+  web:   {tipo: bloco, pos: [4, 0], texto: "web 172.18.0.2:5173<br>Vite + CodeMirror 6<br>sem porta no PC", cor: azul}
+  api:   {tipo: bloco, pos: [4, 1], texto: "notes 172.18.0.4:8000<br>FastAPI · /health ✅ #10<br>/notes ✅ #46 · sem porta no PC", cor: verde}
+  db:    {tipo: banco, pos: [4, 2], texto: "postgres 172.18.0.3:5432<br>Alembic ✅ #12<br>volume db", cor: amarelo}
   lo:    {tipo: grupo, contem: [nav, term, proxy], texto: "rede loopback lo · 127.0.0.0/8 · só dentro do PC", cor: azul}
-  rede:  {tipo: grupo, contem: [gw, web, api, db], texto: "rede bridge noteproject_default · 172.18.0.0/16 · DNS pelo nome do serviço", cor: laranja}
+  rede:  {tipo: grupo, contem: [gw, cad, web, api, db], texto: "rede bridge noteproject_default · 172.18.0.0/16 · DNS pelo nome do serviço", cor: laranja}
   env:   {tipo: nota, pos: [2, 3], texto: ".env fora do git ✅ #13: senha e DATABASE_URL"}
   ci:    {tipo: bloco, pos: [0, 4], texto: "CI (GitHub Actions)<br>jobs web · notes · tools<br>Postgres próprio no job", cor: roxo}
   ws:    {tipo: bloco, pos: [1, 4], texto: "workspace de IA ✅ #4<br>ai/np, lint W01–W16,<br>hooks, skills", cor: roxo}
   vault: {tipo: bloco, pos: [2, 4], texto: "vault ai/obsidian/<br>notas e figuras", cor: roxo}
 arestas:
-  - [nav, proxy, {rotulo: "TCP :5173"}]
-  - [term, proxy, {rotulo: "TCP :8000 · :5432"}]
+  - [nav, proxy, {rotulo: "HTTPS :443"}]
+  - [term, proxy, {rotulo: "TCP :5432"}]
   - [proxy, gw, {rotulo: "TCP novo,<br>origem .1"}]
-  - [gw.c, web.e, {rotulo: ":5173"}]
-  - [gw, api, {rotulo: ":8000"}]
+  - [gw.c, cad.e, {rotulo: ":443"}]
+  - [cad, web, {rotulo: "resto → web:5173"}]
+  - [cad.b, api.e, {rotulo: "/api/* sem o /api<br>→ notes:8000"}]
   - [gw.b, db.e, {rotulo: ":5432"}]
-  - [web.d, api.d, {rotulo: "/api → notes:8000<br>(front novo ⏳)", tracejada: true}]
   - [api, db, {rotulo: "postgres:5432"}]
   - [ws, vault, {rotulo: "sync"}]
-legenda: {"✅": "issue fechada", "⏳": "em andamento", "tracejada": "ainda não existe", "loopback": "outro aparelho na rede de casa não alcança"}
+legenda: {"✅": "issue fechada", "⏳": "em andamento", "loopback": "outro aparelho na rede de casa não alcança", "Caddy": "lê o nome (SNI/Host) e escolhe o bloco notes.localhost"}

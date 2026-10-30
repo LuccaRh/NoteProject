@@ -107,6 +107,43 @@ O cliente abre o `/sync` como um [[WebSocket]]. São **duas conexões**: cliente
 > - Serviço que confia em `X-Forwarded-For` vindo de qualquer um aceita IP falso; só vale o que o proxy escreveu.
 > - Proxy com tempo limite curto derruba [[WebSocket]] parado; o sync precisa de ping.
 
+## Vários sites e várias rotas
+
+Um proxy só, numa [[Porta|porta]] só, atende vários nomes e vários serviços. Quem leva o pedido até ele é o IP e a porta ([[DNS]], firewall, porta publicada); vários nomes podem dar o mesmo IP. Lá dentro, ele decide em dois passos:
+
+| Passo | Olha | Onde está no pedido | Escolhe |
+|---|---|---|---|
+| 1. Site | o nome | SNI (no handshake [[TLS]]) e o cabeçalho `Host` | o certificado e o bloco de rotas daquele nome |
+| 2. Rota | o caminho | a linha `GET /api/notas` | o serviço |
+
+No Caddy, um site com três rotas:
+
+```
+notas.exemplo.com {
+    handle_path /api/* {
+        reverse_proxy api:8000
+    }
+
+    handle_path /ia/* {
+        reverse_proxy ia:9000
+    }
+
+    handle {
+        reverse_proxy front:5173
+    }
+}
+```
+
+- `handle_path` tira o prefixo antes de repassar (`/api/notas` → `/notas`); `handle /api/*` repassaria o caminho inteiro.
+- O `handle` sem caminho é o "senão": pega o que nenhum outro pegou. Só um `handle` roda por pedido, e os que têm caminho são testados antes do que não tem, seja qual for a ordem no arquivo *(geral)*.
+- Serviço novo = prefixo novo; o "senão" continua pegando só o resto.
+- `api:8000`: o nome acha a máquina (o [[Container|container]]), a porta acha o programa nela. Sem porta, o Caddy tenta a 80 *(geral)*.
+
+> [!warning] Erros comuns nas rotas
+> - Prefixos que se cruzam (`/api/*` e `/api/ia/*`): o Caddy fica com o caminho mais longo *(geral)*, mas a regra fica escondida; prefixos separados evitam a dúvida.
+> - Página do front com o mesmo prefixo de um serviço (`/api/...`) vai parar no serviço.
+> - Serviço que o navegador nunca chama (um worker que só fala com o banco) não precisa de rota.
+
 ## Programas de reverse proxy
 
 | | Caddy | nginx | Traefik | HAProxy | ALB (AWS) |
@@ -132,4 +169,4 @@ Os cinco fazem o básico (TLS na 443, rota por caminho, WebSocket). A escolha pe
 > [!example] No NoteProject
 > Caddy na frente da api e do sync ([[Infra — deploy e operação]]).
 
-Docs: [Caddy reverse_proxy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy), [Caddy Automatic HTTPS](https://caddyserver.com/docs/automatic-https), [nginx WebSocket proxying](https://nginx.org/en/docs/http/websocket.html), [Traefik Docker provider](https://doc.traefik.io/traefik/providers/docker/), [RFC 6455 (WebSocket)](https://www.rfc-editor.org/rfc/rfc6455).
+Docs: [Caddy reverse_proxy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy), [Caddy handle](https://caddyserver.com/docs/caddyfile/directives/handle), [Caddy handle_path](https://caddyserver.com/docs/caddyfile/directives/handle_path), [Caddy Automatic HTTPS](https://caddyserver.com/docs/automatic-https), [nginx WebSocket proxying](https://nginx.org/en/docs/http/websocket.html), [Traefik Docker provider](https://doc.traefik.io/traefik/providers/docker/), [RFC 6455 (WebSocket)](https://www.rfc-editor.org/rfc/rfc6455).
