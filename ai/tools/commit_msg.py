@@ -4,7 +4,7 @@
 Formato (checklist no vault, Plano do projeto/Regras de git):
 - título em inglês, imperativo, com maiúscula, sem ponto final, ≤ 72 caracteres;
 - sem prefixo (`feat:`, `fix:`, `docs:`...); a única marca aceita é a tag do que não é app:
-  `[docs] ` (notas do vault) ou `[ai-workspace] ` (workspace de IA), antes do imperativo;
+  `[docs] ` (notas do vault e README) ou `[ai-workspace] ` (workspace de IA), antes do imperativo;
 - nada de Claude/IA, sem Co-Authored-By nem "Generated with" (com tag, pode);
 - commit do app (sem tag) só com título; corpo só nos commits com tag;
 - nada de "wip", "fix", "update", "changes" sozinhos: diga o que mudou.
