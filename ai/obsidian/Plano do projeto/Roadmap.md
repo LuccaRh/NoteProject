@@ -29,9 +29,9 @@ Para 2026-11-06, a [[Entrega de 2026-11-06|entrega]] puxa notas e IA em localhos
 | Milestone | Issues | Fecha quando |
 |---|---|---|
 | **M0 Server skeleton** | #10–#13 | `apps/notes` em [[Docker Compose\|compose]] com [[Postgres]] e migrations, `/health` respondendo |
-| **M1 Notes in the browser** | #46, #62, #56, #47, #6–#9 | o editor abre pela URL do servidor e cria, edita e busca notas no [[Postgres]]; [[Pastas, campos e views\|pastas, campos e views]] |
-| **M2 Login and TLS** | #48, #16, #17 | login por cookie de sessão, [[Reverse proxy\|Caddy]] com [[TLS]] local, [[CI]] do servidor verde |
-| **M3 Online on AWS** | #18–#25 | domínio com [[TLS\|HTTPS]], deploy por merge, [[Backup\|backup]] restaurado uma vez |
+| **M1 Notes in the browser** | #46, #62, #16, #56, #6–#9 | o editor abre por `https://` local, pelo [[Reverse proxy\|Caddy]], e cria, edita e busca notas no [[Postgres]]; [[Pastas, campos e views\|pastas, campos e views]] |
+| **M2 Login and TLS** | #48, #17 | login por cookie de sessão, `/api/auth` no [[Reverse proxy\|Caddy]], [[CI]] do servidor verde |
+| **M3 Online on AWS** | #18–#25, #47 | domínio com [[TLS\|HTTPS]], deploy por merge, [[Backup\|backup]] restaurado uma vez |
 | **M4 Live edits** | #26, #27, #30 | edição numa aba aparece na outra, pelo [[WebSocket]] |
 | **Desktop app** | #14, #15, #28, #29 | sem data: app instalado com o [[O daemon notesd\|`notesd`]], [[Token por dispositivo\|token por dispositivo]] e [[Sync por versão\|sync depois de offline]] |
 | **Mobile app** | — | sem data: app do celular, depois do desktop |
@@ -43,15 +43,15 @@ Para 2026-11-06, a [[Entrega de 2026-11-06|entrega]] puxa notas e IA em localhos
 
 ### M1 — notas no navegador
 1. #46 rotas `/notes` no [[Postgres]], e #56 `/search` com a busca full-text; no front, #62 o cliente da API e a lista de notas, com o proxy do Vite apontando para o servidor (`:8000`).
-2. #47 o servidor serve o build do front: uma URL só, nada instalado.
+2. #16 [[Reverse proxy|Caddy]] com [[TLS]] local no compose de dev: `/api/notes` → `notes`, o resto → Vite; sai o proxy do Vite.
 3. #6 pastas, #7 campos (JSONB), #8 [[Pastas, campos e views|views]]: modelo de dados, à mão.
 4. #9 sidebar com pastas e views: delegada.
 
 ### M2 — login e TLS
-#48 cookie de sessão → #16 [[Reverse proxy|Caddy]] com [[TLS]] local → #17 [[CI]] do servidor com Postgres.
+#48 cookie de sessão, com `/api/auth` no [[Reverse proxy|Caddy]] → #17 [[CI]] do servidor com Postgres.
 
 ### M3 — no ar na AWS
-#18 conta + Budget → #19 Terraform → #20 host com SSM → #21 domínio → #22 HTTPS → #23 deploy por [[OIDC]] → #24 [[Backup|backup]] em [[S3]] → #25 alarme. Detalhe de cada peça em [[Trilha de infra]].
+#18 conta + Budget → #19 Terraform → #20 host com SSM → #21 domínio → #22 HTTPS → #47 imagem do [[Reverse proxy|Caddy]] com o build do front → #23 deploy por [[OIDC]] → #24 [[Backup|backup]] em [[S3]] → #25 alarme. Detalhe de cada peça em [[Trilha de infra]].
 
 ### M4 — edição ao vivo
 #26 decidir como a edição chega no documento do servidor ([[WebSocket]] com [[Yjs]] ou `PATCH` virando update) → #27 endpoint [[WebSocket]] → #30 [[WebSocket]] atrás do [[Reverse proxy|Caddy]].

@@ -4,22 +4,16 @@ services:
         build:
             context: ./apps/web
             dockerfile: Dockerfile.dev
-        ports:
-            - "127.0.0.1:5173:5173"
         volumes:
             - ./apps/web:/app
             - /app/node_modules
         environment:
             - CHOKIDAR_USEPOLLING=true
-            # Vite proxy target: the notes service on the compose network
-            - API_URL=http://notes:8000
 
     notes:
         build:
             context: ./apps/notes
             dockerfile: Dockerfile.dev
-        ports:
-            - "127.0.0.1:8000:8000"
         volumes:
             - ./apps/notes:/app
             - /app/.venv
@@ -37,6 +31,22 @@ services:
         volumes:
             - db:/var/lib/postgresql
 
+    caddy:
+        image: caddy:2.11
+        ports:
+            - "127.0.0.1:80:80"
+            - "127.0.0.1:443:443"
+        volumes:
+            - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+            # Local CA and certificates: a new CA would need trusting again
+            - caddy_data:/data
+            - caddy_config:/config
+        depends_on:
+            - web
+            - notes
+
 
 volumes:
     db:
+    caddy_data:
+    caddy_config:

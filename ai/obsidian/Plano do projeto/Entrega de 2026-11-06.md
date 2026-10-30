@@ -10,7 +10,7 @@ O [[Roadmap]] deixa a v1 do [[Objetivo do app]] para o fim do M3 e a IA para dep
 | Parte | Entra | Fica para depois |
 |---|---|---|
 | notas | CRUD completo no [[Postgres]], pastas por `parent_id`, mover entre pastas, salvar sozinho, busca com `tsvector`, importar um vault do Obsidian | campos, views, sidebar de pastas e views |
-| site | o [[FastAPI]] serve o build do front e a [[API de notas]] na mesma origem ([[Navegador]]); `make check` do servidor no [[CI]] | login, Caddy, AWS |
+| site | o [[Reverse proxy\|Caddy]] do compose de dev, com [[TLS]] local, entrega o front (Vite) e a [[API de notas]] na mesma origem ([[Navegador]]); `make check` do servidor no [[CI]] | login, servir o build em produção (#47), AWS |
 | IA | [[Marcar dúvida\|Ctrl+D]], [[Fila de pedidos\|fila]], worker, `.workspace/` com regras e skills, [[Edição por âncora\|sugestão por âncora]] | mapa do workspace, agentes, scripts e hooks, [[MCP]], classificação de tema, modelo local |
 
 ## O que a IA faz
@@ -32,7 +32,7 @@ O `.workspace/` são notas comuns, editáveis no próprio app, e começa com um 
 | 2 | [#12](https://github.com/LuccaRh/NoteProject/issues/12) ✅ | Add Postgres with migrations to the server | [[Postgres]] no [[Docker Compose\|compose]] e uma [[Migration\|migration]] com `notes` (`parent_id`, `is_folder`), sem `users`, que entra com o login (M2); os dados sobrevivem ao `docker compose down` | [M0 Server skeleton](https://github.com/LuccaRh/NoteProject/milestone/1) | feita |
 | 3 | [#46](https://github.com/LuccaRh/NoteProject/issues/46) ✅ | Expose the notes API on the server | rotas `/notes` da [[API de notas]] no [[FastAPI]] (listar, ler, criar, editar, deletar), com testes contra o [[Postgres]] | [M1 Notes in the browser](https://github.com/LuccaRh/NoteProject/milestone/2) | feita |
 | 4 | [#62](https://github.com/LuccaRh/NoteProject/issues/62) | List, create and edit notes in the editor through the API | front novo, do zero: cliente da [[API de notas]] e lista de notas (abrir, criar, renomear, deletar), pelo proxy do Vite; abre a nota no [[Front — editor e UI\|editor]] e salva sozinho | [M1 Notes in the browser](https://github.com/LuccaRh/NoteProject/milestone/2) | 28/10 qua |
-| 5 | [#47](https://github.com/LuccaRh/NoteProject/issues/47) | Serve the web build from the server | o [[FastAPI]] serve `apps/web/dist`; `localhost:8000` abre o site no [[Navegador\|navegador]] | [M1 Notes in the browser](https://github.com/LuccaRh/NoteProject/milestone/2) | 29/10 qui |
+| 5 | [#16](https://github.com/LuccaRh/NoteProject/issues/16) | Put Caddy with local TLS in front of the server | [[Reverse proxy\|Caddy]] no [[Docker Compose\|compose]] de dev com [[TLS]] local: `/api/notes` → `notes`, o resto → Vite; sai o proxy do Vite e nenhuma porta de API fica exposta | [M1 Notes in the browser](https://github.com/LuccaRh/NoteProject/milestone/2) | 29/10 qui |
 | 6 | [#31](https://github.com/LuccaRh/NoteProject/issues/31) | Queue a question from the editor with Ctrl+D | `Ctrl+D` [[Marcar dúvida\|marca a dúvida]], grava o pedido na [[Fila de pedidos\|fila]] (`pedidos`, criada numa [[Migration\|migration]] desta issue) e o editor o mostra com uma [[CodeMirror\|decoração]] | [Editor](https://github.com/LuccaRh/NoteProject/milestone/5) | 30/10 sex |
 | 7 | [#5](https://github.com/LuccaRh/NoteProject/issues/5) | Show chips for duvida and fix markers in the editor | chips ([[CodeMirror\|decorações]]) no lugar de `[!duvida]` e `[!fix]`, com o estado do pedido ([[Marcador no texto, conteúdo fora\|marcador no texto, conteúdo fora]]) | [Editor](https://github.com/LuccaRh/NoteProject/milestone/5) | 30/10 sex |
 | 8 | [#35](https://github.com/LuccaRh/NoteProject/issues/35) | Process the request queue with a worker | `apps/worker`, em [[Container\|container]] próprio, lê a [[Fila de pedidos\|fila]], monta o contexto, chama o modelo ([[Sem Claude Code — provedores\|provedor]]) e grava a resposta como sugestão | [AI in the app](https://github.com/LuccaRh/NoteProject/milestone/9) | 31/10 sáb |
@@ -54,7 +54,7 @@ Sai nesta ordem: #17, #51, a importação do vault, #6. Da IA, a #32 é a primei
 
 ## Fora da entrega
 
-#7–#9 (campos, views e sidebar de pastas e views), o resto do M2 Login and TLS, M3 Online on AWS, M4 Live edits, #33, #34, #36, #37, #43–#45 e as milestones Desktop app e Mobile app. Sem login, o servidor fica só em `127.0.0.1`.
+#7–#9 (campos, views e sidebar de pastas e views), #47 (o build servido pelo Caddy, na M3), o resto do M2 Login and TLS, M3 Online on AWS, M4 Live edits, #33, #34, #36, #37, #43–#45 e as milestones Desktop app e Mobile app. Sem login, o servidor fica só em `127.0.0.1`.
 
 ## Risco
 

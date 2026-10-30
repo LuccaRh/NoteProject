@@ -211,7 +211,7 @@ def problemas() -> list[str]:
 
 # Prefixos de branch fora de apps/: o postgres (container do compose) e, sem serviço,
 # infra (label infrastructure sem container: CI, Terraform, AWS) e workspace (ai-workspace).
-_PREFIXOS_FIXOS = {"postgres", "infra", "workspace"}
+_PREFIXOS_FIXOS = {"postgres", "caddy", "infra", "workspace"}
 
 
 def _branch_servico() -> list[str]:

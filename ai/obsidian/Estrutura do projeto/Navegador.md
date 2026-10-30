@@ -7,7 +7,7 @@ O navegador abre as notas de qualquer computador, sem instalar nada. Quem serve 
 
 ## Como funciona
 
-1. O servidor entrega o build do front e responde `/api` com as rotas `/notes` e `/search`.
+1. O [[Reverse proxy|Caddy]] entrega o [[Build do front|build do front]] e repassa `/api` à api, com as rotas `/notes` e `/search`.
 2. A tela usa [[UI otimista]]: a edição aparece na hora e vai ao servidor em seguida.
 3. O servidor confirma → nada muda na tela. Recusa ou a rede cai → a tela desfaz ou avisa e tenta de novo.
 
@@ -29,7 +29,7 @@ A [[UI otimista]] cobre a escrita; a leitura pede ao servidor só o necessário,
 
 | Peça | O que muda | Estado |
 |---|---|---|
-| servidor | serve o build do front (`apps/web/dist`), #47 | ⏳ |
+| [[Reverse proxy\|Caddy]] | serve o build do front (`apps/web/dist`), #47 | ⏳ |
 | servidor | expõe as rotas `/notes` (#46) e `/search` (#56) que o front vai chamar | ⏳ |
 | `apps/web/src/notes/api.ts` | cliente da API: chama `/api` na própria origem, o [[Proxy de desenvolvimento\|proxy do Vite]] repassa | ⏳ |
 | front | [[UI otimista]]: estado pendente na tela, desfaz ou tenta de novo se o servidor recusar | ⏳ |
@@ -39,6 +39,20 @@ A [[UI otimista]] cobre a escrita; a leitura pede ao servidor só o necessário,
 
 - O `api.ts` será a única fronteira de rede do front: quando o app desktop vier, o [[O daemon notesd|`notesd`]] responde o mesmo contrato e a tela não muda.
 - Cookie no navegador porque ele já guarda e envia sozinho; o [[Token por dispositivo|token por dispositivo]] fica para o app desktop, que não tem sessão de navegador.
+
+## Quem entrega o front
+
+Em produção não há Vite nem serviço do front: o [[Build do front|build]] vira uma pasta de [[Arquivo estático|arquivos estáticos]], e o [[Reverse proxy|Caddy]], que já fica na porta 443 pelo [[TLS]] e pelas rotas (#16), também entrega essa pasta.
+
+| Pedido | Quem responde |
+|---|---|
+| `GET /`, `GET /assets/...` | o Caddy, com os arquivos do `dist/` no disco dele |
+| `GET /api/notes...` | o Caddy repassa ao `notes:8000` ([[Rede de containers]]) |
+
+- O `dist/` entra na imagem do Caddy por [[Build multi-stage|build multi-stage]]: o Node gera a pasta num estágio que é descartado ([[Infra — deploy e operação]]).
+- Front e api saem da mesma origem: o `api.ts` continua chamando `/api/notes` como [[URL relativa]], sem [[CORS]].
+- A api fica só com dados; nenhuma rota do [[FastAPI]] serve arquivo.
+- O Caddy entra antes no compose de dev (#16, M1), na frente do Vite; servir o `dist/` (#47) fica para a M3, quando houver servidor na AWS.
 
 ## Por que não SQLite em WASM
 
@@ -58,6 +72,8 @@ A [[UI otimista]] é bem mais simples de implementar, e o navegador funcionar se
 > Com o [[Yjs]], a nota no servidor vira um documento CRDT. Um `PATCH` com o texto inteiro vindo do navegador pode apagar o que outro dispositivo acabou de mandar. Saídas: o navegador editar pelo [[WebSocket]] do sync (online, sem guardar nada) ou o servidor transformar o `PATCH` em update [[Yjs]]. Decidir junto com onde mora o documento ([[Back — daemon e servidor]]).
 
 ## Revisar se...
+
+- o front ganhar um servidor próprio (renderização no servidor, SSR) → o `/` passa a ser repassado a esse serviço, e o Caddy deixa de servir o `dist/`;
 
 - a edição pendente perdida ao fechar a aba incomodar, ou o uso no navegador precisar de offline → SQLite em WASM;
 - quando o app desktop vier, manter o contrato igual nos dois lados der trabalho demais → o app desktop também falar direto com o servidor e o `notesd` virar só cache offline.

@@ -68,6 +68,7 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[URL relativa]] | o código escreve só o caminho; o navegador completa com a origem da página |
 | [[Proxy de desenvolvimento]] | o servidor do front repassa `/api` à api, e tudo fica na mesma origem |
 | [[Servidor de desenvolvimento]] | quem responde `/` com o `index.html` e converte o `.ts` na hora; o `Content-Type` diz o que o navegador faz |
+| [[Arquivo estático]] | resposta lida do disco como está, um pedido por arquivo; a dinâmica sai de código |
 
 ## TypeScript
 
@@ -79,6 +80,7 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[Nullish coalescing]] | `a ?? b`: `b` só quando `a` é `null` ou `undefined`, diferente do `\|\|` |
 | [[Promise]] | o valor que chega depois; `await` espera, `void` ignora de propósito |
 | [[Callback]] | a peça recebe uma função e a chama no acontecimento; quem cria decide o que fazer |
+| [[Build do front]] | o `dist/`: TS convertido e juntado uma vez; o navegador baixa e roda |
 
 ## Docker
 
@@ -86,6 +88,7 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 |---|---|
 | [[Container]] | o programa empacotado com o que precisa, rodando isolado |
 | [[Dockerfile]] | receita da imagem; build × container; a ordem das instruções decide o que o cache reaproveita |
+| [[Build multi-stage]] | um estágio gera os arquivos, a imagem final leva só o resultado |
 | [[Docker Compose]] | vários containers descritos num arquivo e subidos juntos |
 | [[Volume do Docker]] | pasta de fora montada por cima da imagem; o dado sobrevive ao container |
 | [[Rede de containers]] | containers se acham pelo nome; só a porta publicada chega de fora |
