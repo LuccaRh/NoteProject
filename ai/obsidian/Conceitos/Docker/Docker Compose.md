@@ -10,8 +10,9 @@ Um sistema tem vários [[Container|containers]] (API, banco, proxy) que precisam
 | No compose | Para quê |
 |---|---|
 | `services` | um container por serviço (api, banco como o [[Postgres]], [[Reverse proxy\|proxy]]) |
-| `volumes` | dado que sobrevive ao container (o banco): [[Volume do Docker\|volume]] |
+| `volumes` | dado que sobrevive ao container (o banco, os certificados de um [[Reverse proxy\|proxy]]): [[Volume do Docker\|volume]] |
 | `ports` | publica uma porta do container na máquina ([[Rede de containers]]) |
+| `depends_on` | ordem de subida: o serviço sobe depois dos listados, sem esperar que estejam prontos; para esperar, `condition: service_healthy` com `healthcheck` *(geral)* |
 | `restart: unless-stopped` | volta sozinho depois de cair ou de a máquina reiniciar |
 | `healthcheck` | o compose sabe se o serviço responde ([[Observabilidade]]) |
 
@@ -58,6 +59,6 @@ Um sistema tem vários [[Container|containers]] (API, banco, proxy) que precisam
 - O Compose também junta arquivos: `docker compose -f docker-compose.yml -f docker-compose.prod.yml up` aplica o segundo por cima do primeiro ([Merge Compose files](https://docs.docker.com/compose/how-tos/multiple-compose-files/merge/)).
 
 > [!example] No NoteProject
-> Hoje o compose sobe o Vite; o servidor e o [[Postgres]] entram em M0, e em produção, o mesmo jeito numa [[EC2]] ([[Infra — deploy e operação]]).
+> O compose de desenvolvimento sobe o [[Reverse proxy|Caddy]], o Vite, a API e o [[Postgres]]; em produção, o mesmo jeito numa [[EC2]] ([[Infra — deploy e operação]]).
 
 Doc: [Docker Compose](https://docs.docker.com/compose/).

@@ -66,6 +66,6 @@ server: {
 > - O proxy só existe no `vite dev`. O build (`vite build`) não leva configuração de proxy; em produção quem divide `/api` é o reverse proxy.
 
 > [!example] No NoteProject
-> O front chama `/api/notes`, e o Vite repassa ao serviço `notes` ([[Front — editor e UI]]).
+> O proxy do Vite repassava `/api/notes` ao serviço `notes` até o [[Reverse proxy|Caddy]] entrar na frente do compose de dev ([[Infra — deploy e operação]]).
 
 Docs: [Vite — server.proxy](https://vite.dev/config/server-options#server-proxy).

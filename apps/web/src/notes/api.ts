@@ -1,5 +1,5 @@
 // Global variables
-// Same origin: the Vite proxy (dev) or the server (build) forwards /api
+// Same origin: Caddy forwards /api to the notes service
 const BASE = '/api/notes'
 
 export type Note = {

@@ -1,0 +1,26 @@
+titulo: "Plano (M3): o mesmo caminho em produção, na AWS"
+tipo: blocos
+grade: [330, 160]
+destino: Plano do projeto/Issues feitas/Figuras
+nos:
+  nav:   {tipo: bloco, pos: [0, 0], texto: "navegador (qualquer lugar)<br>https://notes.&lt;domínio&gt;", cor: azul}
+  dns:   {tipo: bloco, pos: [0, 2], texto: "DNS público<br>notes.&lt;domínio&gt; → IP da EC2", cor: roxo}
+  sg:    {tipo: bloco, pos: [1, 1], texto: "security group da EC2<br>abre só 80 e 443<br>(5432 fechado)", cor: vermelho}
+  gw:    {tipo: bloco, pos: [2, 1], texto: "EC2 na rede Docker<br>(gateway)", cor: roxo}
+  cad:   {tipo: bloco, pos: [3, 0], texto: "caddy :443<br>certificado Let's Encrypt<br>file_server do dist/", cor: vermelho}
+  dist:  {tipo: bloco, pos: [4, 0], texto: "dist/ (build do web)<br>dentro da imagem do Caddy<br>sem Vite · #47", cor: azul}
+  api:   {tipo: bloco, pos: [4, 1], texto: "notes :8000<br>FastAPI (sem reload)<br>sem porta publicada", cor: verde}
+  db:    {tipo: banco, pos: [4, 2], texto: "postgres :5432<br>volume no disco (EBS)<br>sem porta publicada", cor: amarelo}
+  le:    {tipo: bloco, pos: [3, 3], texto: "Let's Encrypt<br>(CA pública)", cor: vermelho}
+  inet:  {tipo: grupo, contem: [nav, dns], texto: "internet", cor: azul}
+  rede:  {tipo: grupo, contem: [gw, cad, dist, api, db], texto: "EC2 · docker compose de produção · DNS pelo nome do serviço", cor: laranja}
+arestas:
+  - [nav.b, dns.c, {rotulo: "1. nome → IP"}]
+  - [nav, sg, {rotulo: "2. HTTPS :443"}]
+  - [sg, gw]
+  - [gw.c, cad.e, {rotulo: ":443"}]
+  - [cad, dist, {rotulo: "resto → dist/"}]
+  - [cad.b, api.e, {rotulo: "/api/* sem o /api<br>→ notes:8000"}]
+  - [api, db, {rotulo: "postgres:5432"}]
+  - [cad.b, le.c, {rotulo: "pede e renova<br>o certificado", tracejada: true, por: [3.0, 2.5]}]
+legenda: {"dev → prod": "nome real em vez de .localhost; Let's Encrypt em vez de CA local; dist/ em vez do Vite; sem 5432 aberto", "tracejada": "acontece de tempos em tempos, não a cada pedido"}

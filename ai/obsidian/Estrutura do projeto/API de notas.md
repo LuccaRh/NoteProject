@@ -29,7 +29,7 @@ O build do editor não passa pela api: o [[Reverse proxy|Caddy]] serve os [[Arqu
 | conexão por pedido (`Depends`) e as consultas das rotas | `apps/notes/src/notes/` | ⏳ #46 |
 
 - O Alembic roda dentro do container `notes` ([[Comandos do Docker no dev|`dc exec notes uv run alembic upgrade head`]]): fora da rede do compose, o host `postgres` não resolve ([[Rede de containers]]).
-- O proxy do Vite (`make dev`) manda `/api` para `localhost:8000`; no ar, quem repassa é o [[Reverse proxy|Caddy]].
+- Quem manda `/api` para o `notes:8000`, tirando o prefixo, é o [[Reverse proxy|Caddy]], no compose de dev e no ar.
 
 ## Estrutura dentro de `apps/notes`: `src/`
 

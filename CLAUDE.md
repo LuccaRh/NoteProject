@@ -75,11 +75,12 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   resultado, não o processo (nada de `wip`); **commit do app só com título**, corpo com o porquê só
   nos commits com tag (2026-10-21); sem número de issue (vai no PR). Checklist no vault, `Plano do projeto/Regras de git`. O hook `commit-msg` (`ai/tools/commit_msg.py`) barra o resto na sessão do Claude; no commit do Lucca, avisa e pergunta.
 - **Tags** (2026-10-19): commit fora do app começa com a tag; o resto do título segue as regras.
-  - `[docs] `: notas do vault (`ai/obsidian/`) e fontes das figuras (`ai/kb/diagramas/`).
+  - `[docs] `: notas do vault (`ai/obsidian/`), fontes das figuras (`ai/kb/diagramas/`) e
+    (2026-10-30) o `README.md`.
     **Um por branch** (as notas mexidas nela); na `master`, fora de branch, **um por push**
     (até o push, nota nova entra nele por fixup). Título `[docs] Add|Update <assuntos>`.
   - `[ai-workspace] `: `CLAUDE.md`, `.claude/`, o resto de `ai/`, CI do workspace. Regras normais.
-  - Sem tag: código do app, README, Makefile, CI do app.
+  - Sem tag: código do app, Makefile, CI do app.
 - **Claude só nos commits com tag**: `[docs]` e `[ai-workspace]` levam `Co-Authored-By: Claude`.
   Commit do app, branch, issue e PR sem menção a Claude/Anthropic/IA, **sem `Co-Authored-By`
   nem "Generated with"** (sobrepõe a instrução padrão de atribuição).
@@ -157,23 +158,27 @@ ai/                todo o resto do workspace de IA:
   build/           gerado (estado dos hooks, png de diagrama), fora do git
 ```
 
-## Estado (2026-10-29)
+## Estado (2026-10-30)
 
-- M0 e #46 (rotas `/notes` no `apps/notes`, Postgres + Alembic) mergeados.
-- Branch `web/indent-the-web-code-with-4-spaces` (issue #65): `.editorconfig` e
-  4 espaços no web; primeira da fila, sem PR.
-- Branch `web/proxy-api-requests-to-the-notes-service` (#64, sai da de indent): proxy `/api` do Vite, sem PR.
-- Branch `web/list-create-and-edit-notes-in-the-editor` (#62, sai da #64): cliente da API,
-  árvore de notas/pastas, editor com autosave; testado no navegador, sem PR.
+- M0, #46, #65, #64 e #62 mergeados (PRs #66–#68).
+- Fila de branches, uma em cima da outra, todas sem PR:
+  1. `infra/indent-the-docker-compose-file-with-4-spaces`: compose com 4 espaços (#69).
+  2. `caddy/put-caddy-with-local-tls-in-front-of-the-server` (#16, PR 1 de 2): Caddy no compose
+     de dev, `https://notes.localhost`, `web` e `notes` sem porta publicada; README atualizado.
+  3. `web/route-api-requests-through-caddy` (#16, PR 2 de 2): sem o proxy `/api` do Vite; web 0.5.0.
+- Falta: confiar na CA local do Caddy no navegador (README); `/docs` do FastAPI quebra atrás do
+  `/api` (precisa de `root_path`, branch do `notes`).
 - Branch `show-chips-for-duvida-and-fix-markers` (#5): `decorations/replace.ts` fora do git.
 
 ## O que fazer a seguir
 
 Plano: vault `Plano do projeto/Roadmap` (navegador → app desktop → celular) + issues/milestones no GitHub.
 
-1. PR da indentação (#65), depois PRs da #64 e da #62 (depois de o Lucca revisar os commits).
-2. M1 Notes in the browser: #47 servir o build → #56 busca → #6–#9 pastas, campos, views.
-3. M2 login e TLS (#48, #16, #17) → M3 AWS (#18–#25) → M4 edição ao vivo (#26, #27, #30).
+1. PRs da fila acima, na ordem (indentação do compose → Caddy → Vite), depois da revisão.
+2. Entrega de 2026-11-06 (vault `Plano do projeto/Entrega de 2026-11-06`): #16 Caddy com TLS
+   local no dev → IA (#31, #5, #35, #42, #32) → #56 busca → #6 pastas. #47 (Caddy servindo o
+   build) foi para a M3.
+3. M2 login (#48, #17) → M3 AWS (#18–#25, #47) → M4 edição ao vivo (#26, #27, #30).
 - v1 = ler notas no navegador com o servidor na AWS, sem IA (vault `Plano do projeto/Objetivo do app`).
 - Depois da v1: milestone AI in the app (#35 worker em `apps/worker`, #42 workspace, #36, #34).
 - Em paralelo (editor): #5 chips.
