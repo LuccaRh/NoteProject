@@ -13,18 +13,33 @@ apps/
 
 ## Run
 
-Each service runs in its own terminal. The notes API needs [uv](https://docs.astral.sh/uv/).
+Docker Compose starts everything: Caddy, the editor, the notes API and Postgres. It needs
+the `.env` below. `make check` also needs [uv](https://docs.astral.sh/uv/).
 
-| Service | Start | Open in the browser |
+| What | Start | Open in the browser |
 |---|---|---|
-| web (editor) | `make install` once, then `make dev` | <http://localhost:5173> |
-| notes (API) + Postgres | `docker compose -f docker-compose-dev.yml up --build` | <http://localhost:8000/docs> |
+| everything | `docker compose -f docker-compose-dev.yml up --build` | <https://notes.localhost> |
+| editor only, no API | `make install` once, then `make dev` | <http://localhost:5173> |
 
-The ports come from each tool: 5173 is set in `apps/web/vite.config.ts`, and 8000 is the
-default of `fastapi dev`. Both listen on localhost only and reload when a file is saved.
+Caddy (`caddy/Caddyfile`) is the only way in: `/api/*` goes to the notes API without the
+`/api` prefix, and everything else goes to the Vite dev server. Both reload when a file is
+saved. The editor and the API publish no port of their own; Postgres listens on
+`localhost:5432` for the tests. `*.localhost` names resolve to the machine itself.
 
-The API needs the database and the `.env` below, so it runs in Docker Compose, which also
-starts the editor (same ports, same reload). Postgres listens on `localhost:5432`.
+### Trusting the local certificate
+
+Caddy signs the certificate for `notes.localhost` with its own local CA, kept in the
+`caddy_data` volume. Until the system trusts that CA, the browser shows a warning. Copy the
+root certificate out of the container and add it once (Arch Linux):
+
+```sh
+docker compose -f docker-compose-dev.yml cp \
+    caddy:/data/caddy/pki/authorities/local/root.crt caddy-root.crt
+sudo trust anchor caddy-root.crt
+```
+
+Firefox keeps its own list: import the same file under Settings, Certificates. Deleting the
+`caddy_data` volume creates a new CA, which has to be trusted again.
 
 ### Environment variables
 
@@ -64,12 +79,13 @@ docker compose -f docker-compose-dev.yml exec notes uv run alembic upgrade head
 Every FastAPI service serves its own interactive docs at `/docs` (Swagger UI), built from the
 code:
 
-1. Open `http://localhost:<port>/docs`; it lists every route.
+1. Open the service's `/docs` (for now only with a published port: through Caddy the page
+   asks for `/openapi.json` without the `/api` prefix); it lists every route.
 2. Click a route, then **Try it out** and **Execute**.
 3. The page shows the request it sent (as a `curl` command), the status code and the body.
 
 A `GET` route can also be opened straight in the address bar, e.g.
-<http://localhost:8000/health> shows `{"status":"ok"}`.
+<https://notes.localhost/api/health> shows `{"status":"ok"}`.
 
 ## Check
 

@@ -24,10 +24,10 @@ A resposta traz o cabeçalho `Content-Type`, e é ele que diz ao navegador o que
 
 | | Servidor de desenvolvimento | Produção |
 |---|---|---|
-| Comando | `vite` (`npm run dev`) | `vite build` gera a pasta `dist/` uma vez |
+| Comando | `vite` (`npm run dev`) | `vite build` gera a pasta `dist/` uma vez ([[Build do front\|build]]) |
 | Conversão | a cada pedido, arquivo por arquivo | antes, tudo junto e compactado |
 | Ao salvar | a página recarrega sozinha | nada muda até o próximo build |
-| Quem serve | o próprio Vite | um servidor de arquivos ou o [[Reverse proxy\|reverse proxy]] |
+| Quem serve | o próprio Vite | um [[Arquivo estático\|servidor de arquivos]] ou o [[Reverse proxy\|reverse proxy]] |
 
 > [!warning] Erros comuns
 > - Achar que ver o código no navegador é falha: todo código de front chega ao navegador para rodar, em qualquer site (aba **Sources** do DevTools). Segredo (senha, chave de API) fica no back, nunca no front.

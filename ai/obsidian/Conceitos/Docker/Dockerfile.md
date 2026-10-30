@@ -21,7 +21,7 @@ Uma [[Container|imagem]] precisa de uma receita repetível: qual sistema, qual l
 | `CMD ["programa", "arg"]` | container         | comando que roda quando o container sobe; nada roda no build                 |
 
 - **Como ler o `COPY`**: `COPY <origem…> <destino>`. O último argumento é o destino; os outros são origens, relativas ao contexto do build. Destino relativo (`./`) parte do `WORKDIR`: depois de `WORKDIR /app`, `COPY pyproject.toml uv.lock ./` põe os dois arquivos em `/app`.
-- **`COPY --from=<imagem>`** copia de **outra imagem**, não do host. `COPY --from=ghcr.io/astral-sh/uv:0.13.1 /uv /uvx /bin/` pega os executáveis da imagem oficial do uv e os põe em `/bin/`, uma das pastas do `PATH` (a lista de pastas onde o shell procura comandos); por isso os `RUN` seguintes acham o `uv` ([uv — Docker](https://docs.astral.sh/uv/guides/integration/docker/)).
+- **`COPY --from=<imagem>`** copia de **outra imagem**, não do host. `COPY --from=ghcr.io/astral-sh/uv:0.13.1 /uv /uvx /bin/` pega os executáveis da imagem oficial do uv e os põe em `/bin/`, uma das pastas do `PATH` (a lista de pastas onde o shell procura comandos); por isso os `RUN` seguintes acham o `uv` ([uv — Docker](https://docs.astral.sh/uv/guides/integration/docker/)). O `--from` também aceita um estágio do próprio Dockerfile ([[Build multi-stage]]).
 
 ## Build e container
 

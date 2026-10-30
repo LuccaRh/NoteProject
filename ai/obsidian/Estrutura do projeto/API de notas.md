@@ -12,7 +12,8 @@ O serviço `notes` do [[Back — daemon e servidor|servidor]]: a API que o [[Nav
 | `GET /health` | responde 200 se o processo está de pé; o healthcheck do [[Docker Compose\|compose]] usa ([[Observabilidade]]) | ⏳ M0 (#10) |
 | `/notes` | CRUD das notas e pastas no [[Postgres]] | ⏳ M1 (#46) |
 | `/search` | busca full-text no Postgres | ⏳ M1 (#56) |
-| `/` e arquivos estáticos | o build do editor: uma URL só, nada instalado | ⏳ M1 (#47) |
+
+O build do editor não passa pela api: o [[Reverse proxy|Caddy]] serve os [[Arquivo estático|arquivos estáticos]] na mesma origem ([[Navegador]], #47).
 
 - Rotas síncronas (`def`) até o banco entrar: sem `await`, a thread do pool é o caminho seguro ([[FastAPI]], "`async def` ou `def`").
 - O [[Postgres]] entra na #12, com o pool aberto no `lifespan`.

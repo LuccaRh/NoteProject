@@ -9,16 +9,18 @@ Enquanto tudo roda no notebook, infra é só o [[Docker Compose|`docker compose`
 
 | Arquivo | Faz |
 |---|---|
-| `docker-compose-dev.yml` | `web` (Vite :5173) e `notes` (FastAPI :8000), com reload; sobe com `-f` |
+| `docker-compose-dev.yml` | `caddy` na frente (`https://notes.localhost`), `web` (Vite) e `notes` (FastAPI) com reload, [[Postgres]]; sobe com `-f` |
+| `caddy/Caddyfile` | `/api/*` → `notes:8000` sem o `/api`; o resto → `web:5173`; certificado da CA local (`tls internal`) |
 | `apps/web/Dockerfile.dev`, `apps/notes/Dockerfile.dev` | imagens de desenvolvimento, com reload |
 | `Makefile` | `make dev` sem [[Container\|Docker]]; `make check` |
 | `.github/workflows/ci.yml` | tsc + build do web; testes de `ai/tools/`; ruff, mypy e pytest entram com o servidor (#17) |
 
-Os serviços do compose de desenvolvimento são programas separados, cada um na sua [[Porta|porta]]. O front é só o `web`; a "api" é o `notes`, o back.
+Os serviços do compose de desenvolvimento são programas separados, cada um na sua [[Porta|porta]]. O front é só o `web`; a "api" é o `notes`, o back. Só o `caddy` publica porta no notebook; `web` e `notes` ficam só na [[Rede de containers|rede do compose]].
 
 | Serviço | Pasta | Porta | Faz |
 |---|---|---|---|
-| `web` | `apps/web/` | 5173 | entrega o HTML e o JS do editor ao navegador; repassa `/api` ao `notes` ([[Proxy de desenvolvimento\|proxy de desenvolvimento]]) |
+| `caddy` | `caddy/` | 80, 443 | [[Reverse proxy\|reverse proxy]] com [[TLS]] local: divide `/api` e o resto entre `notes` e `web` |
+| `web` | `apps/web/` | 5173 | entrega o HTML e o JS do editor ao navegador |
 | `notes` | `apps/notes/` | 8000 | a api: rotas `/notes` em [[FastAPI]], lê e grava no [[Postgres]] |
 | `postgres` | — | 5432 | o banco |
 
@@ -34,7 +36,7 @@ A ideia de partida: um [[Docker Compose|compose]] com FastAPI, sync, [[Postgres]
 | domínio + [[DNS]] | um nome fixo para os dispositivos acharem o servidor | domínio do GitHub pack + Cloudflare |
 | [[Reverse proxy\|reverse proxy]] + [[TLS]] | só a porta 443 aberta, [[TLS\|HTTPS]], roteia `/api` e `/sync` | [[Reverse proxy\|Caddy]] |
 | máquina | onde os [[Container\|containers]] rodam | [[EC2]] `t4g.small` |
-| [[Docker Compose\|compose]] de produção | sem bind de código, `restart: unless-stopped`, healthcheck | api, sync, [[Postgres]], [[Reverse proxy\|Caddy]] |
+| [[Docker Compose\|compose]] de produção | sem bind de código, `restart: unless-stopped`, healthcheck | api, sync, [[Postgres]], [[Reverse proxy\|Caddy]] com o `dist/` do front |
 | imagens + registry | o servidor baixa a imagem pronta em vez de buildar | [[CI\|GitHub Actions]] → [[CD\|GHCR]] |
 | segredos | senha do [[Postgres]] e chaves fora do git | `.env` fora do git; [[IAM]] no lugar de chave |
 | [[Backup\|backup]] | [[Backup\|`pg_dump`]] + blobs fora da máquina, com [[Backup\|restore]] testado | cron → [[S3]] |
@@ -48,6 +50,14 @@ A ideia de partida: um [[Docker Compose|compose]] com FastAPI, sync, [[Postgres]
 - [[EC2]] `t4g.small`, grátis até 31/12/2026 ([[Custo zero — créditos e free tier]]).
 - [[Reverse proxy|Caddy]] na frente de api e sync (#16 e #22 do [[Roadmap]]); portas e caminho de um pedido na [[Rede do servidor|rede do servidor]].
 - [[TLS|Certificado]]: no PC (M1), local, emitido pelo Caddy; na AWS (M2), Let's Encrypt, pedido pelo Caddy.
+- Caddy nos dois composes: muda só para onde vai o `/*`.
+
+| | Compose de desenvolvimento | Compose de produção |
+|---|---|---|
+| `/api/notes/*` | Caddy → `notes:8000` | Caddy → `notes:8000` |
+| `/*` (o front) | Caddy → `web:5173`, o [[Servidor de desenvolvimento\|Vite]], que recompila e recarrega | Caddy serve o `dist/` do próprio disco ([[Arquivo estático\|arquivos estáticos]]) |
+| container do front | `web` (Vite) | nenhum: o `dist/` vai na imagem do Caddy por [[Build multi-stage\|build multi-stage]] |
+| proxy `/api` do Vite | sai: o Caddy já roteia | não existe |
 - [[Domínio]] (#21): GitHub Student Pack, DNS no Cloudflare.
 - [[CI]]: hoje o `ci.yml`; CI do servidor (#17) e deploy por merge (#23), entrando na AWS por [[OIDC]] com uma role que só aceita a `master` deste repo.
 - [[Terraform]] (#19): [[EC2]], Security Group, [[IAM]] e [[S3]], na pasta `infra/` ([[Um repo ou vários]]).
