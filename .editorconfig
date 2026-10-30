@@ -13,3 +13,7 @@ indent_size = 2
 # make requires a real tab
 [Makefile]
 indent_style = tab
+
+# The compose file follows the code: 4 spaces
+[docker-compose*.yml]
+indent_size = 4

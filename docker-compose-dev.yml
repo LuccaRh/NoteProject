@@ -1,41 +1,42 @@
 services:
 
-  web:
-    build:
-      context: ./apps/web
-      dockerfile: Dockerfile.dev
-    ports:
-      - "127.0.0.1:5173:5173"
-    volumes:
-      - ./apps/web:/app
-      - /app/node_modules
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-      # Vite proxy target: the notes service on the compose network
-      - API_URL=http://notes:8000
+    web:
+        build:
+            context: ./apps/web
+            dockerfile: Dockerfile.dev
+        ports:
+            - "127.0.0.1:5173:5173"
+        volumes:
+            - ./apps/web:/app
+            - /app/node_modules
+        environment:
+            - CHOKIDAR_USEPOLLING=true
+            # Vite proxy target: the notes service on the compose network
+            - API_URL=http://notes:8000
 
-  notes:
-    build:
-      context: ./apps/notes
-      dockerfile: Dockerfile.dev
-    ports:
-      - "127.0.0.1:8000:8000"
-    volumes:
-      - ./apps/notes:/app
-      - /app/.venv
-    env_file: .env
-    depends_on:
-      - postgres
- 
-  postgres:
-    image: postgres:18
-    command: postgres -c log_statement=all
-    # Loopback only: lets the host run the tests and psql
-    ports:
-      - "127.0.0.1:5432:5432"
-    env_file: .env
-    volumes:
-      - db:/var/lib/postgresql
+    notes:
+        build:
+            context: ./apps/notes
+            dockerfile: Dockerfile.dev
+        ports:
+            - "127.0.0.1:8000:8000"
+        volumes:
+            - ./apps/notes:/app
+            - /app/.venv
+        env_file: .env
+        depends_on:
+            - postgres
+
+    postgres:
+        image: postgres:18
+        command: postgres -c log_statement=all
+        # Loopback only: lets the host run the tests and psql
+        ports:
+            - "127.0.0.1:5432:5432"
+        env_file: .env
+        volumes:
+            - db:/var/lib/postgresql
+
 
 volumes:
-  db:
+    db:
