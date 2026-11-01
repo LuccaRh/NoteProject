@@ -3,7 +3,7 @@ tags: [noteproject, servidor]
 ---
 # API de notas
 
-O serviço `notes` do [[Back — daemon e servidor|servidor]]: a API que o [[Navegador|navegador]] chama em `/api` para listar, abrir, salvar e buscar notas, e que serve o build do front. É uma app [[FastAPI]] em `apps/notes`, com imagem e [[Container|container]] próprios ([[Um repo ou vários]]). Login fica em outro serviço, `auth` (M2).
+O serviço `ichiro` do [[Back — daemon e servidor|servidor]]: a API que o [[Navegador|navegador]] chama em `/api` para listar, abrir, salvar e buscar notas, e que serve o build do front. É uma app [[FastAPI]] em `apps/ichiro`, com imagem e [[Container|container]] próprios ([[Um repo ou vários]]). Login fica em outro serviço, `auth` (M2).
 
 ## O que ela terá
 
@@ -23,21 +23,21 @@ O build do editor não passa pela api: o [[Reverse proxy|Caddy]] serve os [[Arqu
 | Peça | Onde | Etapa |
 |---|---|---|
 | `DATABASE_URL` no `.env`, com o host `postgres` (nome do serviço) | raiz, injetada pelo [[Docker Compose\|compose]] | ⏳ #12 |
-| [[Migration\|migrations]]: `alembic.ini`, `migrations/env.py` (lê a `DATABASE_URL`), `migrations/versions/` | `apps/notes` | ⏳ #12 |
+| [[Migration\|migrations]]: `alembic.ini`, `migrations/env.py` (lê a `DATABASE_URL`), `migrations/versions/` | `apps/ichiro` | ⏳ #12 |
 | primeira migration: `users` e `notes` | `migrations/versions/` | ⏳ #12 |
-| [[SQLAlchemy\|engine]] criado com a mesma URL; `/health` faz um `SELECT 1` | `apps/notes/src/notes/` | ⏳ #12 |
-| conexão por pedido (`Depends`) e as consultas das rotas | `apps/notes/src/notes/` | ⏳ #46 |
+| [[SQLAlchemy\|engine]] criado com a mesma URL; `/health` faz um `SELECT 1` | `apps/ichiro/src/ichiro/` | ⏳ #12 |
+| conexão por pedido (`Depends`) e as consultas das rotas | `apps/ichiro/src/ichiro/` | ⏳ #46 |
 
-- O Alembic roda dentro do container `notes` ([[Comandos do Docker no dev|`dc exec notes uv run alembic upgrade head`]]): fora da rede do compose, o host `postgres` não resolve ([[Rede de containers]]).
-- Quem manda `/api` para o `notes:8000`, tirando o prefixo, é o [[Reverse proxy|Caddy]], no compose de dev e no ar.
+- O Alembic roda dentro do container `ichiro` ([[Comandos do Docker no dev|`dc exec ichiro uv run alembic upgrade head`]]): fora da rede do compose, o host `postgres` não resolve ([[Rede de containers]]).
+- Quem manda `/api` para o `ichiro:8000`, tirando o prefixo, é o [[Reverse proxy|Caddy]], no compose de dev e no ar.
 
-## Estrutura dentro de `apps/notes`: `src/`
+## Estrutura dentro de `apps/ichiro`: `src/`
 
 A divisão entre serviços está em [[Um repo ou vários]]; aqui fica a de dentro do serviço, que vale para todo serviço Python do repo. Como o `import` acha o código em cada estrutura: [[Módulo Python|módulo]], [[Package Python|package]] e [[venv]].
 
 | | Plana | `src/` |
 |---|---|---|
-| Arquivos | `apps/notes/main.py`, `tests/`, `pyproject.toml` | `apps/notes/src/notes/main.py`, `tests/`, `pyproject.toml` |
+| Arquivos | `apps/ichiro/main.py`, `tests/`, `pyproject.toml` | `apps/ichiro/src/ichiro/main.py`, `tests/`, `pyproject.toml` |
 | `uv init` (0.13.1) | `uv init --no-package` | padrão |
 | Import nos testes | só com `pythonpath = ["."]` no pytest: sem isso a lista começa em `tests/` e `from main import app` falha | com o pacote instalado: o `uv sync` põe `src/` na lista por um `notes.pth` |
 | Pega erro de empacotamento | não: o teste pode passar com arquivo que a imagem não copia | só com instalação não editável (a da imagem); a editável, padrão do uv, lê direto de `src/` |
@@ -69,20 +69,20 @@ Uma pasta por papel, e dentro dela um arquivo por recurso (`notes.py`, depois `f
 
 ## Imagem ⏳ #11
 
-O serviço roda num [[Container|container]] do compose, com imagem feita pelo `apps/notes/Dockerfile` ([[Dockerfile]]):
+O serviço roda num [[Container|container]] do compose, com imagem feita pelo `apps/ichiro/Dockerfile` ([[Dockerfile]]):
 
 - base com Python 3.14 e o uv; libs do `uv.lock` instaladas **antes** de copiar o `src/`, para a edição do código não reinstalar as libs;
 - `.dockerignore` com a `.venv` do host;
 - sobe com `fastapi run`, que escuta em `0.0.0.0`: o pedido do host chega pela rede do Docker, não pelo loopback do container ([[Rede de containers]]).
 
-Ainda a decidir: o alvo do `Makefile` que roda ruff, mypy e pytest do serviço (hoje só existem `check-web` e `check-tools`), com `uv run` na pasta `apps/notes`.
+Ainda a decidir: o alvo do `Makefile` que roda ruff, mypy e pytest do serviço (hoje só existem `check-chimchar` e `check-tools`), com `uv run` na pasta `apps/ichiro`.
 
 ## Exercício
 
 Montar o esqueleto da #10, sem banco e sem Docker:
 
 1. Escolher a estrutura acima e registrar a escolha nesta página.
-2. Criar o projeto Python em `apps/notes` com uv (Python 3.14), com `fastapi[standard]` e, como dependências de desenvolvimento, `pytest`, `ruff` e `mypy`.
+2. Criar o projeto Python em `apps/ichiro` com uv (Python 3.14), com `fastapi[standard]` e, como dependências de desenvolvimento, `pytest`, `ruff` e `mypy`.
 3. Uma app [[FastAPI]] com `GET /health` devolvendo `{"status": "ok"}`.
 4. Um teste com `TestClient` que confere o 200 e o corpo.
 5. Um alvo no `Makefile` que roda ruff, mypy e pytest do serviço, chamado pelo `make check`.

@@ -1,21 +1,21 @@
 services:
 
-    web:
+    chimchar:
         build:
-            context: ./apps/web
+            context: ./apps/chimchar
             dockerfile: Dockerfile.dev
         volumes:
-            - ./apps/web:/app
+            - ./apps/chimchar:/app
             - /app/node_modules
         environment:
             - CHOKIDAR_USEPOLLING=true
 
-    notes:
+    ichiro:
         build:
-            context: ./apps/notes
+            context: ./apps/ichiro
             dockerfile: Dockerfile.dev
         volumes:
-            - ./apps/notes:/app
+            - ./apps/ichiro:/app
             - /app/.venv
         env_file: .env
         depends_on:
@@ -42,8 +42,8 @@ services:
             - caddy_data:/data
             - caddy_config:/config
         depends_on:
-            - web
-            - notes
+            - chimchar
+            - ichiro
 
 
 volumes:

@@ -3,13 +3,13 @@ notes.localhost {
     # Certificate from Caddy's own local CA (kept in the caddy_data volume)
     tls internal
 
-    # /api/notes -> notes:8000/notes; the API routes have no /api prefix
+    # /api/notes -> ichiro:8000/notes; the API routes have no /api prefix
     handle_path /api/* {
-        reverse_proxy notes:8000
+        reverse_proxy ichiro:8000
     }
 
     # Everything else is the front, served by the Vite dev server
     handle {
-        reverse_proxy web:5173
+        reverse_proxy chimchar:5173
     }
 }

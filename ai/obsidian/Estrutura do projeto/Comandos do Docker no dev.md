@@ -3,7 +3,7 @@ tags: [noteproject, infra]
 ---
 # Comandos do Docker no dev
 
-O dev do NoteProject roda no [[Docker Compose]], com três serviços no `docker-compose-dev.yml`: `web` (Vite), `notes` ([[API de notas]]) e `postgres` ([[Postgres]]). Todo comando passa pelo mesmo `-f`, então há um alias no `~/.bashrc`:
+O dev do NoteProject roda no [[Docker Compose]], com três serviços no `docker-compose-dev.yml`: `chimchar` (Vite), `ichiro` ([[API de notas]]) e `postgres` ([[Postgres]]). Todo comando passa pelo mesmo `-f`, então há um alias no `~/.bashrc`:
 
 ```bash
 alias dc='docker compose -f docker-compose-dev.yml'
@@ -16,7 +16,7 @@ Os comandos abaixo rodam da raiz do repo, onde o arquivo está.
 | Comando | Faz |
 |---|---|
 | `dc up -d` | sobe tudo em segundo plano (cria o que falta, recria o que mudou no compose ou no `.env`) |
-| `dc up -d --build notes` | refaz a imagem do `notes` e recria o container; depois de `uv add` ou de mudar o `Dockerfile.dev` |
+| `dc up -d --build ichiro` | refaz a imagem do `ichiro` e recria o container; depois de `uv add` ou de mudar o `Dockerfile.dev` |
 | `dc up -d --force-recreate notes` | recria o container sem refazer a imagem; para ler o `.env` de novo |
 | `dc restart notes` | reinicia o processo no mesmo container; **não** lê o `.env` de novo |
 | `dc stop` | para os containers, sem apagar |
@@ -28,7 +28,7 @@ Os comandos abaixo rodam da raiz do repo, onde o arquivo está.
 | Comando                      | Faz                                                           |
 | ---------------------------- | ------------------------------------------------------------- |
 | `dc ps`                      | serviços, estado e portas                                     |
-| `dc logs -f notes`           | log do `notes`, seguindo (`Ctrl+C` sai, o container continua) |
+| `dc logs -f ichiro`           | log do `ichiro`, seguindo (`Ctrl+C` sai, o container continua) |
 | `dc logs --tail=50 postgres` | as últimas 50 linhas do banco                                 |
 | `docker volume ls`           | os volumes; o do banco é `noteproject_db`                     |
 
@@ -42,22 +42,22 @@ Os comandos abaixo rodam da raiz do repo, onde o arquivo está.
 
 Dentro do psql: `\dt` (tabelas), `\d notes` (colunas), `SELECT * FROM notes;`, `\q` (sai). Detalhes em [[Postgres#Ver o banco: psql|Postgres]].
 
-## Migrations no `notes`
+## Migrations no `ichiro`
 
-O [[Migration|Alembic]] conecta pelo nome `postgres`, que só resolve na rede do compose ([[Rede de containers]]): o que toca no banco roda dentro do container `notes`.
+O [[Migration|Alembic]] conecta pelo nome `postgres`, que só resolve na rede do compose ([[Rede de containers]]): o que toca no banco roda dentro do container `ichiro`.
 
 | Comando | Faz | Toca no banco? |
 |---|---|---|
-| `dc exec notes uv run alembic upgrade head` | aplica as migrations que faltam | sim |
-| `dc exec notes uv run alembic downgrade -1` | reverte a última | sim |
-| `dc exec notes uv run alembic current` | qual migration o banco está | sim |
-| `dc exec notes uv run alembic history` | a lista das migrations | não |
-| `dc exec notes uv run alembic revision -m "<mensagem>"` | cria o arquivo da migration nova | não |
+| `dc exec ichiro uv run alembic upgrade head` | aplica as migrations que faltam | sim |
+| `dc exec ichiro uv run alembic downgrade -1` | reverte a última | sim |
+| `dc exec ichiro uv run alembic current` | qual migration o banco está | sim |
+| `dc exec ichiro uv run alembic history` | a lista das migrations | não |
+| `dc exec ichiro uv run alembic revision -m "<mensagem>"` | cria o arquivo da migration nova | não |
 
-- O `revision` não roda o `env.py` (`revision_environment` desligado no `alembic.ini`), então também funciona no host, de `apps/notes`: `uv run alembic revision -m "..."`. Criado no container, o arquivo aparece no host igual, pelo bind mount de `apps/notes`.
+- O `revision` não roda o `env.py` (`revision_environment` desligado no `alembic.ini`), então também funciona no host, de `apps/ichiro`: `uv run alembic revision -m "..."`. Criado no container, o arquivo aparece no host igual, pelo bind mount de `apps/ichiro`.
 - Container novo sem a `DATABASE_URL` → `KeyError: 'DATABASE_URL'`: o container é de antes da variável; `dc up -d --force-recreate notes`.
 
 > [!warning] Erros comuns
-> - `exec notes ...` sem o `dc` na frente: o `bash` usa o `exec` dele e responde `exec: notes: not found`.
+> - `exec ichiro ...` sem o `dc` na frente: o `bash` usa o `exec` dele e responde `exec: ichiro: not found`.
 > - `dc exec` com o container parado: falha; antes, `dc up -d`.
 > - `dc down -v` para "limpar": apaga o banco junto.

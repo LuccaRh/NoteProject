@@ -196,7 +196,7 @@ def problemas() -> list[str]:
                 out.append(f"W04 {p.relative_to(REPO)}: área {ar} fora de kb/areas.yaml")
     out += _versoes_libs()
     # W06: api.ts é a única fronteira de rede do front (README, "Decisões que valem lembrar")
-    for f in sorted((REPO / "apps/web/src").rglob("*.ts")):
+    for f in sorted((REPO / "apps/chimchar/src").rglob("*.ts")):
         if f.name != "api.ts" and re.search(r"\bfetch\(|new WebSocket\(|XMLHttpRequest", f.read_text(encoding="utf-8")):
             out.append(f"W06 {f.relative_to(REPO)}: rede fora de notes/api.ts")
     out += _docs()
@@ -212,6 +212,8 @@ def problemas() -> list[str]:
 # Prefixos de branch fora de apps/: o postgres (container do compose) e, sem serviço,
 # infra (label infrastructure sem container: CI, Terraform, AWS) e workspace (ai-workspace).
 _PREFIXOS_FIXOS = {"postgres", "caddy", "infra", "workspace"}
+# Exceções ao "um serviço por branch": mudanças que não se dividem (2026-11-01, #80).
+_VARIOS_SERVICOS = {"infra/rename-the-services"}
 
 
 def _branch_servico() -> list[str]:
@@ -227,7 +229,7 @@ def _branch_servico() -> list[str]:
     mexidos = git("diff", "--name-only", base).splitlines()
     mexidos += git("ls-files", "--others", "--exclude-standard", "apps").splitlines()
     outros = sorted({f.split("/")[1] for f in mexidos if f.startswith("apps/") and f.count("/") > 1} - {m.group(1)})
-    if outros:
+    if outros and br not in _VARIOS_SERVICOS:
         return [f"W13 branch {br}: mexe em apps/{', apps/'.join(outros)}; um serviço por branch (outro PR na mesma issue)"]
     return []
 
@@ -428,7 +430,7 @@ def _ingles() -> list[str]:
 def _versoes_libs() -> list[str]:
     """W05: card de lib com versão diferente da instalada (lockfiles) está velho."""
     out = []
-    lock_js = REPO / "apps/web/package-lock.json"
+    lock_js = REPO / "apps/chimchar/package-lock.json"
     pk = json.loads(lock_js.read_text()).get("packages", {}) if lock_js.exists() else {}
     uv = "\n".join(f.read_text() for f in sorted(REPO.glob("apps/*/uv.lock")))
     for p in sorted(LIBS.glob("*.md")):

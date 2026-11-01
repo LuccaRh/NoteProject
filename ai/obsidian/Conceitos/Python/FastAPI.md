@@ -215,6 +215,6 @@ FastAPI virou escolha comum para APIs novas em Python e para serviços que serve
 > - Mudar a assinatura da função muda a API: renomear um parâmetro renomeia o campo da query.
 
 > [!example] No NoteProject
-> As APIs do servidor (`notes`, `auth`) são apps FastAPI, uma por container ([[API de notas]]).
+> As APIs do servidor (`ichiro`, `auth`) são apps FastAPI, uma por container ([[API de notas]]).
 
 Docs: [FastAPI — First Steps](https://fastapi.tiangolo.com/tutorial/first-steps/), [FastAPI CLI](https://fastapi.tiangolo.com/fastapi-cli/), [Bigger Applications](https://fastapi.tiangolo.com/tutorial/bigger-applications/), [Dependencies](https://fastapi.tiangolo.com/tutorial/dependencies/), [Testing](https://fastapi.tiangolo.com/tutorial/testing/), [Concurrency and async/await](https://fastapi.tiangolo.com/async/), [Lifespan Events](https://fastapi.tiangolo.com/advanced/events/), [Release Notes](https://fastapi.tiangolo.com/release-notes/), [ASGI spec](https://asgi.readthedocs.io/), [PEP 333 (WSGI)](https://peps.python.org/pep-0333/).

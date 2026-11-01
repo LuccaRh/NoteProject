@@ -11,7 +11,7 @@ devolva só o necessário.
 Como ler
 - PDF (doc oficial baixada): `pdftotext -layout -f N -l M arq.pdf -` por página;
   sem página indicada, `pdftotext arq.pdf - | grep -n` para achar e só então leia as páginas.
-- Lib: `grep -n` no `.d.ts` (`apps/web/node_modules/<pacote>/dist/index.d.ts`) ou no fonte Python
+- Lib: `grep -n` no `.d.ts` (`apps/chimchar/node_modules/<pacote>/dist/index.d.ts`) ou no fonte Python
   (`apps/server/.venv/lib/python3*/site-packages/<pacote>/`); diga a versão (`package.json` do pacote
   ou `METADATA`).
 - Código, log, lockfile: `grep -n` para achar, `sed -n 'a,bp'` para ler o trecho.

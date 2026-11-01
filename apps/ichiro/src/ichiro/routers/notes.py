@@ -6,14 +6,14 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import Connection, text
 from sqlalchemy.exc import IntegrityError
 
-from notes.db import get_conn
-from notes.errors.notes import (
+from ichiro.db import get_conn
+from ichiro.errors.notes import (
     not_found,
     parent_inside_note,
     parent_not_folder,
     parent_not_found,
 )
-from notes.schemas.notes import Note, NoteCreate, NoteUpdate
+from ichiro.schemas.notes import Note, NoteCreate, NoteUpdate
 
 
 # Global variables

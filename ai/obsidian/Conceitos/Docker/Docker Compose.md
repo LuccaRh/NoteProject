@@ -27,7 +27,7 @@ Um sistema tem vários [[Container|containers]] (API, banco, proxy) que precisam
 |---|---|
 | `docker compose exec postgres bash` | abre um shell no container; `exit` volta |
 | `docker compose exec postgres psql -U <usuário> -d <banco>` | abre direto o [[Postgres#Ver o banco: psql\|psql]] |
-| `docker compose exec notes uv run alembic upgrade head` | roda as [[Migration\|migrations]] onde o nome do banco resolve |
+| `docker compose exec ichiro uv run alembic upgrade head` | roda as [[Migration\|migrations]] onde o nome do banco resolve |
 
 - O serviço é o nome no arquivo do compose; com `-f`, o mesmo `-f` do `up`.
 - Container parado: o `exec` falha. O `docker compose run <serviço> <programa>` cria um container novo só para o comando.

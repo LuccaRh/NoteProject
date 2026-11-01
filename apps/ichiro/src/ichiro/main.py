@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from notes.routers import health, notes
+from ichiro.routers import health, notes
 
 
 app = FastAPI()

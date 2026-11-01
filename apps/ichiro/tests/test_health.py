@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from notes.main import app
+from ichiro.main import app
 
 
 def test_health() -> None:

@@ -26,7 +26,7 @@ Primeiro: **persistir, servir o [[Navegador|navegador]] e autenticar** (M0–M2)
 
 | Peça | Papel |
 |---|---|
-| `notes` ([[FastAPI]], [[API de notas]]) | rotas de notas e busca, upload, export; para o navegador, o build do front |
+| `ichiro` ([[FastAPI]], [[API de notas]]) | rotas de notas e busca, upload, export; para o navegador, o build do front |
 | `auth` ([[FastAPI]]) | login, sessões, bootstrap do app desktop |
 | `worker` | pedidos de IA da [[Fila de pedidos\|fila]], depois da v1 |
 | [[WebSocket]] + y-py | recebe updates [[Yjs]], faz o merge, repassa aos outros dispositivos |

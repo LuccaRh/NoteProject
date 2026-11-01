@@ -38,7 +38,7 @@ Com pouco token:
 | Peça | O que faz | Estado |
 |---|---|---|
 | agente `revisor` | Sonnet, esforço baixo; lê só o diff e o escopo, devolve até ~15 linhas com arquivo:linha; roda quando pedido, para o código escrito à mão | ⏳ |
-| card do front em `ai/kb/` | componentes, CodeMirror, chamada à `/api`; a sessão escreve o front sem reler `apps/web` | ⏳ |
+| card do front em `ai/kb/` | componentes, CodeMirror, chamada à `/api`; a sessão escreve o front sem reler `apps/chimchar` | ⏳ |
 | agente `leitor` | lê arquivo grande e devolve o trecho | ✅ |
 
 O briefing do `revisor` tem forma fixa: **objetivo · leia antes · restrições · entregue · pronto quando**. Na terceira rodada de revisão da mesma mudança ele para e pede decisão (quebrar a mudança, rever o escopo) em vez de seguir.

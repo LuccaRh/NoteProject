@@ -1,7 +1,7 @@
 ---
 pacote: alembic
 versao: 1.20.1
-fonte: apps/notes/.venv/lib/python3.14/site-packages/alembic/
+fonte: apps/ichiro/.venv/lib/python3.14/site-packages/alembic/
 areas: [dados]
 ---
 # alembic — migrations do Postgres

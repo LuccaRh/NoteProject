@@ -6,23 +6,23 @@ on:
   pull_request:
 
 jobs:
-  web:
+  chimchar:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: apps/web
+        working-directory: apps/chimchar
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: apps/web/package-lock.json
+          cache-dependency-path: apps/chimchar/package-lock.json
       - run: npm ci
       - run: npx tsc --noEmit
       - run: npm run build
 
-  notes:
+  ichiro:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v10.3.0
-      - run: make check-notes
+      - run: make check-ichiro
 
   tools:
     runs-on: ubuntu-latest

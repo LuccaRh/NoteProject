@@ -41,7 +41,7 @@ versions/
 
 O Alembic é um cliente do [[Postgres]] como outro qualquer: conecta por uma URL (`postgresql+psycopg://usuário:senha@host:5432/banco`), em que o host é o nome do serviço, achado pelo DNS da [[Rede de containers|rede do compose]], e a URL vem do [[Docker Compose#Variáveis do .env|`.env`]]. Quem monta a conexão é o `env.py`, gerado pelo `alembic init` e editado à mão; o `alembic.ini` diz onde ficam as migrations.
 
-- Dentro do compose, roda-se com `docker compose exec notes uv run alembic upgrade head` ([[Docker Compose#Rodar um comando no container: exec|exec]]).
+- Dentro do compose, roda-se com `docker compose exec ichiro uv run alembic upgrade head` ([[Docker Compose#Rodar um comando no container: exec|exec]]).
 
 > [!warning] Erros comuns
 > - Achar que o `alembic revision` criou a tabela: ele só cria o arquivo.

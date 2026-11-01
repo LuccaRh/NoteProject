@@ -7,8 +7,8 @@ API (only a health check). Notes are not saved yet.
 
 ```
 apps/
-  web/     CodeMirror 6 editor.
-  notes/   Notes API (FastAPI). See apps/notes/README.md.
+  chimchar/  CodeMirror 6 editor.
+  ichiro/    Notes API (FastAPI). See apps/ichiro/README.md.
 ```
 
 ## Run
@@ -51,7 +51,7 @@ cp .env.example .env    # then replace every value
 ```
 
 `.env.example` lists the variables the project uses, each with a comment and a placeholder
-value. Docker Compose loads `.env` into the `postgres` and `notes` containers (`env_file` in
+value. Docker Compose loads `.env` into the `postgres` and `ichiro` containers (`env_file` in
 `docker-compose-dev.yml`):
 
 | Variable | Read by | Meaning |
@@ -67,11 +67,11 @@ empty; after changing them, recreate the volume with
 
 ### Database migrations
 
-Alembic creates and changes the tables (`apps/notes/migrations/versions/`). On a fresh
-database, and after pulling a new migration, apply them inside the `notes` container:
+Alembic creates and changes the tables (`apps/ichiro/migrations/versions/`). On a fresh
+database, and after pulling a new migration, apply them inside the `ichiro` container:
 
 ```sh
-docker compose -f docker-compose-dev.yml exec notes uv run alembic upgrade head
+docker compose -f docker-compose-dev.yml exec ichiro uv run alembic upgrade head
 ```
 
 ### Trying an API in the browser
@@ -90,10 +90,10 @@ A `GET` route can also be opened straight in the address bar, e.g.
 ## Check
 
 ```bash
-make check     # web: tsc + vite build; notes: ruff, mypy, pytest
+make check     # chimchar: tsc + vite build; ichiro: ruff, mypy, pytest
 ```
 
-The notes tests talk to the real database: start Postgres first
+The ichiro tests talk to the real database: start Postgres first
 (`docker compose -f docker-compose-dev.yml up -d postgres`).
 
 ## Next steps
