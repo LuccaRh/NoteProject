@@ -3,6 +3,9 @@ tags: [noteproject, ia, editor]
 ---
 # Marcar dúvida
 
+> [!info] Depois, sem data
+> Saiu da fila em 2026-10-31: o [[Chat com o workspace|chat]] cobre a pergunta sobre um trecho ([[Ordem de implementação]]).
+
 Hoje, para marcar uma dúvida no Obsidian, você digita `> [!duvida] ...` à mão. Depois vai ao terminal e roda `/duvida`.
 
 A ideia é marcar com um atalho, sem sair da leitura, e deixar a resposta para depois.

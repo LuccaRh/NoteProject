@@ -1,0 +1,41 @@
+titulo: "Uma pergunta no Claude Code hoje: do terminal até os arquivos mudados"
+tipo: blocos
+grade: [300, 150]
+destino: IA no projeto/Figuras
+nos:
+  te1:  {tipo: bloco, pos: [0, 0], texto: "1. mensagem<br>no terminal", cor: azul}
+  cc0:  {tipo: bloco, pos: [2, 0], texto: "2. recebe a mensagem<br>(sessão aberta na pasta<br>do projeto)", cor: verde}
+  di1:  {tipo: bloco, pos: [1, 1], texto: "lê CLAUDE.md (+ imports @),<br>cabeçalho de .claude/skills/*,<br>settings.json (hooks)", cor: amarelo}
+  cc1:  {tipo: bloco, pos: [2, 1], texto: "3. pacote 1:<br>system (CLAUDE.md, skills)<br>+ tools + histórico", cor: verde}
+  an1:  {tipo: bloco, pos: [3, 1], texto: "4. modelo entende a pergunta<br>e não tem o arquivo:<br>tool_use Grep('caddy')", cor: laranja}
+  di2:  {tipo: bloco, pos: [1, 2], texto: "grep em ai/obsidian/<br>→ '.../Caddy.md:12'", cor: amarelo}
+  cc2:  {tipo: bloco, pos: [2, 2], texto: "5. auto mode aprova;<br>executa o Grep<br>pacote 2 = 1 + resultado", cor: verde}
+  an2:  {tipo: bloco, pos: [3, 2], texto: "6. já sabe o caminho:<br>tool_use Read('.../Caddy.md')", cor: laranja}
+  di3:  {tipo: bloco, pos: [1, 3], texto: "abre o arquivo<br>(hook leitura confere<br>o tamanho antes)", cor: amarelo}
+  cc3:  {tipo: bloco, pos: [2, 3], texto: "7. executa o Read<br>pacote 3 = pacote 2<br>+ texto com nº de linha", cor: verde}
+  an3:  {tipo: bloco, pos: [3, 3], texto: "8. decide as mudanças:<br>Edit(Caddy.md, velho → novo)<br>Write('TLS.md', texto)<br>Bash('rm rascunho.md')", cor: laranja}
+  di4:  {tipo: bloco, pos: [1, 4], texto: "troca o trecho, cria<br>o arquivo, apaga o outro<br>no disco do PC", cor: amarelo}
+  cc4:  {tipo: bloco, pos: [2, 4], texto: "9. auto mode aprova;<br>executa as três<br>pacote 4 = 3 + ok", cor: verde}
+  an4:  {tipo: bloco, pos: [3, 4], texto: "10. nada mais a pedir:<br>só texto ('atualizei Caddy,<br>criei TLS, apaguei rascunho')", cor: laranja}
+  cc5:  {tipo: bloco, pos: [2, 5], texto: "11. grava a conversa<br>(transcript .jsonl em ~/.claude/)<br>e mostra o texto aos pedaços", cor: verde}
+  te2:  {tipo: bloco, pos: [0, 5], texto: "12. resposta no terminal;<br>o Obsidian vê os arquivos<br>mudados", cor: azul}
+  gte:  {tipo: grupo, contem: [te1, te2], texto: "Terminal", cor: cinza}
+  gdi:  {tipo: grupo, contem: [di1, di2, di3, di4], texto: "Disco do PC (arquivos)", cor: cinza}
+  gcc:  {tipo: grupo, contem: [cc0, cc1, cc2, cc3, cc4, cc5], texto: "Claude Code (programa no PC)", cor: cinza}
+  gan:  {tipo: grupo, contem: [an1, an2, an3, an4], texto: "Anthropic (modelo)", cor: cinza}
+arestas:
+  - [te1, cc0]
+  - [cc0, cc1]
+  - [cc1, di1, {rotulo: "lê"}]
+  - [cc1, an1, {rotulo: "request 1"}]
+  - [an1.b, cc2.c, {rotulo: "resposta", tracejada: true}]
+  - [cc2, di2, {rotulo: "grep"}]
+  - [cc2, an2, {rotulo: "request 2"}]
+  - [an2.b, cc3.c, {rotulo: "resposta", tracejada: true}]
+  - [cc3, di3, {rotulo: "lê"}]
+  - [cc3, an3, {rotulo: "request 3"}]
+  - [an3.b, cc4.c, {rotulo: "resposta", tracejada: true}]
+  - [cc4, di4, {rotulo: "escreve,<br>rm"}]
+  - [cc4, an4, {rotulo: "request 4"}]
+  - [an4.b, cc5.c, {rotulo: "resposta", tracejada: true}]
+  - [cc5, te2]

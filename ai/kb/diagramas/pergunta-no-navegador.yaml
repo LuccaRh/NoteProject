@@ -1,0 +1,41 @@
+titulo: "Uma pergunta no navegador: do chat até as notas mudadas"
+tipo: blocos
+grade: [300, 150]
+destino: IA no projeto/Figuras
+nos:
+  nav1: {tipo: bloco, pos: [0, 0], texto: "1. pergunta no chat<br>POST /api/chat<br>{workspace, conversa, pergunta}", cor: azul}
+  as0:  {tipo: bloco, pos: [2, 0], texto: "2. recebe a pergunta<br>(o Caddy encaminhou)", cor: verde}
+  no1:  {tipo: bloco, pos: [1, 1], texto: "lê .workspace/:<br>regras + cabeçalho<br>das skills", cor: amarelo}
+  as1:  {tipo: bloco, pos: [2, 1], texto: "3. pacote 1:<br>system (regras, índice)<br>+ tools + histórico", cor: verde}
+  an1:  {tipo: bloco, pos: [3, 1], texto: "4. modelo entende a pergunta<br>e não tem a nota:<br>tool_use search_notes('caddy')", cor: laranja}
+  no2:  {tipo: bloco, pos: [1, 2], texto: "busca no Postgres<br>→ [{id 42, 'Caddy'}]", cor: amarelo}
+  as2:  {tipo: bloco, pos: [2, 2], texto: "5. executa search_notes<br>pacote 2 = pacote 1<br>+ pedido + resultado", cor: verde}
+  an2:  {tipo: bloco, pos: [3, 2], texto: "6. já sabe o id:<br>tool_use read_note(42)", cor: laranja}
+  no3:  {tipo: bloco, pos: [1, 3], texto: "SELECT da nota 42", cor: amarelo}
+  as3:  {tipo: bloco, pos: [2, 3], texto: "7. executa read_note<br>pacote 3 = pacote 2<br>+ texto da nota", cor: verde}
+  an3:  {tipo: bloco, pos: [3, 3], texto: "8. decide as mudanças:<br>edit_note(42, velho → novo)<br>create_note('TLS', texto)<br>delete_note(57)", cor: laranja}
+  no4:  {tipo: bloco, pos: [1, 4], texto: "PATCH 42, POST 'TLS',<br>DELETE 57<br>→ Postgres", cor: amarelo}
+  as4:  {tipo: bloco, pos: [2, 4], texto: "9. executa as três<br>pacote 4 = pacote 3<br>+ 'ok' de cada uma", cor: verde}
+  an4:  {tipo: bloco, pos: [3, 4], texto: "10. nada mais a pedir:<br>só texto ('atualizei Caddy,<br>criei TLS, apaguei 57')", cor: laranja}
+  as5:  {tipo: bloco, pos: [2, 5], texto: "11. grava a conversa<br>(banco do lonzo)<br>e manda o texto aos pedaços", cor: verde}
+  nav2: {tipo: bloco, pos: [0, 5], texto: "12. mostra a resposta;<br>a lista de notas<br>recarrega", cor: azul}
+  gnav: {tipo: grupo, contem: [nav1, nav2], texto: "Navegador", cor: cinza}
+  gno:  {tipo: grupo, contem: [no1, no2, no3, no4], texto: "ichiro + Postgres", cor: cinza}
+  gas:  {tipo: grupo, contem: [as0, as1, as2, as3, as4, as5], texto: "lonzo (Agent SDK)", cor: cinza}
+  gan:  {tipo: grupo, contem: [an1, an2, an3, an4], texto: "Anthropic (modelo)", cor: cinza}
+arestas:
+  - [nav1, as0]
+  - [as0, as1]
+  - [as1, no1, {rotulo: "GET"}]
+  - [as1, an1, {rotulo: "request 1"}]
+  - [an1.b, as2.c, {rotulo: "resposta", tracejada: true}]
+  - [as2, no2, {rotulo: "GET /search"}]
+  - [as2, an2, {rotulo: "request 2"}]
+  - [an2.b, as3.c, {rotulo: "resposta", tracejada: true}]
+  - [as3, no3, {rotulo: "GET"}]
+  - [as3, an3, {rotulo: "request 3"}]
+  - [an3.b, as4.c, {rotulo: "resposta", tracejada: true}]
+  - [as4, no4, {rotulo: "PATCH, POST,<br>DELETE"}]
+  - [as4, an4, {rotulo: "request 4"}]
+  - [an4.b, as5.c, {rotulo: "resposta", tracejada: true}]
+  - [as5, nav2, {rotulo: "SSE"}]

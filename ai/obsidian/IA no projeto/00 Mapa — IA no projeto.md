@@ -5,7 +5,7 @@ tags: [noteproject, ia]
 
 Um app de notas com IA pode ser só isto: um editor, arquivos `.md` como banco e o Claude Code escrevendo neles. O NoteProject vai além: o app tem o próprio [[Workspace no app|workspace]], e quem usa não precisa do Claude Code.
 
-Ideia central: **o app funciona inteiro sem IA**. A IA é mais um cliente das notas: no navegador, um worker do servidor; no app desktop, um worker do [[O daemon notesd|daemon]]. Recebe pouco contexto e devolve pouca coisa.
+Ideia central: **o app funciona inteiro sem IA**. A IA é mais um cliente das notas: no navegador, o [[Chat com o workspace|chat]] e um worker do servidor; no app desktop, um worker do [[O daemon notesd|daemon]]. Recebe pouco contexto e devolve pouca coisa.
 
 ## Base
 
@@ -15,12 +15,14 @@ Ideia central: **o app funciona inteiro sem IA**. A IA é mais um cliente das no
 | [[O daemon notesd]] | um processo é dono do [[SQLite]]; todo mundo fala com ele |
 | [[MCP — a IA como cliente do daemon]] | o Claude Code chama funções do [[O daemon notesd\|daemon]] em vez de ler arquivos |
 | [[Edição por âncora]] | a IA nunca reescreve a nota; propõe uma operação presa a um trecho |
+| [[Chat com o workspace]] | workspace e laço da IA no servidor: a mesma pergunta, com o mesmo contexto, de qualquer aparelho |
+| [[Caminho de uma pergunta]] | passo a passo de uma pergunta, do navegador às notas mudadas, lado a lado com o Claude Code de hoje |
 
 ## O que a IA faz
 
 | Página | Ideia |
 |---|---|
-| [[Marcar dúvida]] | selecionar + `Ctrl+D`; vira um callout que o Obsidian também lê |
+| [[Marcar dúvida]] | selecionar + `Ctrl+D`; vira um callout que o Obsidian também lê (depois, sem data) |
 | [[Fila de pedidos]] | marcar e pedir a resposta no editor, sem ir ao terminal |
 | [[Blocos padronizados]] | a IA preenche moldes (passos, quem é quem...); o [[O daemon notesd\|daemon]] escreve o Markdown |
 | [[Figuras geradas]] | a IA escreve a receita (YAML, script); o [[O daemon notesd\|daemon]] gera a imagem |
@@ -36,4 +38,4 @@ Ideia central: **o app funciona inteiro sem IA**. A IA é mais um cliente das no
 
 ## Próximo passo
 
-[[Ordem de implementação]]: as partes sem IA vêm antes, porque são o que a IA usa depois.
+[[Ordem de implementação]]: o chat com o workspace primeiro; a marcação de dúvida fica para depois.

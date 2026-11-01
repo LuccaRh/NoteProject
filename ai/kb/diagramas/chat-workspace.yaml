@@ -1,0 +1,20 @@
+titulo: Uma pergunta no chat com o workspace
+tipo: blocos
+grade: [200, 130]
+destino: IA no projeto/Figuras
+nos:
+  cli:   {tipo: bloco, pos: [0, 0], texto: "Navegador<br>ou app", cor: azul}
+  caddy: {tipo: bloco, pos: [1, 0], texto: "Caddy", cor: roxo}
+  ia:    {tipo: bloco, pos: [2, 0], texto: "serviço de IA<br>(Agent SDK)", cor: verde}
+  notes: {tipo: bloco, pos: [2, 1], texto: "ichiro<br>(FastAPI)", cor: verde}
+  db:    {tipo: banco, pos: [3, 1], texto: "Postgres<br>notas, .workspace/,<br>conversas", cor: amarelo}
+  srv:   {tipo: grupo, contem: [caddy, ia, notes, db], texto: "Servidor", cor: cinza}
+  ant:   {tipo: bloco, pos: [4, 0], texto: "API da Anthropic<br>(o modelo)", cor: laranja}
+  n1:    {tipo: nota, pos: [4, 1], texto: "a cada tool_use,<br>nova request com<br>tudo + o resultado"}
+arestas:
+  - [cli, caddy, {rotulo: "POST /api/chat"}]
+  - [caddy, ia]
+  - [ia, ant, {rotulo: "system + tools<br>+ messages"}]
+  - [ant.c, ia.c, {rotulo: "texto ou tool_use", tracejada: true, por: cima}]
+  - [ia, notes, {rotulo: "ler_nota,<br>editar_nota"}]
+  - [notes, db]

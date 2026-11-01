@@ -37,7 +37,27 @@ Por isso o app depende da IA o mínimo possível, e cada pessoa escolhe de onde 
 - No navegador as perguntas passam pelo servidor; no desktop ficam na máquina.
 - A fila sincroniza: um pedido feito no navegador ou no celular pode ser respondido pelo app desktop, com o modelo grátis do PC ([[Fila de pedidos]]).
 
+## Harness
+
+O [[Chat com o workspace|chat]] precisa de um [[Laço de ferramentas#Harness|harness]]: o programa que monta o pacote, executa as ferramentas e repete. O mesmo modelo responde melhor ou pior conforme ele.
+
+| Opção | A favor | Contra |
+|---|---|---|
+| laço próprio, direto na Messages API | troca de provedor fácil (`anthropic`, `ollama`); cada peça entendida por dentro | prompt, desenho das ferramentas, resumo de conversa longa e erros, tudo a escrever e ajustar |
+| `tool_runner` da lib `anthropic` | o laço pronto sobre as funções do app (`@beta_tool`); mesma lib de 15 MB da Messages API | beta; só Claude; resumo de conversa longa ainda por escrever |
+| Claude Agent SDK | o harness do Claude Code pronto: laço, resumo do contexto, subagentes, skills, sessões, streaming | só Claude; traz o binário do Claude Code (314 MB, um subprocesso por pergunta); lib nova |
+
+Critério: a qualidade das respostas do chat, perto da do Claude Code, desde o primeiro dia.
+
+Escolha (2026-11-01): **Messages API pela lib `anthropic`**, sem o Agent SDK. Na #74 não há laço: uma request com stream. Quando entram as ferramentas (#77), o laço é o `tool_runner` da própria lib, com cada ferramenta do app como função `@beta_tool`. *(Conferido na `anthropic` 2.3.0 instalada: `resources/beta/messages/messages.py:1436`, `lib/tools/_beta_functions.py:354`.)*
+
+- Por que não o SDK: o `claude-agent-sdk` 0.2.176 traz o Claude Code CLI como binário de 328 MB (`_bundled/claude`) e abre um subprocesso por pergunta; o chat tem poucas ferramentas, e o laço cabe em poucas linhas.
+- Escolha anterior (2026-10-31): Agent SDK, com as ferramentas como servidor [[MCP]] no processo e `tools=[]`; caiu ao conferir o tamanho do pacote.
+- A interface `responder(pacote)` da seção "No código" continua para a [[Fila de pedidos|fila]].
+
 ## Revisar se...
+
+- o chat precisar de modelo local (Ollama) → laço próprio para esse provedor, com as mesmas ferramentas;
 
 - o servidor rodar numa máquina com memória para um modelo aberto → Ollama também no navegador;
 - os termos da Anthropic liberarem a assinatura em app de terceiro → camada 3 para todos.
