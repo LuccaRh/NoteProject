@@ -35,6 +35,14 @@ services:
         depends_on:
             - postgres
 
+    lonzo:
+        build:
+            context: ./apps/lonzo
+            dockerfile: Dockerfile.dev
+        volumes:
+            - ./apps/lonzo:/app
+            - /app/.venv
+
     postgres:
         image: postgres:18
         command: postgres -c log_statement=all
