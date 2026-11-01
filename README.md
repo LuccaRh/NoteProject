@@ -24,8 +24,9 @@ the `.env` below. `make check` also needs [uv](https://docs.astral.sh/uv/).
 | everything | `docker compose -f docker-compose-dev.yml up --build` | <https://notes.localhost> |
 | editor only, no API | `make install` once, then `make dev` | <http://localhost:5173> |
 
-Caddy (`caddy/Caddyfile`) is the only way in: `/api/*` goes to the notes API without the
-`/api` prefix, and everything else goes to the Vite dev server. Both reload when a file is
+Caddy (`caddy/Caddyfile`) is the only way in. Each API prefix goes to its own service,
+without the `/api` prefix: `/api/notes` to the notes API, `/api/chat` to the chat service;
+any other `/api` path is a 404, and everything else goes to the Vite dev server. Both reload when a file is
 saved. The editor and the API publish no port of their own; Postgres listens on
 `localhost:5432` for the tests. `*.localhost` names resolve to the machine itself.
 
@@ -89,7 +90,7 @@ code:
 3. The page shows the request it sent (as a `curl` command), the status code and the body.
 
 A `GET` route can also be opened straight in the address bar, e.g.
-<https://notes.localhost/api/health> shows `{"status":"ok"}`.
+<https://notes.localhost/api/notes> lists the notes.
 
 ## Check
 
