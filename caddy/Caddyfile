@@ -3,9 +3,23 @@ notes.localhost {
     # Certificate from Caddy's own local CA (kept in the caddy_data volume)
     tls internal
 
-    # /api/notes -> ichiro:8000/notes; the API routes have no /api prefix
-    handle_path /api/* {
+    # Each API prefix goes to its own service, which sees no /api:
+    # /api/notes -> ichiro:8000/notes, /api/chat -> lonzo:8000/chat
+    @ichiro path /api/notes /api/notes/*
+    handle @ichiro {
+        uri strip_prefix /api
         reverse_proxy ichiro:8000
+    }
+
+    @lonzo path /api/chat /api/chat/*
+    handle @lonzo {
+        uri strip_prefix /api
+        reverse_proxy lonzo:8000
+    }
+
+    # An API path no service owns: 404, never the front
+    handle /api/* {
+        respond 404
     }
 
     # Everything else is the front, served by the Vite dev server

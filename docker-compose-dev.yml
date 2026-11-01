@@ -13,6 +13,7 @@ services:
         depends_on:
             - chimchar
             - ichiro
+            - lonzo
 
     chimchar:
         build:
