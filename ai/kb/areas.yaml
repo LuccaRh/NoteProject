@@ -66,8 +66,9 @@ infra:
 ia:
   nome: IA dentro do produto (MCP, fila de pedidos, edição por âncora)
   lado: back
-  notas: ["IA no projeto/00 Mapa — IA no projeto.md", "IA no projeto/Ordem de implementação.md", "Conceitos/IA/MCP.md"]
-  futuro: true
+  codigo: [apps/lonzo/src/lonzo/routers/chat.py, apps/lonzo/src/lonzo/rules.md]
+  libs: [anthropic]
+  notas: ["IA no projeto/00 Mapa — IA no projeto.md", "IA no projeto/Ordem de implementação.md", "IA no projeto/Caminho de uma pergunta.md", "IA no projeto/Sem Claude Code — provedores.md", "Conceitos/IA/MCP.md"]
 
 workspace:
   nome: Este workspace de IA (CLAUDE.md, skills, tools)

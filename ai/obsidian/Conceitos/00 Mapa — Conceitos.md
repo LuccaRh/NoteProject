@@ -3,7 +3,7 @@ tags: [noteproject, conceito]
 ---
 # Conceitos — mapa
 
-Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada seção abaixo é uma pasta de `Conceitos/`. Como o NoteProject usa cada um mora em [[00 Mapa — Estrutura do projeto|Estrutura do projeto]].
+Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada seção abaixo é uma pasta de `Conceitos/`. Como o NoteProject usa cada um mora em [[00 Mapa — Estrutura do projeto|Estrutura do projeto]]; perguntas para se testar, em [[00 Mapa — Prova do projeto|Prova do projeto]].
 
 ## Sync
 
@@ -47,7 +47,8 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[venv]] | cada projeto com o seu Python e as suas libs |
 | [[uv]] | o `pyproject.toml` é o pedido, o `.venv` o resultado; o uv deixa os dois iguais |
 | [[Decorator]] | o `@` passa a função a outra logo depois do `def`, uma vez, ao importar |
-| [[Context manager]] | o `with` garante a saída; o `yield` divide entrada e saída |
+| [[Context manager]] | o `with` garante a saída; o `yield` divide entrada e saída; o `async with` espera ao abrir e fechar |
+| [[Gerador]] | o `yield` entrega um item por vez e pausa; o `async for` espera cada item sem travar os outros |
 | [[FastAPI]] | a função tipada vira rota validada e documentada |
 
 ## Rede
@@ -92,6 +93,7 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[Docker Compose]] | vários containers descritos num arquivo e subidos juntos |
 | [[Volume do Docker]] | pasta de fora montada por cima da imagem; o dado sobrevive ao container |
 | [[Rede de containers]] | containers se acham pelo nome; só a porta publicada chega de fora |
+| [[Sandbox]] | código de terceiros rodando fechado: sem rede, banco nem chave |
 
 ## Linux
 
@@ -133,4 +135,6 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | Página | Ideia |
 |---|---|
 | [[MCP]] | padrão para a IA chamar funções de fora |
+| [[Chamada a um modelo]] | request HTTP comum; o modelo não lembra nada e só sabe o que vem no pacote (`system`, `tools`, `messages`) |
+| [[Laço de ferramentas]] | o modelo pede ferramenta, o programa executa e chama de novo; o harness em volta |
 | [[Cache de prompt]] | começo igual da chamada sai mais barato |

@@ -9,11 +9,14 @@ API (only a health check). Notes are not saved yet.
 apps/
   chimchar/  CodeMirror 6 editor.
   ichiro/    Notes API (FastAPI). See apps/ichiro/README.md.
+  lonzo/     Chat service (FastAPI): sends a question to the Anthropic API and
+             streams the answer back as server-sent events.
 ```
 
 ## Run
 
-Docker Compose starts everything: Caddy, the editor, the notes API and Postgres. It needs
+Docker Compose starts everything: Caddy, the editor, the notes API, the chat service and
+Postgres. It needs
 the `.env` below. `make check` also needs [uv](https://docs.astral.sh/uv/).
 
 | What | Start | Open in the browser |
@@ -52,12 +55,13 @@ cp .env.example .env    # then replace every value
 
 `.env.example` lists the variables the project uses, each with a comment and a placeholder
 value. Docker Compose loads `.env` into the `postgres` and `ichiro` containers (`env_file` in
-`docker-compose-dev.yml`):
+`docker-compose-dev.yml`); `lonzo` gets only `ANTHROPIC_API_KEY` (`environment`):
 
 | Variable | Read by | Meaning |
 |---|---|---|
 | `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | `postgres` image | user, password and database created on the first start |
 | `DATABASE_URL` | notes API and Alembic | `postgresql+psycopg://<user>:<password>@postgres:5432/<db>`, with the three values above |
+| `ANTHROPIC_API_KEY` | chat service | one Anthropic API key for every chat, until there is a login |
 
 The host in `DATABASE_URL` is `postgres`, the service name in the compose file, which only
 resolves inside the containers. `make check` runs the tests on the host, so it swaps the host
@@ -90,7 +94,7 @@ A `GET` route can also be opened straight in the address bar, e.g.
 ## Check
 
 ```bash
-make check     # chimchar: tsc + vite build; ichiro: ruff, mypy, pytest
+make check     # chimchar: tsc + vite build; ichiro, lonzo: ruff, mypy, pytest
 ```
 
 The ichiro tests talk to the real database: start Postgres first

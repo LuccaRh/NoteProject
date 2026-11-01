@@ -32,3 +32,18 @@ https://www.figma.com/resource-library/web-design-trends/
 https://www.designrush.com/agency/website-design-development/trends/web-design-trends
 https://claude.ai/artifact/J1zxf5yrPvuFBS4ZunhBX1#play-b5870ad06ee7
 Trocar o icone do site em abas do navegador (esta o do vite atualmente)
+
+Nomes:
+	Sakuragi Hanamichi
+	Kanou Shoutarou/Gakuen
+	Luffy
+	mob
+	Ichiro
+	Lonzo 
+	Mac Miller
+	Nujabes
+	Chimchar
+	Yonosuke
+	Summer Wars/sakae jinnouchi(avó)
+	Taylor Russel
+	Anthony Bourdain

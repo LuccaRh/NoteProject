@@ -1,4 +1,4 @@
-.PHONY: dev check check-chimchar check-tools install check-ichiro
+.PHONY: dev check check-chimchar check-tools install check-ichiro check-lonzo
 
 # Local secrets (DATABASE_URL); in CI they come from the job env
 -include .env
@@ -9,7 +9,7 @@ install:
 dev:
 	cd apps/chimchar && npm run dev
 
-check: check-chimchar check-ichiro
+check: check-chimchar check-ichiro check-lonzo
 
 check-chimchar:
 	cd apps/chimchar && npx tsc --noEmit && npm run build
@@ -20,6 +20,10 @@ TEST_DATABASE_URL = $(subst @postgres:,@localhost:,$(DATABASE_URL))
 check-ichiro:
 	cd apps/ichiro && uv run ruff check && uv run mypy src tests \
 		&& DATABASE_URL='$(TEST_DATABASE_URL)' uv run pytest
+
+check-lonzo:
+	cd apps/lonzo && uv run ruff check && uv run mypy src tests \
+		&& uv run pytest
 
 # Development workspace tools (ai/tools, ai/kb): tests + lint.
 check-tools:

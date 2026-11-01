@@ -1,5 +1,19 @@
 services:
 
+    caddy:
+        image: caddy:2.11
+        ports:
+            - "127.0.0.1:80:80"
+            - "127.0.0.1:443:443"
+        volumes:
+            - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+            # Local CA and certificates: a new CA would need trusting again
+            - caddy_data:/data
+            - caddy_config:/config
+        depends_on:
+            - chimchar
+            - ichiro
+
     chimchar:
         build:
             context: ./apps/chimchar
@@ -21,6 +35,17 @@ services:
         depends_on:
             - postgres
 
+    lonzo:
+        build:
+            context: ./apps/lonzo
+            dockerfile: Dockerfile.dev
+        volumes:
+            - ./apps/lonzo:/app
+            - /app/.venv
+        # Only this variable from .env: lonzo never sees the database password
+        environment:
+            - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+
     postgres:
         image: postgres:18
         command: postgres -c log_statement=all
@@ -30,20 +55,6 @@ services:
         env_file: .env
         volumes:
             - db:/var/lib/postgresql
-
-    caddy:
-        image: caddy:2.11
-        ports:
-            - "127.0.0.1:80:80"
-            - "127.0.0.1:443:443"
-        volumes:
-            - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-            # Local CA and certificates: a new CA would need trusting again
-            - caddy_data:/data
-            - caddy_config:/config
-        depends_on:
-            - chimchar
-            - ichiro
 
 
 volumes:

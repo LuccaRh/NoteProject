@@ -59,7 +59,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   serviço = pasta de `apps/`, `postgres` ou `caddy` (2026-10-30) (container do compose; config em pasta
   própria); sem serviço, `infra/` (label `infrastructure` sem container: CI, Terraform,
   AWS) ou `workspace/` (label `ai-workspace`). **Um serviço por branch**: issue que mexe em vários →
-  um PR por serviço, na mesma issue. Alembic e migrations são do `ichiro`. O lint W13 confere. Cada branch tem `ai/kb/escopos/<branch>.md`
+  um PR por serviço, na mesma issue. Alembic e migrations: cada serviço tem as suas, no banco dele (2026-11-01: `ichiro` e `lonzo` no mesmo Postgres, bancos separados). O lint W13 confere. Cada branch tem `ai/kb/escopos/<branch>.md`
   (Pedido / Contexto / Fora + número da issue, criado pela `/tarefa`); as áreas dele dizem
   o que ler (`ai/np contexto`).
 - **Versão do serviço** (2026-10-23): branch que mexe em `apps/<serviço>/` sobe a minor dele
@@ -91,6 +91,9 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   CI, Dockerfile, `.ini`/`.toml`), em qualquer linguagem; md e workspace de IA ficam de fora.
   Código novo já sai quebrado; linha longa achada em código existente → avisar o Lucca.
   Python: ruff `E501` (`line-length = 80`); o resto: lint W12 (`ai/np lint`).
+- **Cabe em uma linha, fica em uma** (2026-11-01): assinatura, chamada, lista ou comando
+  que caiba em 80 colunas (tab do Makefile conta 8) fica numa linha só, sem quebrar.
+  Só juntar: nada de simplificar, reescrever nem renomear para fazer caber.
 - **Linha em branco em volta de cada bloco** (2026-10-26): no código do app, `if`, `for`,
   `while`, `try`, `with`, `match`, `return` e `raise` têm uma linha em branco antes (salvo
   quando abrem o corpo) e o comando depois de um bloco também; a primeira linha do corpo de
@@ -104,6 +107,8 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   linhas em branco, `# Code` (`def`, `class`); cada parte com o comentário em cima, e as
   globais seguidas, sem linha em branco entre elas. Python:
   lint W16 e ruff isort `lines-after-imports = 2`.
+- **Compose em ordem alfabética** (2026-11-01): serviços do `docker-compose-dev.yml` pelo
+  nome (`caddy`, `chimchar`, `ichiro`, `lonzo`, `postgres`). Lint W17 (`ai/np lint`).
 - **Data real no commit** (2026-10-15): nunca mexer em `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE`
   nem passar `--date`; reescrever história usa a hora do momento (`rebase --reset-author-date`).
 - **Issue quem fecha é o Lucca** (2026-10-19): a sessão nunca roda `gh issue close`; quando
@@ -146,6 +151,7 @@ Agente `leitor` (Sonnet): lê arquivo grande e devolve só o trecho, com linha/p
 
 ```
 apps/ichiro/       API de notas (FastAPI + Postgres); auth/, worker/, sync/ depois
+apps/lonzo/        chat com o workspace (Claude Agent SDK), a criar na #74; banco próprio
 apps/chimchar/     front: Vite + CodeMirror 6
 CLAUDE.md          este arquivo (o Claude Code só o acha na raiz)
 .claude/           settings/hooks, skills, agentes (idem: tem de ficar na raiz)
@@ -158,32 +164,33 @@ ai/                todo o resto do workspace de IA:
   build/           gerado (estado dos hooks, png de diagrama), fora do git
 ```
 
-## Estado (2026-10-30)
+## Estado (2026-11-01)
 
-- M0, #46, #65, #64 e #62 mergeados (PRs #66–#68).
-- Fila de branches, uma em cima da outra, todas sem PR:
-  1. `infra/indent-the-docker-compose-file-with-4-spaces`: compose com 4 espaços (#69).
-  2. `caddy/put-caddy-with-local-tls-in-front-of-the-server` (#16, PR 1 de 2): Caddy no compose
-     de dev, `https://notes.localhost`, `chimchar` e `ichiro` sem porta publicada; README atualizado.
-  3. `web/route-api-requests-through-caddy` (#16, PR 2 de 2): sem o proxy `/api` do Vite; web 0.5.0.
+- M0, #46, #62, #64, #65, #69 e #16 mergeados (PRs #66–#68, #70–#72); `master` local = remoto.
+- IA redesenhada (2026-10-31): chat com o workspace no servidor, serviço `apps/lonzo` com o
+  Claude Agent SDK; vault `IA no projeto/Chat com o workspace` e `Caminho de uma pergunta`.
+  Workspace = pasta com `.workspace/`, vários por pessoa; conversas no banco do `lonzo`.
+- #31 (Ctrl+D) e #5 (chips) sem milestone, para depois; `decorations/replace.ts` (#5) fora do git.
+- #82 (uv 0.13.5 na imagem do ichiro) mergeada (PR #83). Branch
+  `lonzo/answer-chat-questions-through-the-lonzo-service` (#74, sem PR): `apps/lonzo`
+  com `/health`, container no compose, job na CI; falta o `/api/chat`.
 - Falta: confiar na CA local do Caddy no navegador (README); `/docs` do FastAPI quebra atrás do
   `/api` (precisa de `root_path`, branch do `ichiro`).
-- Serviços renomeados (2026-11-01, #80, branch `infra/rename-the-services`): `web` →
-  `chimchar`, `notes` → `ichiro`; o de IA vai nascer como `lonzo`. Tabela, rotas `/notes` e
+- Serviços renomeados (2026-11-01, #80, PR #81 mergeado): `web` →
+  `chimchar`, `notes` → `ichiro`; o de IA nasce como `lonzo`. Tabela, rotas `/notes` e
   `notes.localhost` ficam (são o domínio, não o serviço).
-- Branch `show-chips-for-duvida-and-fix-markers` (#5): `decorations/replace.ts` fora do git.
 
 ## O que fazer a seguir
 
 Plano: vault `Plano do projeto/Roadmap` (navegador → app desktop → celular) + issues/milestones no GitHub.
 
-1. PRs da fila acima, na ordem (indentação do compose → Caddy → Vite), depois da revisão.
-2. Entrega de 2026-11-06 (vault `Plano do projeto/Entrega de 2026-11-06`): #16 Caddy com TLS
-   local no dev → IA (#31, #5, #35, #42, #32) → #56 busca → #6 pastas. #47 (Caddy servindo o
-   build) foi para a M3.
-3. M2 login (#48, #17) → M3 AWS (#18–#25, #47) → M4 edição ao vivo (#26, #27, #30).
-- v1 = ler notas no navegador com o servidor na AWS, sem IA (vault `Plano do projeto/Objetivo do app`).
-- Depois da v1: milestone AI in the app (#35 worker em `apps/worker`, #42 workspace, #36, #34).
-- Em paralelo (editor): #5 chips.
+1. Entrega de 2026-11-06 (vault `Plano do projeto/Entrega de 2026-11-06`): #74 `lonzo`
+   (regras fixas) + rota no Caddy → #73 workspace criado pela IA a partir de um texto breve
+   (esqueleto; vault `Workspace no app#Como nasce`) → #75 conversas, #76 tela do chat → #56 busca, #77 ler/buscar
+   → #78 criar/editar/apagar, #51 → #6 pastas, #79 importar o vault → #17 se sobrar.
+2. M2 login (#48, #17) → M3 AWS (#18–#25, #47) → M4 edição ao vivo (#26, #27, #30).
+- v1 = ler notas no navegador com o servidor na AWS (vault `Plano do projeto/Objetivo do app`);
+  o chat não vai para a AWS antes do login.
+- Depois da entrega (IA): #32 âncora, scripts em sandbox, #34 MCP, #35 worker, resto da #42, #36.
 - Depois do navegador: Desktop app (#14, #15, #28, #29), depois Mobile app; sem data.
-- #4 (workspace no git) já feito pelo commit do workspace; falta fechar.
+- #4 (workspace no git) já feito pelo commit do workspace; falta fechar. #16, #62, #64, #65, #69 prontas; falta fechar.

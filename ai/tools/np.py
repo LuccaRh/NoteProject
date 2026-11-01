@@ -7,7 +7,7 @@
     ai/np obsidian [-q] [--simular] sincronia vault Note Project/ ↔ obsidian/
     ai/np duvidas [trecho da pág]   marcas [!duvida] [duvidas] [fix] [coment] nas notas
     ai/np diagrama <spec.yaml> [--png]   YAML → draw.io; `destino:` no spec copia o .drawio.svg para obsidian/
-    ai/np lint                      regras do workspace que viraram código (W01–W16)
+    ai/np lint                      regras do workspace que viraram código (W01–W17)
     ai/np test                      testes das ferramentas (tools/test_*.py)
     ai/np check                     o check do app (make check: ruff, mypy, pytest, tsc, build)
 
@@ -206,6 +206,7 @@ def problemas() -> list[str]:
     out += _largura()
     out += _blocos()
     out += _branch_servico()
+    out += _compose()
     return out
 
 
@@ -231,6 +232,25 @@ def _branch_servico() -> list[str]:
     outros = sorted({f.split("/")[1] for f in mexidos if f.startswith("apps/") and f.count("/") > 1} - {m.group(1)})
     if outros and br not in _VARIOS_SERVICOS:
         return [f"W13 branch {br}: mexe em apps/{', apps/'.join(outros)}; um serviço por branch (outro PR na mesma issue)"]
+    return []
+
+
+def servicos_compose(texto: str) -> list[str]:
+    """Nomes dos serviços do compose, na ordem do arquivo (chaves logo abaixo de `services:`)."""
+    nomes, dentro = [], False
+    for linha in texto.splitlines():
+        if re.fullmatch(r"\S.*:\s*", linha):
+            dentro = linha.strip() == "services:"
+        elif dentro and (m := re.fullmatch(r"( +)([\w.-]+):\s*", linha)) and len(m.group(1)) <= 4:
+            nomes.append(m.group(2))
+    return nomes
+
+
+def _compose() -> list[str]:
+    """W17: serviços do docker-compose em ordem alfabética (2026-11-01)."""
+    nomes = servicos_compose((REPO / "docker-compose-dev.yml").read_text(encoding="utf-8"))
+    if nomes != sorted(nomes):
+        return [f"W17 docker-compose-dev.yml: serviços fora da ordem alfabética; use {', '.join(sorted(nomes))}"]
     return []
 
 
@@ -476,7 +496,7 @@ def cmd_lint(_a) -> int:
 
 def cmd_test(_a) -> int:
     r = subprocess.run([sys.executable, "-m", "unittest", "-q", "test_commit_msg",
-                        "test_hooks_contexto", "test_estilo", "test_blocos"], cwd=RAIZ / "tools")
+                        "test_hooks_contexto", "test_estilo", "test_blocos", "test_compose"], cwd=RAIZ / "tools")
     r2 = subprocess.run([sys.executable, "test_obsidian_sync.py"], cwd=RAIZ / "tools")
     r3 = subprocess.run([sys.executable, "test_diagrama.py"], cwd=RAIZ / "tools")
     return r.returncode or r2.returncode or r3.returncode

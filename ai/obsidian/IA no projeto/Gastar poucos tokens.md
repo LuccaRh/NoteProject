@@ -22,6 +22,14 @@ Esta página junta as decisões das outras que cortam esse gasto.
 | uma chamada na fila | sem loop de ferramentas; o pedido já vem completo | [[Fila de pedidos]] |
 | poucas ferramentas [[MCP]] | 4, com descrição curta | [[MCP — a IA como cliente do daemon]] |
 
+## No chat
+
+O [[Chat com o workspace|chat]] é o oposto da fila: a IA busca o próprio contexto pelo [[Laço de ferramentas|laço de ferramentas]], e cada volta é uma chamada nova com o pacote inteiro.
+
+- O pacote cresce a cada volta: uma pergunta que lê 5 notas faz 6 chamadas, e a última leva as 5 notas.
+- O que segura o gasto: `system` e `tools` fixos no começo do pacote, para o [[Cache de prompt|cache]] pegar; ferramentas que devolvem a seção, não a nota inteira; um limite de voltas por pergunta.
+- O ganho é a pergunta livre, sem pedido montado antes; o preço é gastar mais por pergunta que a fila.
+
 ## Ordem do pacote, para o cache
 
 O [[Cache de prompt|cache]] reaproveita o começo da chamada enquanto ele for igual. Então, do mais fixo ao mais variável:

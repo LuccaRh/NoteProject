@@ -69,7 +69,7 @@ ROLLBACK por causa de: ZeroDivisionError('division by zero')
 
 ## `yield` e `@contextmanager`
 
-O `yield` funciona como um `return` que **pausa** a função: entrega um valor e, quando alguém pede, continua da linha seguinte. O [[Decorator|decorator]] `@contextlib.contextmanager` usa isso para montar um context manager sem escrever a classe:
+O `yield` funciona como um `return` que **pausa** a função ([[Gerador|gerador]]): entrega um valor e, quando alguém pede, continua da linha seguinte. O [[Decorator|decorator]] `@contextlib.contextmanager` usa isso para montar um context manager sem escrever a classe:
 
 | Parte da função | Vira |
 |---|---|
@@ -113,6 +113,49 @@ erro segue adiante: ZeroDivisionError('division by zero')
 - Com `return` no lugar do `yield`, a função acabaria ali: a saída rodaria **antes** do bloco, e o bloco receberia um recurso já fechado.
 - `type(...)` de um desses é `contextlib._GeneratorContextManager`. O `engine.begin()` do [[SQLAlchemy]] é feito assim ([[Transação#Transação no SQLAlchemy|transação]]), e o `Depends` do [[FastAPI]] aceita função com `yield` pelo mesmo formato.
 
+## `async with`: entrada e saída que esperam
+
+Abrir ou fechar pode depender da rede (conectar num servidor, mandar um pedido). O `async with` é o mesmo `with`, com métodos `async`: `__aenter__` e `__aexit__`, chamados com `await`. Enquanto esperam, o [[FastAPI#Muitos clientes ao mesmo tempo|event loop]] atende outras tarefas.
+
+```python
+import asyncio
+
+
+class PortaLenta:
+    async def __aenter__(self):
+        print("abrindo... (demora 1s)")
+        await asyncio.sleep(1)
+        print("aberta")
+        return self
+
+    async def __aexit__(self, tipo, erro, tb):
+        print("fechando... (demora 1s)")
+        await asyncio.sleep(1)
+        print("fechada")
+
+
+async def main():
+    async with PortaLenta() as p:     # p = await PortaLenta().__aenter__()
+        print("  dentro do bloco")
+                                      # await ....__aexit__(None, None, None)
+
+asyncio.run(main())
+```
+
+```
+abrindo... (demora 1s)
+aberta
+  dentro do bloco
+fechando... (demora 1s)
+fechada
+```
+
+- Só existe dentro de `async def`: fora, é `SyntaxError`.
+- A garantia é a mesma do `with`: o `__aexit__` roda mesmo se o bloco quebrar.
+
+> [!example] Uso
+> O chat abre o stream da resposta do modelo com `async with`, e a conexão fecha no fim mesmo com erro ([[Caminho de uma pergunta|caminho de uma pergunta]]).
+
 > [!warning] Erros comuns
 > - `open(...).read()` sem `with`: o arquivo fica aberto se o `read()` quebrar.
 > - Engolir o erro no `except` de um `@contextmanager` sem `raise`: o bloco parece ter dado certo.
@@ -121,4 +164,5 @@ erro segue adiante: ZeroDivisionError('division by zero')
 
 - `with` e context managers: https://docs.python.org/3/reference/compound_stmts.html#the-with-statement
 - `contextlib.contextmanager`: https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager
-- saídas conferidas em 2026-10-26 com Python 3.14.8 e SQLAlchemy 2.1.6.
+- `async with`: https://docs.python.org/3/reference/compound_stmts.html#the-async-with-statement
+- saídas conferidas em 2026-10-26 com Python 3.14.8 e SQLAlchemy 2.1.6; `async with` em 2026-11-01.
