@@ -1,0 +1,41 @@
+---
+pacote: anthropic
+versao: 2.3.0
+fonte: apps/lonzo/.venv/lib/python3.14/site-packages/anthropic/
+areas: [ia]
+---
+# anthropic — cliente da Messages API (lonzo)
+
+Card destilado do código instalado (fonte acima, linhas citadas). Versão mudou → `ai/np lint`
+avisa; reconfira as linhas antes de confiar no card. Escolhida em 2026-11-01 no lugar do
+`claude-agent-sdk` 0.2.176 (traz o Claude Code CLI 2.1.316 como binário de 328 MB em
+`claude_agent_sdk/_bundled/claude`; um subprocesso por pergunta).
+
+## Cliente (`_client.py`)
+- `AsyncAnthropic(api_key=None, ...)` (607). Sem argumento, lê `ANTHROPIC_API_KEY` (107).
+- Sem key, **constrói sem erro** e só falha na request, com `TypeError` "Could not resolve
+  authentication method" (conferido rodando). Por isso o `get_client` do lonzo checa o env antes.
+
+## Stream (`resources/messages/messages.py`, `lib/streaming/_messages.py`)
+- `client.messages.stream(model=, max_tokens=, messages=, system=, tools=, ...)` (2660) devolve
+  um gerenciador: `async with ... as stream`.
+- `stream.text_stream` (216): só os pedaços de texto, `AsyncIterator[str]`.
+- `async for event in stream` (238): todos os eventos (`text`, `content_block_*`, `message_stop`...).
+- `await stream.get_final_message()` (261): a mensagem inteira no fim; `.stop_reason`, `.usage`.
+- `stop_reason` (`types/stop_reason.py`): `end_turn`, `max_tokens`, `stop_sequence`, `tool_use`,
+  `pause_turn`, `refusal`, `model_context_window_exceeded`.
+- `usage.input_tokens`, `usage.output_tokens` (`types/usage.py:25,28`).
+
+## Modelos (`types/model.py`)
+- `claude-haiku-5-5` (8): o do lonzo no dev, `max_tokens` 512.
+
+## Erros (`_exceptions.py`)
+- `APIError` (35, com `.message`) ← `APIStatusError` (71: 4xx/5xx), `APIConnectionError` (95);
+  `AuthenticationError` (139) é um `APIStatusError` (key errada).
+
+## Ferramentas, para a #77
+- Bloco `tool_use`: `id`, `name`, `input: Dict[str, object]` (`types/tool_use_block.py:16`).
+- Resposta: bloco `tool_result` com `tool_use_id`, conteúdo e `is_error: bool`
+  (`types/tool_result_block_param.py:36`).
+- Laço pronto (beta): `client.beta.messages.tool_runner(...)` (`resources/beta/messages/messages.py:1436`),
+  com cada ferramenta como função decorada por `@beta_tool` (`lib/tools/_beta_functions.py:354`).
