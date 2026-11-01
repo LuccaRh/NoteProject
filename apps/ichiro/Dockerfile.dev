@@ -3,7 +3,7 @@
 FROM python:3.14-slim
 
 # Add the uv and uvx executables to the image bin
-COPY --from=ghcr.io/astral-sh/uv:0.13.1 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.13.5 /uv /uvx /bin/
 
 # Go to the app dir in the image system files
 WORKDIR /app
