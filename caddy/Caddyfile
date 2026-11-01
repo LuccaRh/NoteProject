@@ -10,6 +10,6 @@ notes.localhost {
 
     # Everything else is the front, served by the Vite dev server
     handle {
-        reverse_proxy web:5173
+        reverse_proxy chimchar:5173
     }
 }

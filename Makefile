@@ -1,18 +1,18 @@
-.PHONY: dev check check-web check-tools install check-notes
+.PHONY: dev check check-chimchar check-tools install check-notes
 
 # Local secrets (DATABASE_URL); in CI they come from the job env
 -include .env
 
 install:
-	cd apps/web && npm install
+	cd apps/chimchar && npm install
 
 dev:
-	cd apps/web && npm run dev
+	cd apps/chimchar && npm run dev
 
-check: check-web check-notes
+check: check-chimchar check-notes
 
-check-web:
-	cd apps/web && npx tsc --noEmit && npm run build
+check-chimchar:
+	cd apps/chimchar && npx tsc --noEmit && npm run build
 
 # Tests run on the host: reach the compose Postgres through localhost
 TEST_DATABASE_URL = $(subst @postgres:,@localhost:,$(DATABASE_URL))
