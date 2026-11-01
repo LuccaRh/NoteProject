@@ -13,19 +13,19 @@
 editor:
   nome: Editor CodeMirror e decorações
   lado: front
-  codigo: [apps/web/src/editor.ts, apps/web/src/decorations/]
+  codigo: [apps/chimchar/src/editor.ts, apps/chimchar/src/decorations/]
   libs: [codemirror-view]
   notas: ["Conceitos/Editor/CodeMirror.md", "Estrutura do projeto/Marcador no texto, conteúdo fora.md"]
 
 ui:
   nome: Moldura da interface (sidebar, palette, abas)
   lado: front
-  codigo: [apps/web/src/main.ts, apps/web/src/style.css]
+  codigo: [apps/chimchar/src/main.ts, apps/chimchar/src/style.css]
 
 cliente-api:
   nome: Fronteira de rede do front (única) — chamadas à API, proxy do Vite
   lado: front
-  codigo: [apps/web/src/notes/api.ts, apps/web/vite.config.ts]
+  codigo: [apps/chimchar/src/notes/api.ts, apps/chimchar/vite.config.ts]
   aprender: true
 
 dados:
@@ -60,7 +60,7 @@ infra:
   nome: Containers, CI, deploy, proxy/TLS, backup, monitoramento
   notas: ["Conceitos/00 Mapa — Conceitos.md", "Conceitos/Docker/Docker Compose.md", "Conceitos/Rede/Reverse proxy.md", "Conceitos/Deploy/CI.md"]
   lado: infra
-  codigo: [docker-compose-dev.yml, Makefile, .github/workflows/, apps/web/Dockerfile.dev]
+  codigo: [docker-compose-dev.yml, Makefile, .github/workflows/, apps/chimchar/Dockerfile.dev]
   aprender: true
 
 ia:

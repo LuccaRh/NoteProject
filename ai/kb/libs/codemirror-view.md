@@ -1,7 +1,7 @@
 ---
 pacote: "@codemirror/view"
 versao: 6.43.6
-fonte: apps/web/node_modules/@codemirror/view/dist/index.d.ts
+fonte: apps/chimchar/node_modules/@codemirror/view/dist/index.d.ts
 areas: [editor]
 ---
 # @codemirror/view — decorações

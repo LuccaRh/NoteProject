@@ -12,7 +12,7 @@ argument-hint: "<o que fazer>"
    issue no `nome`, e espere o ok do Pedido:
    ```
    ---
-   id: web/show-chips-for-duvida-and-fix-markers
+   id: chimchar/show-chips-for-duvida-and-fix-markers
    nome: Chips de [!duvida] e [fix] no editor (issue #5)
    areas: [editor]
    ---
@@ -30,7 +30,7 @@ argument-hint: "<o que fazer>"
    - área com `aprender: true` → explique só o conceito do passo (2–4 linhas, ou `/aprender` se é
      novo), diga **o que** escrever e onde, e espere o código dele; depois revise e rode.
    - outra área → implemente o mínimo do passo.
-   - Rode o teste da parte e `ai/np check` (ou `make check-web` se só o front mudou).
+   - Rode o teste da parte e `ai/np check` (ou `make check-chimchar` se só o front mudou).
      Mostre a linha que prova. Falhou → conserte antes de seguir.
 6. **Fecho.** `/commit` (sem push). Atualize "Estado" do `CLAUDE.md` se a etapa mudou. Algo
    aprendido que vale nota → ofereça `/nota` ou `/aprender` (uma linha).

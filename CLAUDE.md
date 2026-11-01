@@ -18,7 +18,7 @@ Regra nova de resposta vai **lá**, com data; de página do Obsidian, em `Regras
 
 1. **Fonte → card → resposta.** Fonte do estado atual = o **código** (e `make check`); do
    porquê = as notas em `ai/obsidian/`, única fonte do projeto; da API de uma lib = o **código instalado**
-   (`apps/web/node_modules/…/*.d.ts`, `apps/<api>/.venv/lib/python3*/site-packages/…`), nunca a
+   (`apps/chimchar/node_modules/…/*.d.ts`, `apps/<api>/.venv/lib/python3*/site-packages/…`), nunca a
    memória. O que se descobre de uma lib vira card em `ai/kb/libs/<lib>.md` (versão + linha do
    d.ts); o lint avisa quando a versão instalada muda. Sem fonte → diga e pergunte.
 2. **Afirmação conferida.** "Funciona", "passa", "corrigido" só depois de rodar: `ai/np check`
@@ -55,16 +55,16 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 - **Tarefa = issue no GitHub**, na milestone da etapa (M0–M4, Editor, AI in the app, Desktop, Mobile); label = lado (`backend`, `frontend`,
   `infrastructure`, `ai-workspace`); `backend`/`infrastructure` o Lucca escreve; `frontend` (2026-10-29) a sessão escreve direto, menos o "front-back" (área `cliente-api`: chamadas à API, comunicação com o servidor, proxy do Vite), que é do Lucca. Próxima tarefa: `gh issue list -m "<milestone>"`.
 - **Branch = uma issue**, em inglês, kebab-case, saindo da `master`
-  atualizada. (2026-10-25) Nome `<serviço>/<kebab>` (`notes/expose-the-notes-api-on-the-server`):
+  atualizada. (2026-10-25) Nome `<serviço>/<kebab>` (`ichiro/search-notes-with-full-text-search`):
   serviço = pasta de `apps/`, `postgres` ou `caddy` (2026-10-30) (container do compose; config em pasta
   própria); sem serviço, `infra/` (label `infrastructure` sem container: CI, Terraform,
   AWS) ou `workspace/` (label `ai-workspace`). **Um serviço por branch**: issue que mexe em vários →
-  um PR por serviço, na mesma issue. Alembic e migrations são do `notes`. O lint W13 confere. Cada branch tem `ai/kb/escopos/<branch>.md`
+  um PR por serviço, na mesma issue. Alembic e migrations são do `ichiro`. O lint W13 confere. Cada branch tem `ai/kb/escopos/<branch>.md`
   (Pedido / Contexto / Fora + número da issue, criado pela `/tarefa`); as áreas dele dizem
   o que ler (`ai/np contexto`).
 - **Versão do serviço** (2026-10-23): branch que mexe em `apps/<serviço>/` sobe a minor dele
   (`0.1.0` → `0.2.0`) com o lockfile; o lint W11 confere. (2026-10-25) A subida vai num
-  commit só dela, um por serviço, depois dos commits do app: `Update notes version to 0.2.0`
+  commit só dela, um por serviço, depois dos commits do app: `Update ichiro version to 0.2.0`
   (manifesto + lockfile, nada mais).
 - **Commit = uma mudança nova**, atômico, cronológico, e **todo commit passa no `make check`**.
   Conserto de commit ainda não enviado ao remoto (mesmo já na `master` local) → rebase/fixup
@@ -145,8 +145,8 @@ Agente `leitor` (Sonnet): lê arquivo grande e devolve só o trecho, com linha/p
 ## Estrutura
 
 ```
-apps/notes/        API de notas (FastAPI + Postgres), a criar na #10; auth/, worker/, sync/ depois
-apps/web/          Vite + CodeMirror 6
+apps/ichiro/       API de notas (FastAPI + Postgres); auth/, worker/, sync/ depois
+apps/chimchar/     front: Vite + CodeMirror 6
 CLAUDE.md          este arquivo (o Claude Code só o acha na raiz)
 .claude/           settings/hooks, skills, agentes (idem: tem de ficar na raiz)
 ai/                todo o resto do workspace de IA:
@@ -164,10 +164,13 @@ ai/                todo o resto do workspace de IA:
 - Fila de branches, uma em cima da outra, todas sem PR:
   1. `infra/indent-the-docker-compose-file-with-4-spaces`: compose com 4 espaços (#69).
   2. `caddy/put-caddy-with-local-tls-in-front-of-the-server` (#16, PR 1 de 2): Caddy no compose
-     de dev, `https://notes.localhost`, `web` e `notes` sem porta publicada; README atualizado.
+     de dev, `https://notes.localhost`, `chimchar` e `ichiro` sem porta publicada; README atualizado.
   3. `web/route-api-requests-through-caddy` (#16, PR 2 de 2): sem o proxy `/api` do Vite; web 0.5.0.
 - Falta: confiar na CA local do Caddy no navegador (README); `/docs` do FastAPI quebra atrás do
-  `/api` (precisa de `root_path`, branch do `notes`).
+  `/api` (precisa de `root_path`, branch do `ichiro`).
+- Serviços renomeados (2026-11-01, #80, branch `infra/rename-the-services`): `web` →
+  `chimchar`, `notes` → `ichiro`; o de IA vai nascer como `lonzo`. Tabela, rotas `/notes` e
+  `notes.localhost` ficam (são o domínio, não o serviço).
 - Branch `show-chips-for-duvida-and-fix-markers` (#5): `decorations/replace.ts` fora do git.
 
 ## O que fazer a seguir

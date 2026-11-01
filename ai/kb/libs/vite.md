@@ -1,7 +1,7 @@
 ---
 pacote: vite
 versao: 8.1.5
-fonte: apps/web/node_modules/vite/dist/node/index.d.ts
+fonte: apps/chimchar/node_modules/vite/dist/node/index.d.ts
 areas: [ui, infra]
 ---
 # vite — servidor de desenvolvimento atrás de proxy
