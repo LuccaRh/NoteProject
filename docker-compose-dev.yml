@@ -42,6 +42,9 @@ services:
         volumes:
             - ./apps/lonzo:/app
             - /app/.venv
+        # Only this variable from .env: lonzo never sees the database password
+        environment:
+            - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
 
     postgres:
         image: postgres:18
