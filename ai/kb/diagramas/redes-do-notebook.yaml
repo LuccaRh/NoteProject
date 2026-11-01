@@ -14,8 +14,8 @@ nos:
   lo_pc:  {tipo: bloco, pos: [2, 1], texto: "notebook<br>127.0.0.1<br>docker-proxy em :8000", cor: roxo}
   lo:     {tipo: grupo, contem: [nav, lo_pc], texto: "loopback · 127.x", cor: cinza}
   dk_pc:  {tipo: bloco, pos: [3, 1], texto: "notebook<br>172.18.0.1", cor: roxo}
-  notes:  {tipo: bloco, pos: [4, 1], texto: "container notes<br>172.18.0.4 (ex.)<br>+ loopback próprio", cor: laranja}
-  web:    {tipo: bloco, pos: [4, 2], texto: "container web<br>172.18.0.3 (ex.)<br>+ loopback próprio", cor: azul}
+  notes:  {tipo: bloco, pos: [4, 1], texto: "container ichiro<br>172.18.0.4 (ex.)<br>+ loopback próprio", cor: laranja}
+  web:    {tipo: bloco, pos: [4, 2], texto: "container chimchar<br>172.18.0.3 (ex.)<br>+ loopback próprio", cor: azul}
   dk:     {tipo: grupo, contem: [dk_pc, notes, web], texto: "rede do Docker · 172.18.0.x", cor: cinza}
   tr:     {tipo: bloco, pos: [1, 4], texto: "outras redes<br>(trânsito)", cor: cinza}
   yt:     {tipo: bloco, pos: [2, 4], texto: "YouTube<br>(rede do Google)", cor: cinza}

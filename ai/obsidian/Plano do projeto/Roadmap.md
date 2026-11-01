@@ -28,7 +28,7 @@ Para 2026-11-06, a [[Entrega de 2026-11-06|entrega]] puxa notas e IA em localhos
 
 | Milestone | Issues | Fecha quando |
 |---|---|---|
-| **M0 Server skeleton** | #10–#13 | `apps/notes` em [[Docker Compose\|compose]] com [[Postgres]] e migrations, `/health` respondendo |
+| **M0 Server skeleton** | #10–#13 | `apps/ichiro` em [[Docker Compose\|compose]] com [[Postgres]] e migrations, `/health` respondendo |
 | **M1 Notes in the browser** | #46, #62, #16, #56, #6–#9 | o editor abre por `https://` local, pelo [[Reverse proxy\|Caddy]], e cria, edita e busca notas no [[Postgres]]; [[Pastas, campos e views\|pastas, campos e views]] |
 | **M2 Login and TLS** | #48, #17 | login por cookie de sessão, `/api/auth` no [[Reverse proxy\|Caddy]], [[CI]] do servidor verde |
 | **M3 Online on AWS** | #18–#25, #47 | domínio com [[TLS\|HTTPS]], deploy por merge, [[Backup\|backup]] restaurado uma vez |
@@ -39,11 +39,11 @@ Para 2026-11-06, a [[Entrega de 2026-11-06|entrega]] puxa notas e IA em localhos
 | **AI in the app** | #35, #42, #36, #34 | sem data, depois da v1 (fim do M3): worker em `apps/worker`, [[Workspace no app\|workspace]] de cada pessoa |
 
 ### M0 — esqueleto do servidor (no PC, custo zero)
-#10 `apps/notes` com `/health` → #11 [[Docker Compose|compose]] → #12 [[Postgres]] + [[Migration|migrations]] (`users`, `notes` com `parent_id`, `fields`, `version`) → #13 `.env` fora do git.
+#10 `apps/ichiro` com `/health` → #11 [[Docker Compose|compose]] → #12 [[Postgres]] + [[Migration|migrations]] (`users`, `notes` com `parent_id`, `fields`, `version`) → #13 `.env` fora do git.
 
 ### M1 — notas no navegador
 1. #46 rotas `/notes` no [[Postgres]], e #56 `/search` com a busca full-text; no front, #62 o cliente da API e a lista de notas, com o proxy do Vite apontando para o servidor (`:8000`).
-2. #16 [[Reverse proxy|Caddy]] com [[TLS]] local no compose de dev: `/api/notes` → `notes`, o resto → Vite; sai o proxy do Vite.
+2. #16 [[Reverse proxy|Caddy]] com [[TLS]] local no compose de dev: `/api/notes` → `ichiro`, o resto → Vite; sai o proxy do Vite.
 3. #6 pastas, #7 campos (JSONB), #8 [[Pastas, campos e views|views]]: modelo de dados, à mão.
 4. #9 sidebar com pastas e views: delegada.
 

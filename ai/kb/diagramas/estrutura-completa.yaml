@@ -16,7 +16,7 @@ nos:
   # servidor dentro da EC2 (M0–M4 ⏳)
   cad:   {tipo: bloco, pos: [3, 1], texto: "Caddy :443<br>Let's Encrypt<br>app · /api · /sync", cor: vermelho}
   auth:  {tipo: bloco, pos: [3, 0], texto: "auth (FastAPI)<br>login · sessões", cor: laranja}
-  api:   {tipo: bloco, pos: [4, 0], texto: "notes (FastAPI)<br>notas · busca<br>build do front", cor: laranja}
+  api:   {tipo: bloco, pos: [4, 0], texto: "ichiro (FastAPI)<br>notas · busca<br>build do front", cor: laranja}
   wk:    {tipo: bloco, pos: [3, 2], texto: "worker de IA<br>lê pedidos no Postgres<br>(depois da v1)", cor: laranja}
   sync:  {tipo: bloco, pos: [4, 1], texto: "sync<br>WebSocket + y-py", cor: laranja}
   red:   {tipo: bloco, pos: [4, 2], texto: "Redis pub/sub<br>(só com 2+ syncs)", cor: laranja}

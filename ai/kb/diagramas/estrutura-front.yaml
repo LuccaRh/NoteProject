@@ -6,7 +6,7 @@ nos:
   main:  {tipo: bloco, pos: [0, 0], texto: "main.ts", cor: azul}
   ed:    {tipo: bloco, pos: [1, 0], texto: "editor.ts<br>(CodeMirror 6)", cor: azul}
   deco:  {tipo: bloco, pos: [2, 0], texto: "decorations/<br>headings · replace", cor: azul}
-  web:   {tipo: grupo, contem: [main, ed, deco], texto: "apps/web/src", cor: cinza}
+  web:   {tipo: grupo, contem: [main, ed, deco], texto: "apps/chimchar/src", cor: cinza}
 arestas:
   - [main, ed]
   - [ed, deco]

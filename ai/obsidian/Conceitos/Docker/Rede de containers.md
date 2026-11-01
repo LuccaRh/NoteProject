@@ -6,7 +6,7 @@ tags: [noteproject, conceito, infra]
 Cada [[Container|container]] é como uma máquina pequena: tem [[Endereço IP|IP]] privado próprio e suas [[Porta|portas]]. Os containers de um sistema precisam se achar entre si, e só alguns devem ser alcançados de fora.
 
 - O [[Docker Compose|compose]] cria uma **[[Rede|rede]]** e põe todos os serviços do arquivo nela. Lá dentro, o **nome do serviço** é o endereço: `http://api:8000` acha o container `api` (o Docker tem um [[DNS]] interno).
-- **Qual DNS responde**: o programa pergunta ao DNS que está no `/etc/resolv.conf` de onde ele roda. Dentro de um container do compose, é o DNS do Docker (`nameserver 127.0.0.11`), que conhece os nomes dos serviços; na máquina, é o da rede (do roteador ou da rede da faculdade), que não conhece. Por isso `curl notes:8000` da máquina falha com `Could not resolve host`, e de lá o caminho é a porta publicada (`curl localhost:8000`).
+- **Qual DNS responde**: o programa pergunta ao DNS que está no `/etc/resolv.conf` de onde ele roda. Dentro de um container do compose, é o DNS do Docker (`nameserver 127.0.0.11`), que conhece os nomes dos serviços; na máquina, é o da rede (do roteador ou da rede da faculdade), que não conhece. Por isso `curl ichiro:8000` da máquina falha com `Could not resolve host`, e de lá o caminho é a porta publicada (`curl localhost:8000`).
 - O IP do container (`172.18.0.x`) é dado quando ele é criado e pode mudar no próximo `up`; o nome do serviço não muda. Por isso URLs e configs usam o nome.
 
 ## Porta publicada

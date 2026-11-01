@@ -29,9 +29,9 @@ A [[UI otimista]] cobre a escrita; a leitura pede ao servidor só o necessário,
 
 | Peça | O que muda | Estado |
 |---|---|---|
-| [[Reverse proxy\|Caddy]] | serve o build do front (`apps/web/dist`), #47 | ⏳ |
+| [[Reverse proxy\|Caddy]] | serve o build do front (`apps/chimchar/dist`), #47 | ⏳ |
 | servidor | expõe as rotas `/notes` (#46) e `/search` (#56) que o front vai chamar | ⏳ |
-| `apps/web/src/notes/api.ts` | cliente da API: chama `/api` na própria origem, o [[Reverse proxy\|Caddy]] repassa | ✅ |
+| `apps/chimchar/src/notes/api.ts` | cliente da API: chama `/api` na própria origem, o [[Reverse proxy\|Caddy]] repassa | ✅ |
 | front | [[UI otimista]]: estado pendente na tela, desfaz ou tenta de novo se o servidor recusar | ⏳ |
 | login | cookie de sessão (httpOnly, mesma origem), #48 | ⏳ |
 | busca | a busca full-text do [[Postgres]] ([doc](https://www.postgresql.org/docs/current/textsearch.html)) | ⏳ |
@@ -47,7 +47,7 @@ Em produção não há Vite nem serviço do front: o [[Build do front|build]] vi
 | Pedido | Quem responde |
 |---|---|
 | `GET /`, `GET /assets/...` | o Caddy, com os arquivos do `dist/` no disco dele |
-| `GET /api/notes...` | o Caddy repassa ao `notes:8000` ([[Rede de containers]]) |
+| `GET /api/notes...` | o Caddy repassa ao `ichiro:8000` ([[Rede de containers]]) |
 
 - O `dist/` entra na imagem do Caddy por [[Build multi-stage|build multi-stage]]: o Node gera a pasta num estágio que é descartado ([[Infra — deploy e operação]]).
 - Front e api saem da mesma origem: o `api.ts` continua chamando `/api/notes` como [[URL relativa]], sem [[CORS]].

@@ -5,13 +5,13 @@ destino: Conceitos/Figuras
 nos:
   yml:   {tipo: bloco, pos: [0, 0], texto: "docker-compose-dev.yml", cor: cinza}
   env:   {tipo: bloco, pos: [0, 1], texto: ".env<br>POSTGRES_*=…", cor: vermelho}
-  code:  {tipo: bloco, pos: [0, 2], texto: "./apps/notes<br>(o código)", cor: azul}
+  code:  {tipo: bloco, pos: [0, 2], texto: "./apps/ichiro<br>(o código)", cor: azul}
   pc:    {tipo: grupo, contem: [yml, env, code], texto: "pasta do projeto no PC", cor: cinza}
   up:    {tipo: bloco, pos: [1, 1], texto: "docker compose up<br>(roda no PC)", cor: roxo}
   hub:   {tipo: bloco, pos: [4, 0], texto: "Docker Hub<br>(imagens públicas)", cor: cinza}
-  inot:  {tipo: bloco, pos: [2, 1], texto: "imagem notes<br>(build do Dockerfile.dev)", cor: roxo}
+  inot:  {tipo: bloco, pos: [2, 1], texto: "imagem ichiro<br>(build do Dockerfile.dev)", cor: roxo}
   ipg:   {tipo: bloco, pos: [4, 1], texto: "imagem postgres:18<br>(baixada no 1º up)", cor: roxo}
-  cnot:  {tipo: bloco, pos: [2, 2], texto: "container notes<br>camada própria: some no down<br>env: POSTGRES_*", cor: verde}
+  cnot:  {tipo: bloco, pos: [2, 2], texto: "container ichiro<br>camada própria: some no down<br>env: POSTGRES_*", cor: verde}
   cpg:   {tipo: bloco, pos: [4, 2], texto: "container postgres<br>camada própria: some no down<br>env: POSTGRES_*", cor: amarelo}
   vven:  {tipo: bloco, pos: [2, 3], texto: "volume anônimo → /app/.venv<br>vazio: recebe as libs da imagem", cor: roxo}
   vdb:   {tipo: banco, pos: [4, 3], texto: "volume noteproject_db<br>→ /var/lib/postgresql<br>vazio: initdb preenche", cor: amarelo}
@@ -29,4 +29,4 @@ arestas:
   - [cnot, cpg, {rotulo: "postgres:5432", tracejada: true}]
 legenda:
   "down": "apaga os containers; imagens e volumes ficam (down -v apaga os volumes)"
-  "web": "igual ao notes: build, bind mount ./apps/web e volume anônimo /app/node_modules"
+  "chimchar": "igual ao ichiro: build, bind mount ./apps/chimchar e volume anônimo /app/node_modules"

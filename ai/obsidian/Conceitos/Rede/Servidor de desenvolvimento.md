@@ -34,6 +34,6 @@ A resposta traz o cabeçalho `Content-Type`, e é ele que diz ao navegador o que
 > - Expor o servidor de desenvolvimento na internet: ele serve os arquivos-fonte e não foi feito para isso; em produção vai o build.
 
 > [!example] No NoteProject
-> O Vite escuta na `5173` e serve o `apps/web/` ([[Como ler o front]]).
+> O Vite escuta na `5173` e serve o `apps/chimchar/` ([[Como ler o front]]).
 
 Docs: [Vite — por que o Vite](https://vite.dev/guide/why).

@@ -61,11 +61,11 @@ server: {
 - `rewrite`: tira o prefixo. A api recebe `/notes`, não `/api/notes`.
 
 > [!warning] Erros comuns
-> - Vite num [[Container|container]]: `localhost` é o próprio container. O alvo é o nome do serviço na [[Rede de containers|rede do compose]] (`http://notes:8000`).
+> - Vite num [[Container|container]]: `localhost` é o próprio container. O alvo é o nome do serviço na [[Rede de containers|rede do compose]] (`http://ichiro:8000`).
 > - Esquecer o `rewrite` quando a api não tem o prefixo: tudo volta 404.
 > - O proxy só existe no `vite dev`. O build (`vite build`) não leva configuração de proxy; em produção quem divide `/api` é o reverse proxy.
 
 > [!example] No NoteProject
-> O proxy do Vite repassava `/api/notes` ao serviço `notes` até o [[Reverse proxy|Caddy]] entrar na frente do compose de dev ([[Infra — deploy e operação]]).
+> O proxy do Vite repassava `/api/notes` ao serviço `ichiro` até o [[Reverse proxy|Caddy]] entrar na frente do compose de dev ([[Infra — deploy e operação]]).
 
 Docs: [Vite — server.proxy](https://vite.dev/config/server-options#server-proxy).
