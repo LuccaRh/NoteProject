@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from sqlalchemy import Connection, text
 
-from notes.db import get_conn
+from ichiro.db import get_conn
 
 
 router = APIRouter()

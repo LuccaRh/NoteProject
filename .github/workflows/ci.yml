@@ -22,7 +22,7 @@ jobs:
       - run: npx tsc --noEmit
       - run: npm run build
 
-  notes:
+  ichiro:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v10.3.0
-      - run: make check-notes
+      - run: make check-ichiro
 
   tools:
     runs-on: ubuntu-latest

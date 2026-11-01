@@ -8,8 +8,8 @@ from alembic.config import Config
 from fastapi.testclient import TestClient
 from sqlalchemy import Connection
 
-from notes.db import engine, get_conn
-from notes.main import app
+from ichiro.db import engine, get_conn
+from ichiro.main import app
 
 
 # Global variables

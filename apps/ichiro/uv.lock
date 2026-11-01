@@ -832,7 +832,7 @@ wheels = [
 ]
 
 [[package]]
-name = "notes"
+name = "ichiro"
 version = "0.5.0"
 source = { editable = "." }
 dependencies = [
