@@ -171,9 +171,11 @@ ai/                todo o resto do workspace de IA:
   Claude Agent SDK; vault `IA no projeto/Chat com o workspace` e `Caminho de uma pergunta`.
   Workspace = pasta com `.workspace/`, vários por pessoa; conversas no banco do `lonzo`.
 - #31 (Ctrl+D) e #5 (chips) sem milestone, para depois; `decorations/replace.ts` (#5) fora do git.
-- #82 (uv 0.13.5 na imagem do ichiro) mergeada (PR #83). Branch
-  `lonzo/answer-chat-questions-through-the-lonzo-service` (#74, sem PR): `apps/lonzo`
-  com `/health`, container no compose, job na CI; falta o `/api/chat`.
+- #82 (uv 0.13.5 na imagem do ichiro) mergeada (PR #83).
+- #74 em duas branches, uma em cima da outra, sem push: `lonzo/answer-chat-questions-through-the-lonzo-service`
+  (`POST /chat` com a lib `anthropic`, Haiku, SSE com eventos nomeados, regras de `rules.md`)
+  → `caddy/route-each-api-prefix-to-its-service` (`/api/notes` → ichiro, `/api/chat` → lonzo,
+  outro `/api` → 404). Falta o Lucca pôr a key no `.env` e testar o `curl -N`; depois push e PRs.
 - Falta: confiar na CA local do Caddy no navegador (README); `/docs` do FastAPI quebra atrás do
   `/api` (precisa de `root_path`, branch do `ichiro`).
 - Serviços renomeados (2026-11-01, #80, PR #81 mergeado): `web` →
