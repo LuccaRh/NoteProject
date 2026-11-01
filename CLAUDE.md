@@ -91,6 +91,9 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   CI, Dockerfile, `.ini`/`.toml`), em qualquer linguagem; md e workspace de IA ficam de fora.
   Código novo já sai quebrado; linha longa achada em código existente → avisar o Lucca.
   Python: ruff `E501` (`line-length = 80`); o resto: lint W12 (`ai/np lint`).
+- **Cabe em uma linha, fica em uma** (2026-11-01): assinatura, chamada, lista ou comando
+  que caiba em 80 colunas (tab do Makefile conta 8) fica numa linha só, sem quebrar.
+  Só juntar: nada de simplificar, reescrever nem renomear para fazer caber.
 - **Linha em branco em volta de cada bloco** (2026-10-26): no código do app, `if`, `for`,
   `while`, `try`, `with`, `match`, `return` e `raise` têm uma linha em branco antes (salvo
   quando abrem o corpo) e o comando depois de um bloco também; a primeira linha do corpo de
