@@ -219,3 +219,58 @@ def test_list_by_missing_title(client: TestClient) -> None:
     response = client.get("/notes", params={"title": "Nothing here"})
 
     assert response.json() == []
+
+
+# Two notes with the same title in one folder: the second POST is 409
+def test_create_title_taken(client: TestClient) -> None:
+
+    folder = create(client=client, title="Work", is_folder=True)
+    create(client=client, title="Plan", parent_id=folder["id"])
+
+    body = {"title": "Plan", "parent_id": folder["id"]}
+    response = client.post("/notes", json=body)
+
+    assert response.status_code == 409
+
+
+# The root is a folder too: the same title twice there is 409
+def test_create_title_taken_at_root(client: TestClient) -> None:
+
+    create(client=client, title="Plan")
+
+    response = client.post("/notes", json={"title": "Plan"})
+
+    assert response.status_code == 409
+
+
+# The same title in another folder is fine
+def test_same_title_in_other_folder(client: TestClient) -> None:
+
+    folder = create(client=client, title="Work", is_folder=True)
+    create(client=client, title="Plan")
+
+    create(client=client, title="Plan", parent_id=folder["id"])
+
+
+# Renaming to a title taken in the folder is 409
+def test_rename_to_title_taken(client: TestClient) -> None:
+
+    create(client=client, title="Plan")
+    note = create(client=client, title="Draft")
+
+    response = client.patch(f"/notes/{note['id']}", json={"title": "Plan"})
+
+    assert response.status_code == 409
+
+
+# Moving into a folder that has a note with the same title is 409
+def test_move_to_title_taken(client: TestClient) -> None:
+
+    folder = create(client=client, title="Work", is_folder=True)
+    create(client=client, title="Plan", parent_id=folder["id"])
+    note = create(client=client, title="Plan")
+
+    body = {"parent_id": folder["id"]}
+    response = client.patch(f"/notes/{note['id']}", json=body)
+
+    assert response.status_code == 409

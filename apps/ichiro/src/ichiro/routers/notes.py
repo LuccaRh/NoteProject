@@ -3,6 +3,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response
+from psycopg.errors import UniqueViolation
 from sqlalchemy import Connection, text
 from sqlalchemy.exc import IntegrityError
 
@@ -12,6 +13,7 @@ from ichiro.errors.notes import (
     parent_inside_note,
     parent_not_folder,
     parent_not_found,
+    title_taken,
 )
 from ichiro.schemas.notes import Note, NoteCreate, NoteUpdate
 
@@ -67,6 +69,18 @@ def check_parent(
 
     if is_cycle:
         raise parent_inside_note()
+
+
+def integrity_error(error: IntegrityError) -> HTTPException:
+    """
+    The error for an insert or update the table refused: a title already
+    in the folder, or a parent deleted in the meantime
+    """
+
+    if isinstance(error.orig, UniqueViolation):
+        return title_taken()
+
+    return parent_not_found()
 
 
 @router.get("")
@@ -127,8 +141,8 @@ def create_note(conn: Conn, note: NoteCreate) -> Note:
             ),
             note.model_dump(),
         ).mappings().one()
-    except IntegrityError:
-        raise parent_not_found()
+    except IntegrityError as error:
+        raise integrity_error(error=error)
 
     return Note.model_validate(row)
 
@@ -161,8 +175,8 @@ def update_note(conn: Conn, note_id: UUID, patch: NoteUpdate) -> Note:
             ),
             {**fields, "id": note_id},
         ).mappings().one_or_none()
-    except IntegrityError:
-        raise parent_not_found()
+    except IntegrityError as error:
+        raise integrity_error(error=error)
 
     if row is None:
         raise not_found()
