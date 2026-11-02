@@ -39,3 +39,13 @@ class NoteUpdate(BaseModel):
     title: str | None = None
     body: str | None = None
     parent_id: UUID | None = None
+
+
+class NotePath(BaseModel):
+    """
+    A note or folder inside another, by its path of titles from there
+    """
+
+    id: UUID
+    path: str
+    is_folder: bool
