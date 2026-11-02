@@ -20,22 +20,30 @@ router = APIRouter(prefix="/chat")
 
 # Code
 class ChatRequest(BaseModel):
+    """
+    A question and, optionally, the workspace folder it is asked in
+    """
+
     question: str
     folder_id: UUID | None = None
 
 
-# One server-sent event: a name and a JSON payload
 def event(name: str, data: dict[str, object]) -> str:
+    """
+    One server-sent event: a name and a JSON payload
+    """
 
     return f"event: {name}\ndata: {json.dumps(data)}\n\n"
 
 
-# Events of one answer, sent to the client while the model writes
 async def answer(
     question: str,
     system: str,
     client: AsyncAnthropic,
 ) -> AsyncIterator[str]:
+    """
+    Events of one answer, sent to the client while the model writes
+    """
 
     yield event(name="message_start", data={})
 
@@ -73,6 +81,10 @@ async def chat(
     client: Annotated[AsyncAnthropic, Depends(get_client)],
     ichiro: Annotated[httpx2.AsyncClient, Depends(get_ichiro)],
 ) -> StreamingResponse:
+    """
+    Answers a question in server-sent events, with the rules of the
+    root and folder workspaces; without any, with no rules
+    """
 
     # Read before the stream starts: an ichiro error is still a status code
     system = await workspace_rules(ichiro=ichiro, folder_id=body.folder_id)
