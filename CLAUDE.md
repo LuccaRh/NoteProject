@@ -123,13 +123,18 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   global, e as funções usam direto; parâmetro fica para o que muda a cada chamada. Instância
   de client fica em `<pacote>/connections.py` (`ichiro`, `claude`); recurso aberto fecha no
   `lifespan` do app.
-- **Backend em camadas** (2026-11-02): `routers/` → `services/` → `clients/`, cada uma só
+- **Backend em camadas** (2026-11-02): `routers/` → `services/` → `clients/` ou `repositories/`, cada uma só
   chama a de baixo. **Client** (`clients/<api>.py`): uma classe por API externa (ichiro,
   Anthropic), um método por endpoint, devolvendo o modelo de `schemas/`, sem regra do
-  serviço. **Service** (`services/<assunto>.py`): as funções do serviço em cima dos clients,
+  serviço. **Repository** (`repositories/<tabela>.py`, no lugar do client quando embaixo é o
+  banco): uma função por consulta SQL, devolvendo o modelo de `schemas/` ou `None`, sem regra;
+  erro do banco (`IntegrityError`) já sai como erro do domínio. **Service**
+  (`services/<assunto>.py`): as funções do serviço em cima dos clients e repositories,
   com as checagens e os erros do domínio (`FolderNotFound`). **Router**: recebe o pedido,
-  chama **um** service e devolve; nunca um client, mesmo para uma chamada direta. Erro do
-  domínio vira status num `exception_handler` do `main.py`. Lint W22 (`ai/np lint`).
+  chama **um** service e devolve; nunca um client nem um repository, mesmo para uma chamada
+  direta. Erro do
+  domínio vira status num `exception_handler`, no `main.py` ou, no ichiro, no `handlers.py`
+  (tabela erro → status). Lint W22 (`ai/np lint`).
 - **Explicação dentro da função** (2026-11-02): todo `def` e `class` do app (`src/`) explica o que
   faz numa docstring, primeiro comando do corpo, **grudada** na assinatura (ou na linha do
   `class`): `"""` sozinho na linha, o texto (sem ponto no fim), `"""` sozinho, e uma linha em
