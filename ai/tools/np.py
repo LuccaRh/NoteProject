@@ -461,7 +461,12 @@ def _versoes_libs() -> list[str]:
             continue
         inst = (pk.get(f"node_modules/{nome}") or {}).get("version")
         if inst is None:
-            m = re.search(rf'name = "{re.escape(nome)}"\nversion = "([^"]+)"', uv)
+            # O lockfile do serviço da `fonte` vem primeiro: a mesma lib pode ter outra versão
+            # em outro serviço (httpx2 2.16.0 no lonzo, 2.15.1 indireta no ichiro)
+            svc = re.match(r"apps/([^/]+)/", str(fm.get("fonte", "")))
+            lock = REPO / f"apps/{svc.group(1)}/uv.lock" if svc else None
+            texto = (lock.read_text() if lock and lock.exists() else "") + "\n" + uv
+            m = re.search(rf'name = "{re.escape(nome)}"\nversion = "([^"]+)"', texto)
             inst = m.group(1) if m else None
         if inst is None:
             out.append(f"W05 {p.relative_to(REPO)}: {nome} não está nos lockfiles")
