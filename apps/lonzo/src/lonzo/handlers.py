@@ -4,7 +4,12 @@ from anthropic import APIError
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from lonzo.errors import FolderNotFound, MissingApiKey, NotAFolder
+from lonzo.errors import (
+    ConversationNotFound,
+    FolderNotFound,
+    MissingApiKey,
+    NotAFolder,
+)
 
 
 # Global variables
@@ -13,6 +18,7 @@ STATUS: dict[type[Exception], int] = {
     MissingApiKey: 503,
     FolderNotFound: 404,
     NotAFolder: 422,
+    ConversationNotFound: 404,
 }
 
 
