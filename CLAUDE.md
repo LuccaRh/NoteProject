@@ -96,6 +96,9 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 - **Cabe em uma linha, fica em uma** (2026-11-01): assinatura, chamada, lista ou comando
   que caiba em 80 colunas (tab do Makefile conta 8) fica numa linha só, sem quebrar.
   Só juntar: nada de simplificar, reescrever nem renomear para fazer caber.
+- **Não coube, um por linha** (2026-11-02): parâmetros de `def` ou argumentos de chamada
+  que não cabem numa linha vão **um por linha**, com vírgula no fim, e o parêntese que
+  fecha na linha dele; nada de vários pendurados na mesma linha. Lint W20 (`ai/np lint`).
 - **Linha em branco em volta de cada bloco** (2026-10-26): no código do app, `if`, `for`,
   `while`, `try`, `with`, `match`, `return` e `raise` têm uma linha em branco antes (salvo
   quando abrem o corpo) e o comando depois de um bloco também; a primeira linha do corpo de
@@ -138,7 +141,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 | `ai/np contexto <área>` / `areas` | o que ler para uma área / o vocabulário |
 | `ai/np obsidian [-q]` / `duvidas [pág]` | sincronia vault ↔ `ai/obsidian/` / marcas `[!duvida]` `[fix]` `[coment]` |
 | `ai/np diagrama <spec> [--png]` | YAML → draw.io (`ai/tools/diagrama.py`, nó `banco` para BD) |
-| `ai/np lint` / `test` | regras do workspace (W01–W19) / testes das ferramentas |
+| `ai/np lint` / `test` | regras do workspace (W01–W20) / testes das ferramentas |
 
 Ambiente: Arch Linux, Python 3.14 + uv, Node 22, Docker, `drawio` CLI, poppler (`pdftotext`).
 Hooks do Claude Code em `.claude/settings.json`; do git em `ai/tools/githooks/` (`ai/tools/instalar.sh`).

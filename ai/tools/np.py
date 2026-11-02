@@ -7,7 +7,7 @@
     ai/np obsidian [-q] [--simular] sincronia vault Note Project/ ↔ obsidian/
     ai/np duvidas [trecho da pág]   marcas [!duvida] [duvidas] [fix] [coment] nas notas
     ai/np diagrama <spec.yaml> [--png]   YAML → draw.io; `destino:` no spec copia o .drawio.svg para obsidian/
-    ai/np lint                      regras do workspace que viraram código (W01–W19)
+    ai/np lint                      regras do workspace que viraram código (W01–W20)
     ai/np test                      testes das ferramentas (tools/test_*.py)
     ai/np check                     o check do app (make check: ruff, mypy, pytest, tsc, build)
 
@@ -413,8 +413,33 @@ def checar_posicionais(texto: str, funcoes: set[str]) -> list[int]:
     return sorted(set(out))
 
 
+def checar_parametros(texto: str) -> list[int]:
+    """Linhas de `def` ou chamada que quebram linha com dois ou mais parâmetros sem ser um por
+    linha (o primeiro também na linha dele): não coube em uma linha, vai um por linha
+    (2026-11-02). Um parâmetro só pode abraçar o parêntese (`f(Model(\n...))`)."""
+    out = []
+    for no in ast.walk(ast.parse(texto)):
+        if isinstance(no, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            a = no.args
+            itens: list[ast.AST] = [*a.posonlyargs, *a.args, *a.kwonlyargs]
+            itens += [x for x in (a.vararg, a.kwarg) if x]
+            fim = max((getattr(x, "end_lineno", x.lineno) for x in itens), default=no.lineno)
+            quebrado = fim > no.lineno
+        elif isinstance(no, ast.Call):
+            itens = [*no.args, *no.keywords]
+            quebrado = (no.end_lineno or no.lineno) > no.lineno
+        else:
+            continue
+        linhas = [x.lineno for x in itens]
+        if len(itens) < 2 or not quebrado:
+            continue
+        if linhas[0] == no.lineno or len(set(linhas)) != len(linhas):
+            out.append(no.lineno)
+    return sorted(set(out))
+
+
 def _chamadas() -> list[str]:
-    """W18–W19 no Python do app criado ou mexido na branch."""
+    """W18–W20 no Python do app criado ou mexido na branch."""
     base = git("merge-base", "master", "HEAD")
     mexidos = git("diff", "--name-only", "--diff-filter=AM", base, "--", "apps").splitlines()
     mexidos += git("ls-files", "--others", "--exclude-standard", "apps").splitlines()
@@ -434,6 +459,9 @@ def _chamadas() -> list[str]:
         for i in checar_posicionais(texto, funcoes_do_servico(textos)):
             out.append(f"W19 {n}:{i}: chamada a função do serviço com argumento por posição;"
                        " passe cada um com o nome do parâmetro")
+        for i in checar_parametros(texto):
+            out.append(f"W20 {n}:{i}: parâmetros quebrados sem ser um por linha;"
+                       " cabe em uma, fica em uma; senão, um por linha")
     return out
 
 

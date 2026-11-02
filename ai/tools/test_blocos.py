@@ -5,6 +5,7 @@ from np import (
     checar_blocos,
     checar_constantes,
     checar_layout,
+    checar_parametros,
     checar_posicionais,
 )
 
@@ -80,3 +81,19 @@ class TestBlocos(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestParametros(unittest.TestCase):
+    def test_um_por_linha(self) -> None:
+        texto = "def f(\n    a: int,\n    b: int,\n) -> int:\n    return g(\n        x=a,\n        y=b,\n    )\n"
+        self.assertEqual(checar_parametros(texto), [])
+
+    def test_pendurados(self) -> None:
+        texto = "def f(\n    a: int, b: int\n) -> int:\n    return g(\n        x=a, y=b\n    )\n"
+        self.assertEqual(checar_parametros(texto), [1, 4])
+
+    def test_primeiro_na_linha_do_parentese(self) -> None:
+        self.assertEqual(checar_parametros("g(a,\n  b)\n"), [1])
+
+    def test_um_so_abraca(self) -> None:
+        self.assertEqual(checar_parametros("g(h(\n    x=1,\n    y=2,\n))\n"), [])
