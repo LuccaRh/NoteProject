@@ -176,13 +176,24 @@ ai/                todo o resto do workspace de IA:
   build/           gerado (estado dos hooks, png de diagrama), fora do git
 ```
 
-## Estado (2026-11-01)
+## Estado (2026-11-02)
 
 - M0, #46, #62, #64, #65, #69, #16, #80, #82 e #74 mergeados (PRs #66–#68, #70–#72, #81, #83–#85);
   `master` local = remoto, sem branches locais além dela.
 - #74 pronta: `apps/lonzo` responde `POST /api/chat` em SSE (Haiku 5.5, `thinking` desligado,
-  `max_tokens` 512, regras de `rules.md`); o Caddy roteia `/api/notes/*` → ichiro, `/api/chat/*` →
+  `max_tokens` 512); o Caddy roteia `/api/notes/*` → ichiro, `/api/chat/*` →
   lonzo, outro `/api` → 404. Evento `status` saiu da #74 e nasce com as ferramentas (#77).
+- #73 na branch `lonzo/create-a-workspace-from-a-short-description-of-its-goal` (sem push):
+  `POST /api/chat/workspaces {folder_id, description}` → o lonzo cria `.workspace/` + `kb/ skills/
+  scripts/ hooks/` (reaproveita as que existem) e o `tool_runner` da SDK roda o laço com o prompt
+  (`create_workspace.md`, sem `CLAUDE.md` base) e as ferramentas `create_note`/`create_folder`
+  (`lonzo/tools.py`, caminho relativo à pasta), que gravam `CLAUDE.md` e as notas no ichiro
+  (`httpx2`, `http://ichiro:8000`); o chat aceita `folder_id` e usa as regras do `.workspace` da
+  raiz + pasta, e sem nenhum vai sem `system` (o `rules.md` da #74 saiu). Docstring em toda
+  função do lonzo (W21); o ichiro ainda tem comentário em cima do `def` (o `check_parent` tem
+  docstring, mas separada da assinatura): arrumar numa branch do `ichiro`.
+  Chamadas a APIs em `lonzo/clients/` (`anthropic.py`, `ichiro.py`), modelos em `lonzo/schemas/`;
+  o `message_start` saiu sem `model`, que foi para o `message_end` (a constante fica no cliente).
 - IA (2026-10-31): chat com o workspace no servidor; vault `IA no projeto/Chat com o workspace` e
   `Caminho de uma pergunta`. Workspace = pasta com `.workspace/`, vários por pessoa.
 - #31 (Ctrl+D) e #5 (chips) sem milestone, para depois; `decorations/replace.ts` (#5) fora do git.
@@ -195,7 +206,7 @@ ai/                todo o resto do workspace de IA:
 
 Plano: vault `Plano do projeto/Roadmap` (navegador → app desktop → celular) + issues/milestones no GitHub.
 
-1. Entrega de 2026-11-06 (vault `Plano do projeto/Entrega de 2026-11-06`): #74 ✅ → #73 workspace criado pela IA a partir de um texto breve
+1. Entrega de 2026-11-06 (vault `Plano do projeto/Entrega de 2026-11-06`): #74 ✅ → #73 (branch pronta, falta PR) workspace criado pela IA a partir de um texto breve
    (esqueleto; vault `Workspace no app#Como nasce`) → #75 conversas, #76 tela do chat → #56 busca, #77 ler/buscar
    → #78 criar/editar/apagar, #51 → #6 pastas, #79 importar o vault → #17 se sobrar.
 2. M2 login (#48, #17) → M3 AWS (#18–#25, #47) → M4 edição ao vivo (#26, #27, #30).
