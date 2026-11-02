@@ -5,6 +5,12 @@ import type { Note } from './api.ts'
 
 
 // Global variables
+export type Folder = {
+    id: string
+    // Titles from the top down to the folder, joined by " / "
+    path: string
+}
+
 type Handlers = {
     open: (note: Note) => void
     rename: (note: Note, title: string) => void
@@ -13,6 +19,9 @@ type Handlers = {
 
 // Key of the top level in the children cache
 const ROOT = 'root'
+
+// Folder that holds a workspace's rules, never a workspace itself
+const WORKSPACE = '.workspace'
 
 const CHEVRON = '<svg aria-hidden="true" width="12" height="12"'
     + ' viewBox="0 0 24 24" fill="none" stroke="currentColor"'
@@ -92,6 +101,26 @@ export class Tree {
         }
 
         return false
+    }
+
+    /** Folders loaded so far, in tree order, without .workspace ones. */
+    folders(parentId: string | null = null): Folder[] {
+
+        const found: Folder[] = []
+
+        for (const note of this.children.get(parentId ?? ROOT) ?? []) {
+
+            if (!note.is_folder || note.title === WORKSPACE) continue
+
+            const path = [...this.path(note), note.title || 'Untitled']
+            found.push({
+                id: note.id,
+                path: path.join(' / '),
+            })
+            found.push(...this.folders(note.id))
+        }
+
+        return found
     }
 
     /** Folder where a new item goes: the selected one or its parent. */

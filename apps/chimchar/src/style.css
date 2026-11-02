@@ -25,7 +25,9 @@ body {
 }
 
 button,
-input {
+input,
+select,
+textarea {
     font: inherit;
     color: inherit;
 }
@@ -188,11 +190,91 @@ button {
     color: var(--muted);
 }
 
+/* Tabs */
+
+.work {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.tabs {
+    flex: none;
+    display: flex;
+    gap: 2px;
+    padding: 6px 8px 0;
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+}
+
+.tab {
+    flex: 0 1 200px;
+    min-width: 90px;
+    display: flex;
+    align-items: center;
+    border-radius: 6px 6px 0 0;
+    color: var(--muted);
+}
+
+.tab:hover {
+    background: var(--hover);
+}
+
+.tab[aria-selected='true'] {
+    background: var(--panel);
+    color: var(--text);
+}
+
+.tab-open {
+    flex: 1;
+    min-width: 0;
+    height: 32px;
+    padding: 0 4px 0 12px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* The chat tabs carry a dot, to tell them from notes */
+.tab.chat .tab-open::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin: 0 8px 1px 0;
+    border-radius: 50%;
+    background: var(--muted);
+}
+
+.tab-close {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--faint);
+}
+
+.tab-close:hover {
+    background: var(--active);
+    color: var(--text);
+}
+
 /* Note */
 
 .page {
     flex: 1;
     min-width: 0;
+    min-height: 0;
     box-sizing: border-box;
     padding: 28px 40px 56px;
     overflow-y: auto;
@@ -272,6 +354,265 @@ button {
     padding-top: 10px !important;
 }
 
+/* Chat */
+
+.chat-panel {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-head {
+    flex: none;
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+}
+
+.chat-workspace,
+.new-conversation,
+.send {
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--panel);
+}
+
+.chat-workspace {
+    max-width: 320px;
+}
+
+.new-conversation:hover,
+.send:hover:enabled {
+    background: var(--hover);
+}
+
+.chat-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+}
+
+.chat-side {
+    flex: 0 0 220px;
+    padding: 10px 8px;
+    border-right: 1px solid var(--line);
+    overflow-y: auto;
+}
+
+.conversations {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.conversation {
+    width: 100%;
+    height: 30px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--soft);
+}
+
+.conversation:hover {
+    background: var(--hover);
+}
+
+.conversation[aria-current='true'] {
+    background: var(--active);
+    color: var(--text);
+}
+
+.chat-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.messages {
+    flex: 1;
+    min-height: 0;
+    padding: 24px max(24px, calc((100% - 700px) / 2));
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow-y: auto;
+}
+
+.message {
+    max-width: 85%;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--body);
+}
+
+.message.user {
+    align-self: flex-end;
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: var(--active);
+    color: var(--text);
+}
+
+/* Blinking bar while the answer is still coming */
+.message.streaming::after {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 1em;
+    margin-left: 2px;
+    vertical-align: -2px;
+    background: var(--muted);
+    animation: blink 1s steps(2) infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+.chat-empty {
+    margin: auto;
+    color: var(--muted);
+}
+
+.chat-error {
+    margin: -6px 0 0;
+    font-size: 13px;
+    color: #e08a7f;
+}
+
+.ask {
+    flex: none;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 12px max(24px, calc((100% - 700px) / 2)) 20px;
+}
+
+.question {
+    box-sizing: border-box;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+    flex: 1;
+    resize: none;
+}
+
+.send:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* Create workspace dialog */
+
+.dialog {
+    width: min(620px, calc(100vw - 32px));
+    box-sizing: border-box;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--ground);
+    color: var(--text);
+}
+
+.dialog::backdrop {
+    background: rgb(0 0 0 / 0.55);
+}
+
+.dialog-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dialog h2 {
+    margin: 0 0 8px;
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 26px;
+}
+
+.dialog label {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.dialog select,
+.dialog textarea {
+    box-sizing: border-box;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+}
+
+.dialog select {
+    height: 36px;
+}
+
+.dialog textarea {
+    resize: vertical;
+    line-height: 1.55;
+}
+
+.dialog .status {
+    min-height: 1.5em;
+    margin: 4px 0 0;
+    padding: 0;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.dialog-actions button {
+    height: 32px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--panel);
+}
+
+.dialog-actions button:hover:enabled {
+    background: var(--hover);
+}
+
+.dialog-actions button[type='submit'] {
+    background: var(--text);
+    border-color: var(--text);
+    color: var(--ground);
+}
+
+.dialog-actions button[type='submit']:hover:enabled {
+    background: var(--body);
+}
+
+.dialog-actions button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
 @media (max-width: 640px) {
     .app {
         flex-direction: column;
@@ -288,11 +629,19 @@ button {
     .page {
         padding: 20px 16px 48px;
     }
+
+    .chat-side {
+        display: none;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .node,
     .node-open svg {
         transition: none;
+    }
+
+    .message.streaming::after {
+        animation: none;
     }
 }

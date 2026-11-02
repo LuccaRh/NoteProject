@@ -1,14 +1,19 @@
 // Imports
 import './style.css'
+import { Chat } from './chat/chat.ts'
+import { WorkspaceDialog } from './chat/workspace-dialog.ts'
 import { createNote, deleteNote, updateNote } from './notes/api.ts'
 import { Page } from './notes/page.ts'
 import { Tree } from './notes/tree.ts'
+import { Tabs } from './tabs.ts'
 
 import type { Note } from './notes/api.ts'
 
 
 // Global variables
 const serverStatus = byId<HTMLElement>('server-status')
+const notePanel = byId('note-panel')
+const work = byId('work')
 
 const page = new Page(
     {
@@ -19,17 +24,34 @@ const page = new Page(
         title: byId('title'),
         editor: byId('editor'),
     }, 
-    saved => tree.update(saved)
+    saved => showSaved(saved)
 )
 
 const tree = new Tree(
         byId('tree'), 
         {
-                open: note => void page.open(note.id, tree.path(note)),
+                open: note => void openNote(note),
                 rename: (note, title) => void rename(note, title),
                 remove: note => void remove(note),
         }
 )
+
+const workspaceDialog = new WorkspaceDialog(
+    {
+        dialog: byId('workspace-dialog'),
+        form: byId('workspace-form'),
+        folder: byId('workspace-folder'),
+        description: byId('workspace-description'),
+        status: byId('workspace-status'),
+        create: byId('workspace-create'),
+        cancel: byId('workspace-cancel'),
+    },
+    () => tree.folders(),
+    folderId => void workspaceCreated(folderId),
+)
+
+// The note panel doubles as the empty page when no tab is open
+const tabs = new Tabs(byId('tabs'), notePanel, () => void page.close())
 
 
 // Code
@@ -43,6 +65,52 @@ function byId<T extends HTMLElement>(id: string): T {
     return el as T
 }
 
+/** Open a note in its tab, or bring its tab back to the front. */
+function openNote(note: Note): Promise<void> {
+
+    return tabs.open({
+        id: note.id,
+        kind: 'note',
+        title: note.title,
+        panel: notePanel,
+        show: () => page.open(note.id, tree.path(note)),
+    })
+}
+
+/** Open a new chat tab in a workspace folder (null = no workspace). */
+function openChat(folderId: string | null): void {
+
+    const id = crypto.randomUUID()
+    const chat = new Chat({
+        parent: work,
+        folderId,
+        folders: () => tree.folders(),
+        onTitle: title => tabs.rename(id, title),
+    })
+    void tabs.open({
+        id,
+        kind: 'chat',
+        title: chat.workspaceName(),
+        panel: chat.panel,
+        show: () => chat.question.focus(),
+        close: () => chat.panel.remove(),
+    })
+}
+
+/** Show the new .workspace in the tree and open a chat in it. */
+async function workspaceCreated(folderId: string): Promise<void> {
+
+    await tree.load(folderId)
+    openChat(folderId)
+}
+
+/** Show a saved note in the tree and on its tab. */
+function showSaved(note: Note): void {
+
+    tree.update(note)
+    tabs.rename(note.id, note.title)
+}
+
 /** Rename a note; the open one goes through the page. */
 async function rename(note: Note, title: string): Promise<void> {
 
@@ -53,7 +121,7 @@ async function rename(note: Note, title: string): Promise<void> {
         return
     }
 
-    tree.update(await updateNote(note.id, { title }))
+    showSaved(await updateNote(note.id, { title }))
 }
 
 /** Ask, delete a note or folder, and close it if it was open. */
@@ -65,10 +133,13 @@ async function remove(note: Note): Promise<void> {
 
     if (!confirm(`Delete ${what}? "${note.title}"`)) return
 
+    // Close first, so pending edits never go to a deleted note
+    const inside = (id: string): boolean => tree.isInside(id, note.id)
+    tabs.closeWhere(tab => tab.kind === 'note' && inside(tab.id))
+
+    if (page.note && inside(page.note.id)) await page.close()
+
     await deleteNote(note.id)
-
-    if (page.note && tree.isInside(page.note.id, note.id)) page.close()
-
     tree.delete(note)
 }
 
@@ -88,7 +159,7 @@ async function create(isFolder: boolean): Promise<void> {
         return
     }
 
-    await page.open(note.id, tree.path(note))
+    await openNote(note)
     byId<HTMLInputElement>('title').select()
 }
 
@@ -106,6 +177,10 @@ document.addEventListener('visibilitychange', () => {
 
 byId('new-note').addEventListener('click', () => void create(false))
 byId('new-folder').addEventListener('click', () => void create(true))
+byId('new-chat').addEventListener('click', () => openChat(tree.target()))
+byId('new-workspace').addEventListener('click', () => {
+    workspaceDialog.open(tree.target())
+})
 
 void tree.load(null).then(() => {
     serverStatus.textContent = ''

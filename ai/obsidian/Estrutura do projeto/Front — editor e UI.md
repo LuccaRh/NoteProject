@@ -15,6 +15,10 @@ O front é o que se vê: a lista de notas e o editor. A regra que manda nele: **
 | `main.ts` | monta o editor no `#editor` (`main.ts:4-7`) |
 | `editor.ts` | [[CodeMirror\|CodeMirror 6]] com Markdown |
 | `decorations/headings.ts` | headings com tamanho; `replace.ts` (chips de `[!duvida]`) está vazio |
+| `tabs.ts` | barra de abas (#76): cada aba é uma nota ou um chat; só o painel da aba ativa aparece; as abas de nota dividem o mesmo editor, que recarrega a nota ao trocar |
+| `chat/chat.ts` | aba de chat: escolhe o workspace (pastas que a árvore já carregou), lista as conversas e escreve a resposta conforme chega |
+| `chat/workspace-dialog.ts` | pop-up "Create workspace": pasta + descrição, que já vem com o modelo (objetivo, como responder, fatos fixos, estado, fontes) e diz que dá para ir além ou apagar |
+| `chat/api.ts` | cliente do [[Chat com o workspace\|chat]]: conversas, criar workspace e a pergunta, lida em [[Server-sent events\|SSE]] pelo `fetch` (o `EventSource` só faz `GET`) |
 
 - Stack: TypeScript + Vite + [[CodeMirror|CodeMirror 6]], sem framework de UI.
 - Ordem para ler o código: [[Como ler o front]].
@@ -41,7 +45,7 @@ O front é o que se vê: a lista de notas e o editor. A regra que manda nele: **
 | [[Yjs]] + `y-codemirror.next` | o editor gera updates de [[CRDT]] para o sync |
 | KaTeX | fórmulas `$$…$$` |
 | índice fuzzy em memória | `Ctrl+P` em < 1 ms |
-| Svelte ou React | palette, abas, outline; **em aberto** |
+| Svelte ou React | palette, outline; **em aberto** (as abas saíram sem framework, #76) |
 | React Native | app do celular, [[Local-first\|local-first]] (milestone Mobile app) |
 
 - Busca em 4 níveis: `Ctrl+F` no [[CodeMirror]], `Ctrl+J` outline, `Ctrl+P` fuzzy, `Ctrl+Shift+F` na busca full-text do servidor (no desktop, o [[FTS5]] do [[O daemon notesd|daemon]]).
