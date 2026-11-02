@@ -3,12 +3,13 @@ import httpx2
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from lonzo.routers import chat, health
+from lonzo.routers import chat, health, workspaces
 
 
 # Global variables
 app = FastAPI()
 app.include_router(health.router)
+app.include_router(workspaces.router)
 app.include_router(chat.router)
 
 
