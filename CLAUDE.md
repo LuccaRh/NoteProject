@@ -245,6 +245,13 @@ ai/                todo o resto do workspace de IA:
     (`lonzo/db.py`, `repositories/conversations.py`, card `ai/kb/libs/sqlalchemy.md`);
     `POST /api/chat {conversation_id?}` manda o histórico e grava pergunta + resposta;
     `GET /api/chat/conversations[?folder_id]` e `/{id}`; versão 0.4.0. Conferido pelo Caddy.
+- #76 na branch `chimchar/chat-with-the-ai-from-the-web-app` (sem push), **em cima da
+  `lonzo/keep-...`** (usa as rotas de conversa): rebase na `master` depois do merge da #75
+  (o W13 avisa `apps/lonzo` até lá). Front com abas (`tabs.ts`: nota ou chat; as notas dividem
+  o mesmo editor), aba de chat (`chat/chat.ts`, SSE lido no `fetch` em `chat/api.ts`) e
+  pop-up "Create workspace" (`chat/workspace-dialog.ts`, texto já preenchido); chimchar
+  0.7.0. Conferido no navegador pelo Caddy (Playwright). Escrita pela sessão, cliente-api
+  incluso (o Lucca pediu pronto).
 - IA (2026-10-31): chat com o workspace no servidor; vault `IA no projeto/Chat com o workspace` e
   `Caminho de uma pergunta`. Workspace = pasta com `.workspace/`, vários por pessoa.
 - #31 (Ctrl+D) e #5 (chips) sem milestone, para depois; `decorations/replace.ts` (#5) fora do git.
@@ -258,7 +265,7 @@ ai/                todo o resto do workspace de IA:
 Plano: vault `Plano do projeto/Roadmap` (navegador → app desktop → celular) + issues/milestones no GitHub.
 
 1. Entrega de 2026-11-06 (vault `Plano do projeto/Entrega de 2026-11-06`): #74 ✅ → #73 ✅ workspace criado pela IA a partir de um texto breve
-   (esqueleto; vault `Workspace no app#Como nasce`) → #98 ✅ ichiro em camadas → #75 conversas (2 branches prontas, falta PR), #76 tela do chat → #56 busca, #77 ler/buscar
+   (esqueleto; vault `Workspace no app#Como nasce`) → #98 ✅ ichiro em camadas → #75 conversas (2 branches prontas, falta PR), #76 tela do chat (branch pronta, falta PR) → #56 busca, #77 ler/buscar
    → #78 criar/editar/apagar, #51 → #6 pastas, #79 importar o vault → #17 se sobrar.
 2. M2 login (#48, #17) → M3 AWS (#18–#25, #47) → M4 edição ao vivo (#26, #27, #30).
 - v1 = ler notas no navegador com o servidor na AWS (vault `Plano do projeto/Objetivo do app`);
