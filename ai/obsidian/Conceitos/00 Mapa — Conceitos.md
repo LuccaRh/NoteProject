@@ -139,3 +139,4 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[Chamada a um modelo]] | request HTTP comum; o modelo não lembra nada e só sabe o que vem no pacote (`system`, `tools`, `messages`) |
 | [[Laço de ferramentas]] | o modelo pede ferramenta, o programa executa e chama de novo; o harness em volta |
 | [[Cache de prompt]] | começo igual da chamada sai mais barato |
+| [[Saída estruturada]] | a chamada leva um JSON Schema e a resposta vem com exatamente aqueles campos |

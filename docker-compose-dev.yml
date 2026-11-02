@@ -46,6 +46,10 @@ services:
         # Only this variable from .env: lonzo never sees the database password
         environment:
             - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+            # Notes go through ichiro's API, straight in the compose network
+            - ICHIRO_URL=http://ichiro:8000
+        depends_on:
+            - ichiro
 
     postgres:
         image: postgres:18

@@ -7,7 +7,7 @@
     ai/np obsidian [-q] [--simular] sincronia vault Note Project/ ↔ obsidian/
     ai/np duvidas [trecho da pág]   marcas [!duvida] [duvidas] [fix] [coment] nas notas
     ai/np diagrama <spec.yaml> [--png]   YAML → draw.io; `destino:` no spec copia o .drawio.svg para obsidian/
-    ai/np lint                      regras do workspace que viraram código (W01–W17)
+    ai/np lint                      regras do workspace que viraram código (W01–W22)
     ai/np test                      testes das ferramentas (tools/test_*.py)
     ai/np check                     o check do app (make check: ruff, mypy, pytest, tsc, build)
 
@@ -207,6 +207,7 @@ def problemas() -> list[str]:
     out += _blocos()
     out += _branch_servico()
     out += _compose()
+    out += _chamadas()
     return out
 
 
@@ -276,11 +277,19 @@ _BLOCO_PY = (ast.If, ast.For, ast.While, ast.Try, ast.With, ast.Match, ast.Retur
 
 def checar_blocos(texto: str) -> list[int]:
     """Linhas de comandos grudados no de cima quando um dos dois é bloco ou return/raise,
-    e a primeira do corpo de um def grudada na assinatura."""
+    e a primeira do corpo de um def grudada na assinatura. Docstring (2026-11-02) fica
+    grudada na assinatura do def ou na linha do class, com uma linha em branco antes do código."""
     linhas = texto.splitlines()
     out = []
     for no in ast.walk(ast.parse(texto)):
-        if isinstance(no, (ast.FunctionDef, ast.AsyncFunctionDef)) and no.body[0].lineno > no.lineno:
+        if isinstance(no, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and _docstring(no):
+            doc = no.body[0]
+            if any(not x.strip() for x in linhas[no.lineno:doc.lineno - 1]):
+                out.append(doc.lineno)
+            if len(no.body) > 1 and not any(
+                    not x.strip() for x in linhas[doc.end_lineno:no.body[1].lineno - 1]):  # type: ignore[misc]
+                out.append(no.body[1].lineno)
+        elif isinstance(no, (ast.FunctionDef, ast.AsyncFunctionDef)) and no.body[0].lineno > no.lineno:
             if not any(not x.strip() for x in linhas[no.lineno:no.body[0].lineno - 1]):
                 out.append(no.body[0].lineno)
         for campo in ("body", "orelse", "finalbody"):
@@ -373,6 +382,143 @@ def _blocos() -> list[str]:
     return out
 
 
+_CONSTANTE = re.compile(r"[A-Z][A-Z0-9_]*")
+
+
+def checar_constantes(texto: str, pacote: str) -> list[int]:
+    """Linhas que importam uma constante (NOME_EM_MAIÚSCULA) do próprio pacote do serviço: a
+    constante fica no módulo dela, usada direto pelas funções de lá (2026-11-02)."""
+    return sorted(
+        no.lineno
+        for no in ast.walk(ast.parse(texto))
+        if isinstance(no, ast.ImportFrom) and (no.module or "").split(".")[0] == pacote
+        and any(_CONSTANTE.fullmatch(a.name) for a in no.names)
+    )
+
+
+def funcoes_do_servico(textos: list[str]) -> set[str]:
+    """Nomes de toda função e método definidos no serviço (src e tests)."""
+    return {
+        no.name
+        for t in textos for no in ast.walk(ast.parse(t))
+        if isinstance(no, (ast.FunctionDef, ast.AsyncFunctionDef))
+    }
+
+
+def checar_posicionais(texto: str, funcoes: set[str]) -> list[int]:
+    """Linhas com chamada a função do próprio serviço (`f(...)` ou `self.f(...)`) que passa
+    argumento por posição: todo argumento vai com o nome do parâmetro (2026-11-02)."""
+    out = []
+    for no in ast.walk(ast.parse(texto)):
+        if not isinstance(no, ast.Call) or not no.args:
+            continue
+        f = no.func
+        nome = f.id if isinstance(f, ast.Name) else (
+            f.attr if isinstance(f, ast.Attribute) and isinstance(f.value, ast.Name)
+            and f.value.id == "self" else None)
+        if nome in funcoes:
+            out.append(no.lineno)
+    return sorted(set(out))
+
+
+def checar_parametros(texto: str) -> list[int]:
+    """Linhas de `def` ou chamada que quebram linha com dois ou mais parâmetros sem ser um por
+    linha (o primeiro também na linha dele): não coube em uma linha, vai um por linha
+    (2026-11-02). Um parâmetro só pode abraçar o parêntese (`f(Model(\n...))`)."""
+    out = []
+    for no in ast.walk(ast.parse(texto)):
+        if isinstance(no, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            a = no.args
+            itens: list[ast.AST] = [*a.posonlyargs, *a.args, *a.kwonlyargs]
+            itens += [x for x in (a.vararg, a.kwarg) if x]
+            fim = max((getattr(x, "end_lineno", x.lineno) for x in itens), default=no.lineno)
+            quebrado = fim > no.lineno
+        elif isinstance(no, ast.Call):
+            itens = [*no.args, *no.keywords]
+            quebrado = (no.end_lineno or no.lineno) > no.lineno
+        else:
+            continue
+        linhas = [x.lineno for x in itens]
+        if len(itens) < 2 or not quebrado:
+            continue
+        if linhas[0] == no.lineno or len(set(linhas)) != len(linhas):
+            out.append(no.lineno)
+    return sorted(set(out))
+
+
+def _docstring(no: ast.AST) -> bool:
+    """Se o primeiro comando do corpo é uma string solta (a docstring)."""
+    corpo = getattr(no, "body", None) or [None]
+    primeiro = corpo[0]
+    return (isinstance(primeiro, ast.Expr) and isinstance(primeiro.value, ast.Constant)
+            and isinstance(primeiro.value.value, str))
+
+
+def checar_docstrings(texto: str) -> list[int]:
+    """Linhas de `def` ou `class` sem docstring como primeiro comando: a explicação de cada
+    função e classe fica dentro dela, não num comentário em cima (2026-11-02)."""
+    out = []
+    for no in ast.walk(ast.parse(texto)):
+        if not isinstance(no, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        if not _docstring(no):
+            out.append(no.lineno)
+    return out
+
+
+_CAMADA_BAIXA = ("clients", "connections")
+
+
+def checar_camadas(texto: str, pacote: str) -> list[int]:
+    """Linhas de um router que importam de clients/ ou connections: o router só usa services,
+    que fazem as checagens e chamam os clients (2026-11-02)."""
+    return sorted(
+        no.lineno
+        for no in ast.walk(ast.parse(texto))
+        if isinstance(no, ast.ImportFrom)
+        and (no.module or "").split(".")[0] == pacote
+        and (
+            (no.module or "").split(".")[1:2] and (no.module or "").split(".")[1] in _CAMADA_BAIXA
+            or any(a.name in _CAMADA_BAIXA for a in no.names)
+        )
+    )
+
+
+def _chamadas() -> list[str]:
+    """W18–W22 no Python do app criado ou mexido na branch."""
+    base = git("merge-base", "master", "HEAD")
+    mexidos = git("diff", "--name-only", "--diff-filter=AM", base, "--", "apps").splitlines()
+    mexidos += git("ls-files", "--others", "--exclude-standard", "apps").splitlines()
+    out = []
+    for n in sorted(set(mexidos)):
+        f = REPO / n
+        if f.suffix != ".py" or not f.is_file() or "/migrations/" in n:
+            continue
+        servico = REPO / "apps" / n.split("/")[1]
+        pacote = n.split("/")[1]
+        textos = [g.read_text(encoding="utf-8") for d in ("src", "tests")
+                  for g in (servico / d).rglob("*.py") if ".venv" not in g.parts]
+        texto = f.read_text(encoding="utf-8")
+        for i in checar_constantes(texto, pacote):
+            out.append(f"W18 {n}:{i}: constante importada de outro módulo; use-a numa função"
+                       " do módulo dela e importe a função")
+        for i in checar_posicionais(texto, funcoes_do_servico(textos)):
+            out.append(f"W19 {n}:{i}: chamada a função do serviço com argumento por posição;"
+                       " passe cada um com o nome do parâmetro")
+        for i in checar_parametros(texto):
+            out.append(f"W20 {n}:{i}: parâmetros quebrados sem ser um por linha;"
+                       " cabe em uma, fica em uma; senão, um por linha")
+        if "/src/" in n:
+            for i in checar_docstrings(texto):
+                out.append(f"W21 {n}:{i}: função ou classe sem docstring; explique dentro"
+                           " dela, não em comentário em cima")
+        if "/routers/" in n:
+            for i in checar_camadas(texto, pacote):
+                out.append(f"W22 {n}:{i}: router importa de clients/ ou connections;"
+                           " chame uma função de services/")
+    return out
+
+
 def _versao(texto: str) -> tuple[int, ...] | None:
     """Versão do pyproject.toml ou do package.json, como tupla para comparar."""
     m = re.search(r'^version = "([\d.]+)"|^\s*"version":\s*"([\d.]+)"', texto, re.M)
@@ -461,7 +607,12 @@ def _versoes_libs() -> list[str]:
             continue
         inst = (pk.get(f"node_modules/{nome}") or {}).get("version")
         if inst is None:
-            m = re.search(rf'name = "{re.escape(nome)}"\nversion = "([^"]+)"', uv)
+            # O lockfile do serviço da `fonte` vem primeiro: a mesma lib pode ter outra versão
+            # em outro serviço (httpx2 2.16.0 no lonzo, 2.15.1 indireta no ichiro)
+            svc = re.match(r"apps/([^/]+)/", str(fm.get("fonte", "")))
+            lock = REPO / f"apps/{svc.group(1)}/uv.lock" if svc else None
+            texto = (lock.read_text() if lock and lock.exists() else "") + "\n" + uv
+            m = re.search(rf'name = "{re.escape(nome)}"\nversion = "([^"]+)"', texto)
             inst = m.group(1) if m else None
         if inst is None:
             out.append(f"W05 {p.relative_to(REPO)}: {nome} não está nos lockfiles")

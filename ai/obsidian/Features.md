@@ -6,12 +6,6 @@ adicionar jeito de tambem ser um organizador de ai workspaces conseguir usar o a
 
 Quando ja tiver a parte de app e escrita, deixar a ia ler ao vivo a pagina que esta sendo escrita. Podendo torar duvidas, pedir para ela completar, etc
 
-Diferença entre rodar serviço localmente (portas diferentes, docker, sem reverse-proxy) com em produção (aws, caddy, todos na mesma porta por serem sua propria red)
-
-fazer o noteproject ser algo relacionado a ia, gerando automaticamente os workspaces, e conseguindo controlar ele por algo muito mais frontend do que o terminal, para qualquer pessoa conseguir usar e se beneficiar dele
-
-Ter alguma coisa de ia para "O que voce esta entendendo até agora, me explique a teoria" Para a ia conseguir entender o que está certo e errado, e onde está esse erro
-
 Estou agora usando de um jeito que eu leio um pouco o obsidian e resposta da ia inicial gerada. E de lá eu falo como eu entendi tudo, podendo estar errado em certas coisas, mas o importante é só falar tudo que eu entendi e todas minhas suposições, para ela ir corrigindo e entendendo onde estou. (É meio que um destrinchar mas melhorado, tanto que de começo até uso o destrinchar para fazer isso) Além disso fazer alguns esboços/desenhos de como estou vendo as coisas, e pedir para ela ver/revisar/arrumar é muito bom também. Acho que seria interessante fazer algo relacionado a isso no projeto
 
 Pode usar voice para conversar com a ia
@@ -29,6 +23,18 @@ Lidar com erros
 Versionamento de notas
 
 cancelar uma request de ia, igual esc no code
+
+key do antropic ser adicionada nas configs da conta da pessoa
+
+Poder mudar o frontend
+
+abas, uma aba pode ser o chat com a ia (poder agrupar, e fazer por workspaces)
+
+arrumar codemirror para mostrar tabelas titulos 
+
+mostrar de forma mais organizada tudo que esta ocorrendo numa request, do que no code, que fica meio desorganizado e nem da para entender direito o que ele quer
+
+atualizar o navegador automaticamente sem precisar apertar f5
 
 https://www.figma.com/resource-library/web-design-trends/
 https://www.designrush.com/agency/website-design-development/trends/web-design-trends

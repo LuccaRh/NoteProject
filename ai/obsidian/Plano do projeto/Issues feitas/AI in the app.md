@@ -9,4 +9,4 @@ Etapa do [[Roadmap]] que põe a IA dentro do app: o serviço `lonzo` responde o 
 |---|---|---|---|
 | #82 | Align the uv version | ✅ PR #83 mergeado | [[uv]], CI |
 | [[Issue 74 — Answer chat questions through the lonzo service\|#74]] | Answer chat questions through the lonzo service | ✅ PRs #84 e #85 mergeados | [[Chamada a um modelo]], [[Gerador]], [[Server-sent events]], [[Reverse proxy]] |
-| #73 | Create a workspace from a short description of its goal | ⏳ aberta | [[Workspace no app]] |
+| [[Issue 73 — Create a workspace from a short description of its goal\|#73]] | Create a workspace from a short description of its goal | ⏳ branch pronta, PR a abrir | [[Saída estruturada]], [[Rede de containers]], [[Workspace no app]] |

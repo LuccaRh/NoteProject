@@ -1,0 +1,117 @@
+# Imports
+import os
+from uuid import UUID
+
+import httpx2
+from pydantic import TypeAdapter
+
+from lonzo.errors import TitleTaken
+from lonzo.schemas.notes import Note
+
+
+# Global variables
+ICHIRO_URL = os.environ.get("ICHIRO_URL", "http://ichiro:8000")
+
+
+# Code
+class IchiroClient:
+    """
+    The notes service, straight through the compose network: one method
+    per endpoint, answering the models of schemas/, with no lonzo rules
+    """
+
+    http: httpx2.AsyncClient
+
+    def __init__(self) -> None:
+        """
+        One pool of connections to ichiro, at ICHIRO_URL
+        """
+
+        self.http = httpx2.AsyncClient(base_url=ICHIRO_URL)
+
+    async def close(self) -> None:
+        """
+        Closes the connections kept open to ichiro
+        """
+
+        await self.http.aclose()
+
+    async def list_notes(
+        self,
+        parent_id: UUID | None,
+        title: str | None = None,
+    ) -> list[Note]:
+        """
+        GET /notes: the notes and folders right inside a folder (None = the
+        root), only the one with that title when title is given
+        """
+
+        params = {}
+
+        if parent_id is not None:
+            params["parent_id"] = str(parent_id)
+
+        if title is not None:
+            params["title"] = title
+
+        response = await self.http.get("/notes", params=params)
+        response.raise_for_status()
+
+        return TypeAdapter(list[Note]).validate_python(response.json())
+
+    async def get_note(self, note_id: UUID) -> Note | None:
+        """
+        GET /notes/{id}: one note or folder; None when there is no such note
+        """
+
+        response = await self.http.get(f"/notes/{note_id}")
+
+        if response.status_code == 404:
+            return None
+
+        response.raise_for_status()
+
+        return Note.model_validate(response.json())
+
+    async def get_note_by_path(self, parent_id: UUID, path: str) -> Note | None:
+        """
+        GET /notes/by-path: the note or folder at a path of titles (a/b/c)
+        inside parent_id; None when a name is missing
+        """
+
+        params = {"parent_id": str(parent_id), "path": path}
+        response = await self.http.get("/notes/by-path", params=params)
+
+        if response.status_code == 404:
+            return None
+
+        response.raise_for_status()
+
+        return Note.model_validate(response.json())
+
+    async def create_note(
+        self,
+        title: str,
+        parent_id: UUID,
+        body: str = "",
+        is_folder: bool = False,
+    ) -> Note:
+        """
+        POST /notes: a new note or folder inside parent_id, as ichiro saved
+        it; TitleTaken when the folder already has that title
+        """
+
+        note = {
+            "title": title,
+            "body": body,
+            "parent_id": str(parent_id),
+            "is_folder": is_folder,
+        }
+        response = await self.http.post("/notes", json=note)
+
+        if response.status_code == 409:
+            raise TitleTaken(f"{title} already exists")
+
+        response.raise_for_status()
+
+        return Note.model_validate(response.json())

@@ -56,23 +56,43 @@ Numa pasta `.workspace/` dentro de qualquer pasta do vault (a coleção de notas
 
 ## Como nasce
 
-Um kit fixo ("Estudo": uma regra e duas skills) serve mal a assuntos diferentes: o que se repete entre os workspaces do Claude Code no PC (NoteProject, Disciplinas e as matérias, baseball) é a forma do `CLAUDE.md`, não as skills. Então o app guarda um esqueleto, e a IA o preenche a partir do que a pessoa quer.
+Um kit fixo ("Estudo": uma regra e duas skills) serve mal a assuntos diferentes: o que se repete entre os workspaces do Claude Code no PC (NoteProject, Disciplinas e as matérias, baseball) é a forma do `CLAUDE.md`, não as skills. Então o app guarda um `CLAUDE.md` base, e a IA o preenche a partir do que a pessoa quer, criando skills, scripts e hooks só quando o texto pede. (2026-11-02) Nenhuma skill entra pronta: nenhuma das que existem nos projetos é básica.
 
-| Seção (nota no `.workspace/`) | Para quê | No Claude Code do PC |
+| Seção do `CLAUDE.md` base (`apps/lonzo/src/lonzo/base_rules.md`) | Para quê | No Claude Code do PC |
 |---|---|---|
-| objetivo e quem | o assunto e o que a pessoa quer dele | "Quem", "Papel do Claude aqui" |
-| como responder | os gostos, ditos uma vez | regras de resposta |
-| fatos fixos | o que não muda e não precisa ser repetido | "Fatos fixos do atleta" |
-| estado datado | onde parou e o que vem a seguir | "Estado", "Memória do atleta" |
-| fontes | onde está cada coisa, para ler só o trecho | KB, cards, `ai/np contexto` |
+| Goal | o assunto, quem é a pessoa e o que ela quer dele | "Quem", "Papel do Claude aqui" |
+| How to answer | os gostos, ditos uma vez | regras de resposta |
+| Fixed facts | o que não muda e não precisa ser repetido | "Fatos fixos do atleta" |
+| Dated state | onde parou e o que vem a seguir, sob a data | "Estado", "Memória do atleta" |
+| Sources | onde está cada coisa, para ler só o trecho | KB, cards, `ai/np contexto` |
 
-1. A pessoa escreve um texto breve (objetivo, nível, como gosta das respostas) ou responde a umas cinco perguntas fixas.
-2. O `lonzo` faz uma [[Chamada a um modelo|chamada]] só, sem [[Laço de ferramentas|laço]]: manda o esqueleto e o texto, e o modelo devolve a lista de notas preenchidas.
-3. O `lonzo` grava as notas no `.workspace/` da pasta pela [[API de notas]].
-4. Opcional: a pessoa marca skills prontas de um catálogo, tiradas das que já existem entre os projetos (desenho, relatório, resumo, commit), copiadas para `.workspace/skills/`.
+1. A pessoa escreve um texto só sobre o que quer. Quem não sabe por onde começar vê no front umas cinco perguntas de ajuda (uma por seção); o `lonzo` recebe só o texto.
+2. ✅ O `lonzo` faz uma [[Chamada a um modelo|chamada]] só, sem [[Laço de ferramentas|laço]]: no `system`, o prompt (`create_workspace.md`) e o `CLAUDE.md` base; na mensagem, a data e o texto. A [[Saída estruturada|saída estruturada]] devolve `Workspace {rules, skills, scripts, hooks}`.
+3. ✅ O `lonzo` cria `.workspace/` na pasta, a nota `CLAUDE.md` e uma subpasta por tipo que veio com algo (`skills/`, `scripts/`, `hooks/`), pela [[API de notas]], direto no `ichiro` pela [[Rede de containers|rede do compose]]. Rota `POST /api/chat/workspaces {folder_id, description}`; a pasta é obrigatória, e uma pasta que já tem `.workspace` dá 409.
+
+```
+Violão/
+└── .workspace/
+    ├── CLAUDE.md            regras: entram em toda pergunta da pasta
+    └── skills/
+        └── revisar-gravacao "toda semana mando a gravação..." virou skill
+```
 
 - O `/nova-materia` do Disciplinas faz o mesmo à mão: monta o workspace de uma matéria nova no padrão comum.
-- Perguntas guiadas e catálogo podem vir depois; o mínimo é o esqueleto preenchido pelo texto breve.
+- Scripts e hooks gerados ficam guardados como texto; só rodam na v3 (abaixo).
+- ✅ Depois disso, toda pergunta do chat com `folder_id` leva no `system` as notas do `.workspace` da raiz e as da pasta, abertas por uma frase que diz que elas ganham dos padrões do modelo; sem nenhum `.workspace`, a pergunta vai sem `system` ([[Issue 73 — Create a workspace from a short description of its goal|#73]]).
+
+### Extrair para a KB (depois)
+
+No PC, nada é automático: uma skill lê a fonte uma vez e grava um card, e da próxima vez lê-se o card.
+
+| Fonte | Como vira card no PC | Onde |
+|---|---|---|
+| PDF | `./es728 fonte <arq> --pag 3-5` (`pdftotext`; escaneado → `pdftoppm` em imagens) e a `/teoria` grava `kb/teoria/<tema>.md` com a página citada | Disciplinas |
+| vídeo, foto | `frames.sh` (`ffmpeg`) tira frames, `pose.py` (MediaPipe) mede a pose, a `/analisar` grava a análise | baseball |
+| código de lib | a sessão lê o `.d.ts`/fonte instalado e grava `ai/kb/libs/<lib>.md` com versão e linha | NoteProject |
+
+No app, a skill de extrair entra quando houver arquivo que não é `.md` (PDF, imagem, vídeo); a KB seria `.workspace/kb/`.
 
 ## Liberação em fases
 

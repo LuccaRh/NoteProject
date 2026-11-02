@@ -1,6 +1,15 @@
 import unittest
 
-from np import checar_atributos, checar_blocos, checar_layout
+from np import (
+    checar_atributos,
+    checar_blocos,
+    checar_docstrings,
+    checar_camadas,
+    checar_constantes,
+    checar_layout,
+    checar_parametros,
+    checar_posicionais,
+)
 
 
 class TestBlocos(unittest.TestCase):
@@ -62,5 +71,65 @@ class TestBlocos(unittest.TestCase):
         self.assertEqual(checar_layout(texto), [7])
 
 
+    def test_constante_importada(self) -> None:
+        texto = "from lonzo.a import MODEL, get\nfrom os import SEEK_SET\nfrom lonzo.b import f\n"
+        self.assertEqual(checar_constantes(texto, "lonzo"), [1])
+
+    def test_chamada_posicional(self) -> None:
+        texto = ("def f(a, b):\n    return a\n\n\nf(1, b=2)\nf(a=1, b=2)\nprint(1)\n"
+                 "class C:\n    def g(self, x):\n        self.g(1)\n        x.g(1)\n")
+        self.assertEqual(checar_posicionais(texto, {"f", "g"}), [5, 10])
+
+
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestParametros(unittest.TestCase):
+    def test_um_por_linha(self) -> None:
+        texto = "def f(\n    a: int,\n    b: int,\n) -> int:\n    return g(\n        x=a,\n        y=b,\n    )\n"
+        self.assertEqual(checar_parametros(texto), [])
+
+    def test_pendurados(self) -> None:
+        texto = "def f(\n    a: int, b: int\n) -> int:\n    return g(\n        x=a, y=b\n    )\n"
+        self.assertEqual(checar_parametros(texto), [1, 4])
+
+    def test_primeiro_na_linha_do_parentese(self) -> None:
+        self.assertEqual(checar_parametros("g(a,\n  b)\n"), [1])
+
+    def test_um_so_abraca(self) -> None:
+        self.assertEqual(checar_parametros("g(h(\n    x=1,\n    y=2,\n))\n"), [])
+
+
+class TestDocstrings(unittest.TestCase):
+    def test_com_docstring(self) -> None:
+        texto = 'def f() -> None:\n    """\n    Faz algo\n    """\n\n    return\n'
+        self.assertEqual(checar_docstrings(texto), [])
+        self.assertEqual(checar_blocos(texto), [])
+
+    def test_docstring_separada_da_assinatura(self) -> None:
+        texto = 'def f() -> None:\n\n    """\n    Faz algo\n    """\n\n    return\n'
+        self.assertEqual(checar_blocos(texto), [3])
+
+    def test_codigo_grudado_na_docstring(self) -> None:
+        texto = 'class A:\n    """\n    Algo\n    """\n    x: int\n'
+        self.assertEqual(checar_blocos(texto), [5])
+
+    def test_comentario_em_cima(self) -> None:
+        texto = "# Faz algo\ndef f() -> None:\n    return\n\nclass A:\n    x: int\n"
+        self.assertEqual(checar_docstrings(texto), [2, 5])
+
+
+class TestCamadas(unittest.TestCase):
+    def test_router_com_service(self) -> None:
+        texto = "from lonzo.services.chat import answer\n"
+        self.assertEqual(checar_camadas(texto, "lonzo"), [])
+
+    def test_router_com_client_ou_conexao(self) -> None:
+        texto = (
+            "from lonzo.clients.ichiro import IchiroClient\n"
+            "from lonzo.connections import ichiro\n"
+            "from lonzo import connections\n"
+            "from fastapi import APIRouter\n"
+        )
+        self.assertEqual(checar_camadas(texto, "lonzo"), [1, 2, 3])

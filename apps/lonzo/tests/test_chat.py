@@ -1,14 +1,18 @@
 # Imports
 import json
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Mapping
 from types import SimpleNamespace, TracebackType
-from typing import Self
+from typing import ClassVar, Self
+from unittest.mock import patch
 
-import pytest
+import httpx2
+from anthropic import omit
+from fakes import FakeIchiro, unreachable
 from fastapi.testclient import TestClient
+from httpx2 import Response
 
+from lonzo import connections
 from lonzo.main import app
-from lonzo.routers.chat import get_client
 
 
 # Global variables
@@ -42,17 +46,26 @@ class FakeStream:
 
         usage = SimpleNamespace(input_tokens=10, output_tokens=2)
 
-        return SimpleNamespace(stop_reason="end_turn", usage=usage)
+        return SimpleNamespace(
+            model="claude-haiku-5-5",
+            stop_reason="end_turn",
+            usage=usage,
+        )
 
 
+# Keeps the parameters of the last call, to check the system prompt
 class FakeMessages:
+    params: ClassVar[dict[str, object]] = {}
 
     def stream(self, **params: object) -> FakeStream:
+
+        FakeMessages.params = params
 
         return FakeStream()
 
 
 class FakeClient:
+    api_key: str = "test-key"
     messages: FakeMessages = FakeMessages()
 
 
@@ -69,14 +82,26 @@ def parse(body: str) -> list[tuple[str, dict[str, object]]]:
     return events
 
 
+def post(
+    body: Mapping[str, object],
+    http: httpx2.AsyncClient | None = None,
+) -> Response:
+
+    http = http or FakeIchiro().client()
+
+    with (
+        patch.object(connections.claude, "sdk", FakeClient()),
+        patch.object(connections.ichiro, "http", http),
+    ):
+        return client.post("/chat", json=body)
+
+
 def test_chat_streams_named_events() -> None:
 
-    app.dependency_overrides[get_client] = FakeClient
-    response = client.post("/chat", json={"question": "Hi"})
-    app.dependency_overrides.clear()
+    response = post(body={"question": "Hi"})
 
     assert response.headers["content-type"].startswith("text/event-stream")
-    events = parse(response.text)
+    events = parse(body=response.text)
     assert [name for name, _ in events] == [
         "message_start", "text_delta", "text_delta", "message_end"
     ]
@@ -88,16 +113,52 @@ def test_chat_streams_named_events() -> None:
 
 def test_chat_needs_a_question() -> None:
 
-    app.dependency_overrides[get_client] = FakeClient
-    response = client.post("/chat", json={})
-    app.dependency_overrides.clear()
+    response = post(body={})
 
     assert response.status_code == 422
 
 
-def test_chat_without_key(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_chat_without_key() -> None:
 
-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
-    response = client.post("/chat", json={"question": "Hi"})
+    no_key = SimpleNamespace(api_key=None)
+
+    with patch.object(connections.claude, "sdk", no_key):
+        response = client.post("/chat", json={"question": "Hi"})
 
     assert response.status_code == 503
+
+
+def test_chat_with_notes_service_down() -> None:
+
+    response = post(body={"question": "Hi"}, http=unreachable())
+
+    assert response.status_code == 502
+
+
+def test_chat_without_workspace_has_no_rules() -> None:
+
+    post(body={"question": "Hi"})
+
+    assert FakeMessages.params["system"] is omit
+
+
+def test_chat_uses_root_and_folder_workspace_rules() -> None:
+
+    ichiro = FakeIchiro()
+    root = ichiro.add(title=".workspace", is_folder=True)
+    ichiro.add(title="How to answer", parent_id=root, body="Be short.")
+    folder = ichiro.add(title="Baseball", is_folder=True)
+    workspace = ichiro.add(title=".workspace", parent_id=folder, is_folder=True)
+    ichiro.add(title="Fixed facts", parent_id=workspace, body="Bats left.")
+    other = ichiro.add(title="Calculus", is_folder=True)
+    elsewhere = ichiro.add(title=".workspace", parent_id=other, is_folder=True)
+    ichiro.add(title="Fixed facts", parent_id=elsewhere, body="Exam soon.")
+
+    body = {"question": "Hi", "folder_id": str(folder)}
+    post(body=body, http=ichiro.client())
+
+    system = str(FakeMessages.params["system"])
+    assert system.endswith(
+        "# How to answer\n\nBe short.\n\n# Fixed facts\n\nBats left."
+    )
+    assert "Exam soon." not in system
