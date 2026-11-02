@@ -7,7 +7,7 @@
 #   codigo:   arquivos/pastas do repo (o lint confere que existem)
 #   notas:    páginas em obsidian/ (cópia do vault Note Project/); o lint confere
 #   libs:     cards em kb/libs/<nome>.md
-#   aprender: true = área que o Lucca quer aprender fazendo (regra "Aprender fazendo" do CLAUDE.md)
+#   aprender: true = área que o usuário quer aprender fazendo (regra "Aprender fazendo" do CLAUDE.md)
 #   futuro:   true = ainda não existe código; a área já tem nome para escopo e nota
 
 editor:

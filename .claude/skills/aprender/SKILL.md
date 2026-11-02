@@ -1,16 +1,16 @@
 ---
 name: aprender
-description: Ensina do zero um conceito de sistemas/infra/backend (CRDT, WebSocket, reverse proxy, TLS, JWT x session, backup, CI/CD, índices...) ligado a onde ele aparece no NoteProject, e fecha com um exercício que o Lucca implementa no projeto. Grava a página do conceito em Note Project/Conceitos/ e o uso nas páginas do projeto. Use quando ele disser "/aprender", "quero entender X", "como funciona X", "me ensina X para usar no projeto".
+description: Ensina do zero um conceito de sistemas/infra/backend (CRDT, WebSocket, reverse proxy, TLS, JWT x session, backup, CI/CD, índices...) ligado a onde ele aparece no NoteProject, e fecha com um exercício que o usuário implementa no projeto. Grava a página do conceito em Note Project/Conceitos/ e o uso nas páginas do projeto. Use quando ele disser "/aprender", "quero entender X", "como funciona X", "me ensina X para usar no projeto".
 argument-hint: "<conceito>"
 ---
 # /aprender <conceito>
 
-O objetivo é o Lucca **saber fazer**, não ler sobre: a página prepara, o exercício ensina.
+O objetivo é o usuário **saber fazer**, não ler sobre: a página prepara, o exercício ensina.
 
 1. **O que ele já tem.** `grep -ril "<conceito>"` em `ai/obsidian/` (primeiro `Conceitos/`): ele já escreveu
    sobre isso?
    Use as palavras de lá e não repita.
-2. **Uma pergunta** ao Lucca: o que ele já sabe do pré-requisito e se quer teoria curta ou
+2. **Uma pergunta** ao usuário: o que ele já sabe do pré-requisito e se quer teoria curta ou
    direto ao exercício. Espere.
 3. **Página do conceito** em `ai/obsidian/Conceitos/<pasta>/` (entra no `00 Mapa — Conceitos`, na seção da pasta; já
    existe → amplie em vez de criar outra), seguindo `.claude/skills/nota/regras.md`:

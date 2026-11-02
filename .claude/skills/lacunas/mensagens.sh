@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Mensagens que o Lucca digitou na sessão, uma por linha (base da /lacunas).
+# Mensagens que o usuário digitou na sessão, uma por linha (base da /lacunas).
 # Uso: mensagens.sh [session-id]   (sem argumento: transcript mais recente do projeto)
 # Raiz do repo, não a pasta atual: a sessão pode estar numa subpasta
 raiz=$(git -C "$(dirname "$0")" rev-parse --show-toplevel)

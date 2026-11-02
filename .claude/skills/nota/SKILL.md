@@ -1,6 +1,6 @@
 ---
 name: nota
-description: Escreve ou atualiza páginas do NoteProject no Obsidian (vault Note Project/, cópia ai/obsidian/) — arquitetura, front/back/infra, decisões e trade-offs — seguindo as regras de página, com desenhos draw.io embutidos. Use quando o Lucca disser "/nota", "documenta X no obsidian", "faz uma pasta explicando X", "escreve a decisão de X".
+description: Escreve ou atualiza páginas do NoteProject no Obsidian (vault Note Project/, cópia ai/obsidian/) — arquitetura, front/back/infra, decisões e trade-offs — seguindo as regras de página, com desenhos draw.io embutidos. Use quando o usuário disser "/nota", "documenta X no obsidian", "faz uma pasta explicando X", "escreve a decisão de X".
 argument-hint: "<tema ou pasta>"
 ---
 # /nota <tema>

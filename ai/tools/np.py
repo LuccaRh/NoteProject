@@ -37,7 +37,7 @@ AMARELO, VERDE, RESET = "\033[33m", "\033[32m", "\033[0m"
 
 
 def marcas(texto: str) -> list[tuple[int, str]]:
-    """Linhas com marca do Lucca, fora de bloco de código e de `crase` (lá é exemplo)."""
+    """Linhas com marca do usuário, fora de bloco de código e de `crase` (lá é exemplo)."""
     out, cerca = [], False
     for i, l in enumerate(texto.splitlines(), 1):
         if l.lstrip().startswith("```"):
@@ -108,7 +108,7 @@ def cmd_contexto(a) -> int:
     ar = todas[nome]
     print(f"# {nome} — {ar.get('nome', '')} ({ar.get('lado', '')})")
     if ar.get("aprender"):
-        print("aprender: true → explicar o conceito e deixar o Lucca escrever primeiro (CLAUDE.md)")
+        print("aprender: true → explicar o conceito e deixar o usuário escrever primeiro (CLAUDE.md)")
     if ar.get("futuro"):
         print("futuro: ainda sem código; ver as notas do vault")
     caminhos = []
@@ -353,7 +353,7 @@ def checar_layout(texto: str) -> list[int]:
 
 
 def _blocos() -> list[str]:
-    """W14–W16 no Python do app criado na branch; código antigo só segue a regra quando o Lucca
+    """W14–W16 no Python do app criado na branch; código antigo só segue a regra quando o usuário
     mexer nele de propósito (CLAUDE.md)."""
     base = git("merge-base", "master", "HEAD")
     mexidos = git("diff", "--name-only", "--diff-filter=A", base, "--", "apps").splitlines()

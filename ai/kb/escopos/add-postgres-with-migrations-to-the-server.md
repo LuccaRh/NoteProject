@@ -6,7 +6,7 @@ areas: [dados, infra]
 ## Pedido (o que a branch entrega; cada item verificável)
 1. Serviço Postgres no `docker-compose-dev.yml`, com volume nomeado: os dados sobrevivem ao `docker compose down`.
 2. `.env` fora do git (`git check-ignore -v .env` acha a regra) e `.env.example` com cada variável comentada; o compose lê o `.env` por `env_file` (#13).
-3. Ferramenta de migration: Alembic + SQLAlchemy (ok do Lucca em 2026-10-22).
+3. Ferramenta de migration: Alembic + SQLAlchemy (ok do usuário em 2026-10-22).
 4. Migration cria `notes` (`parent_id`, `is_folder`) (Entrega de 2026-10-29). `pedidos` vai para a #31, numa migration própria (2026-10-23). Sem `users` (2026-10-23): entra com o login (M2), numa migration nova com `owner_id`; `fields` e `version` nas issues deles.
 5. A API conecta no banco com as variáveis do ambiente; `make check` passa.
 

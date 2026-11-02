@@ -12,7 +12,7 @@ areas: [servidor]
 
 ## Contexto (pode tocar só o mínimo para o Pedido funcionar)
 - `Makefile` (alvo novo e `check`), `.gitignore` (`.venv`, caches), README (como rodar cada serviço no navegador e testar pelo `/docs`).
-- CI: job `notes` com uv rodando `make check-notes` (pedido do Lucca, 2026-10-20).
+- CI: job `notes` com uv rodando `make check-notes` (pedido do usuário, 2026-10-20).
 - Notas `Conceitos/FastAPI` e `Estrutura do projeto/API de notas`; `ai/kb/areas.yaml` (notas da área `servidor`).
 
 ## Fora (vira outra branch)

@@ -9,7 +9,7 @@ areas: [workspace]
 3. `Issues feitas/` com uma página por issue, dentro da pasta da milestone.
 
 ## Contexto (pode tocar só o mínimo para o Pedido funcionar)
-- Regras de página (um conceito por página, página de issue) e o hook `commit-msg`, que só avisa no commit do Lucca; vieram no mesmo `wip`.
+- Regras de página (um conceito por página, página de issue) e o hook `commit-msg`, que só avisa no commit do usuário; vieram no mesmo `wip`.
 
 ## Fora (vira outra branch)
 - Código do app (`apps/`).

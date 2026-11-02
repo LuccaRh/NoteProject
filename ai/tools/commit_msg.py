@@ -14,7 +14,7 @@ Merge, revert e fixup!/squash! gerados pelo git passam (o fixup some no rebase -
     python3 tools/commit_msg.py -m "msg"
 
 Sai com 1 e lista os erros se a mensagem quebrar alguma regra. Só barra a sessão do Claude Code
-(`CLAUDECODE` no ambiente); commit do Lucca vira aviso com "commitar mesmo assim? [y/N]" no terminal.
+(`CLAUDECODE` no ambiente); commit do usuário vira aviso com "commitar mesmo assim? [y/N]" no terminal.
 """
 from __future__ import annotations
 

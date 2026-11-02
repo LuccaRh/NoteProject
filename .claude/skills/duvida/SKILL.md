@@ -1,6 +1,6 @@
 ---
 name: duvida
-description: Responde dúvidas e aplica correções e comentários marcados nas notas do NoteProject no Obsidian (> [!duvida], [duvidas], [fix], [coment]) ou sobre um trecho de nota. Use quando o Lucca disser "/duvida", "marquei dúvidas", "comentei nas notas", "arruma as notas", "não entendi esse trecho".
+description: Responde dúvidas e aplica correções e comentários marcados nas notas do NoteProject no Obsidian (> [!duvida], [duvidas], [fix], [coment]) ou sobre um trecho de nota. Use quando o usuário disser "/duvida", "marquei dúvidas", "comentei nas notas", "arruma as notas", "não entendi esse trecho".
 argument-hint: "[página | texto da dúvida]"
 ---
 # /duvida [página | pergunta]

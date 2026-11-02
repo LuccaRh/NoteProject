@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Faz commits atômicos no NoteProject no formato do repo (inglês, imperativo, tag [docs]/[ai-workspace] fora do app), cada um passando no make check, com fixup em vez de commit de conserto. Não dá push sem ok. Use quando o Lucca disser "/commit", "commita", "salva no git".
+description: Faz commits atômicos no NoteProject no formato do repo (inglês, imperativo, tag [docs]/[ai-workspace] fora do app), cada um passando no make check, com fixup em vez de commit de conserto. Não dá push sem ok. Use quando o usuário disser "/commit", "commita", "salva no git".
 effort: low
 ---
 # /commit

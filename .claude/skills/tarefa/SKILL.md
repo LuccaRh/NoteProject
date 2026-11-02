@@ -1,6 +1,6 @@
 ---
 name: tarefa
-description: Começa ou continua uma funcionalidade do NoteProject do jeito do workspace — branch própria, escopo (Pedido/Contexto/Fora), contexto só da área, passos pequenos conferidos por make check, e o Lucca escrevendo nas áreas de aprender. Use quando ele disser "/tarefa", "vamos fazer X", "implementa X", "próxima feature", "continuar a branch".
+description: Começa ou continua uma funcionalidade do NoteProject do jeito do workspace — branch própria, escopo (Pedido/Contexto/Fora), contexto só da área, passos pequenos conferidos por make check, e o usuário escrevendo nas áreas de aprender. Use quando ele disser "/tarefa", "vamos fazer X", "implementa X", "próxima feature", "continuar a branch".
 argument-hint: "<o que fazer>"
 ---
 # /tarefa <o que fazer>
