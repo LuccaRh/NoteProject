@@ -2,9 +2,10 @@
 import json
 from collections.abc import AsyncIterator
 from types import SimpleNamespace, TracebackType
-from typing import Self
+from typing import ClassVar, Self
 
 import pytest
+from anthropic import omit
 from fakes import FakeIchiro, unreachable
 from fastapi.testclient import TestClient
 
@@ -51,9 +52,13 @@ class FakeStream:
         )
 
 
+# Keeps the parameters of the last call, to check the system prompt
 class FakeMessages:
+    params: ClassVar[dict[str, object]] = {}
 
     def stream(self, **params: object) -> FakeStream:
+
+        FakeMessages.params = params
 
         return FakeStream()
 
@@ -119,3 +124,38 @@ def test_chat_with_notes_service_down() -> None:
     app.dependency_overrides.clear()
 
     assert response.status_code == 502
+
+
+def test_chat_without_workspace_has_no_rules() -> None:
+
+    app.dependency_overrides[get_client] = FakeClient
+    app.dependency_overrides[get_ichiro] = FakeIchiro().client
+    client.post("/chat", json={"question": "Hi"})
+    app.dependency_overrides.clear()
+
+    assert FakeMessages.params["system"] is omit
+
+
+def test_chat_uses_root_and_folder_workspace_rules() -> None:
+
+    ichiro = FakeIchiro()
+    root = ichiro.add(title=".workspace", is_folder=True)
+    ichiro.add(title="How to answer", parent_id=root, body="Be short.")
+    folder = ichiro.add(title="Baseball", is_folder=True)
+    workspace = ichiro.add(title=".workspace", parent_id=folder, is_folder=True)
+    ichiro.add(title="Fixed facts", parent_id=workspace, body="Bats left.")
+    other = ichiro.add(title="Calculus", is_folder=True)
+    elsewhere = ichiro.add(title=".workspace", parent_id=other, is_folder=True)
+    ichiro.add(title="Fixed facts", parent_id=elsewhere, body="Exam soon.")
+
+    app.dependency_overrides[get_client] = FakeClient
+    app.dependency_overrides[get_ichiro] = ichiro.client
+    body = {"question": "Hi", "folder_id": str(folder)}
+    client.post("/chat", json=body)
+    app.dependency_overrides.clear()
+
+    system = str(FakeMessages.params["system"])
+    assert system.endswith(
+        "# How to answer\n\nBe short.\n\n# Fixed facts\n\nBats left."
+    )
+    assert "Exam soon." not in system
