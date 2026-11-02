@@ -70,3 +70,16 @@ class FakeIchiro:
         transport = httpx2.MockTransport(self.handle)
 
         return httpx2.AsyncClient(transport=transport, base_url="http://ichiro")
+
+
+# ichiro down: every request fails to connect
+def down(request: httpx2.Request) -> httpx2.Response:
+
+    raise httpx2.ConnectError("connection refused", request=request)
+
+
+def unreachable() -> httpx2.AsyncClient:
+
+    transport = httpx2.MockTransport(down)
+
+    return httpx2.AsyncClient(transport=transport, base_url="http://ichiro")

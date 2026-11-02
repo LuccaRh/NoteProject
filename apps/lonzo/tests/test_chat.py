@@ -5,7 +5,7 @@ from types import SimpleNamespace, TracebackType
 from typing import Self
 
 import pytest
-from fakes import FakeIchiro
+from fakes import FakeIchiro, unreachable
 from fastapi.testclient import TestClient
 
 from lonzo.clients.anthropic import get_client
@@ -109,3 +109,13 @@ def test_chat_without_key(monkeypatch: pytest.MonkeyPatch) -> None:
     response = client.post("/chat", json={"question": "Hi"})
 
     assert response.status_code == 503
+
+
+def test_chat_with_notes_service_down() -> None:
+
+    app.dependency_overrides[get_client] = FakeClient
+    app.dependency_overrides[get_ichiro] = unreachable
+    response = client.post("/chat", json={"question": "Hi"})
+    app.dependency_overrides.clear()
+
+    assert response.status_code == 502
