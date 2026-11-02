@@ -7,6 +7,10 @@ from pydantic import BaseModel
 
 # Code
 class Note(BaseModel):
+    """
+    A note or folder as the table keeps it
+    """
+
     id: UUID
     parent_id: UUID | None
     is_folder: bool
@@ -17,6 +21,10 @@ class Note(BaseModel):
 
 
 class NoteCreate(BaseModel):
+    """
+    Body of POST /notes: a note at the root unless parent_id is given
+    """
+
     title: str
     body: str = ""
     parent_id: UUID | None = None
@@ -24,6 +32,10 @@ class NoteCreate(BaseModel):
 
 
 class NoteUpdate(BaseModel):
+    """
+    Body of PATCH /notes/{id}: only the fields sent change
+    """
+
     title: str | None = None
     body: str | None = None
     parent_id: UUID | None = None
