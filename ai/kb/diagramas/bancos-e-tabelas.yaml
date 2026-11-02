@@ -1,0 +1,25 @@
+titulo: "Bancos do projeto: um Postgres, dois bancos, cada serviço no seu"
+tipo: blocos
+grade: [300, 170]
+destino: Estrutura do projeto/Figuras
+nos:
+  front:  {tipo: bloco, pos: [0, 0.6], texto: "chimchar<br>(navegador)", cor: azul}
+  caddy:  {tipo: bloco, pos: [1, 0.6], texto: "Caddy<br>/api/notes → ichiro<br>/api/chat → lonzo", cor: roxo}
+  ichiro: {tipo: bloco, pos: [2, 0], texto: "ichiro<br>(API de notas)", cor: verde}
+  lonzo:  {tipo: bloco, pos: [2, 1.5], texto: "lonzo<br>(chat com IA)", cor: verde}
+  notes:  {tipo: banco, pos: [3, 0], texto: "<b>notes</b><br>id · parent_id → notes.id<br>is_folder · title · body<br>created_at · updated_at<br>UNIQUE (parent_id, title)", cor: amarelo}
+  conv:   {tipo: banco, pos: [3, 1.5], texto: "<b>conversations</b><br>id · folder_id (sem FK)<br>title · created_at · updated_at", cor: amarelo}
+  msgs:   {tipo: banco, pos: [4, 1.5], texto: "<b>messages</b><br>id · conversation_id →<br>conversations.id<br>role (user|assistant)<br>content (jsonb)", cor: amarelo}
+  dbn:    {tipo: grupo, contem: [notes], texto: "banco notes", cor: cinza}
+  dbl:    {tipo: grupo, contem: [conv, msgs], texto: "banco lonzo", cor: cinza}
+  pg:     {tipo: grupo, contem: [dbn, dbl], texto: "container postgres (postgres:18, um volume)", cor: cinza}
+  n1:     {tipo: nota, pos: [1, 1.6], texto: "folder_id guarda um notes.id,<br>mas não há FK entre bancos:<br>o lonzo fala com o ichiro por HTTP"}
+arestas:
+  - [front, caddy, {rotulo: "HTTPS"}]
+  - [caddy, ichiro]
+  - [caddy, lonzo]
+  - [ichiro, notes, {rotulo: "SQL"}]
+  - [lonzo, conv, {rotulo: "SQL"}]
+  - [conv, msgs, {rotulo: "1 → N"}]
+  - [lonzo.c, ichiro.b, {rotulo: "HTTP :8000<br>(notas, pastas)"}]
+  - [conv.c, notes.b, {rotulo: "folder_id (lógico)", tracejada: true}]

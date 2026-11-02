@@ -23,7 +23,7 @@ Gerais:
 
 Próprias deste projeto:
 
-- (2026-10-15) **Aprender fazendo** (versão de código do "papel primeiro"): nas áreas marcadas `aprender` (dados, sync, servidor, auth, infra), diga o conceito e **o que** escrever; o código ou o comando é dele. A sessão revisa, roda e aponta onde escorregou.
+- (2026-10-15) **Aprender fazendo** (versão de código do "papel primeiro"): nas áreas marcadas `aprender` (sync, auth, infra; desde 2026-11-02 dados e servidor, o backend de APIs, ficam com a sessão), diga o conceito e **o que** escrever; o código ou o comando é dele. A sessão revisa, roda e aponta onde escorregou.
 - (2026-11-01) **Com pouco tempo, ele pede pronto**: quando o usuário disser que prefere entender e ler a escrever, a sessão escreve também nas áreas `aprender`, mas explica antes o desenho (o que usar, como as peças se conectam) e, no fim, mostra onde ler cada parte do código gerado.
 - (2026-10-15) **Diga de onde veio**: API de lib, comportamento do código ou fato externo vêm com o arquivo:linha, a versão ou o link. Sem fonte, diga que é de memória.
 - (2026-10-16) **Onde está no vault**: dúvida de conceito ou do projeto fecha com a linha `No vault: <página>:<linha>` ou `No vault: não tem (busquei: <termos>)`, para o usuário ver se faltou sinônimo. Achar com **um** `grep -rn -i` em `ai/obsidian/` (saída cortada, sem abrir a página inteira); sem agente.

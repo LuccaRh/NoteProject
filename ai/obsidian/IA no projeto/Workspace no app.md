@@ -80,7 +80,7 @@ Violão/
 
 - O `/nova-materia` do Disciplinas faz o mesmo à mão: monta o workspace de uma matéria nova no padrão comum.
 - Scripts e hooks gerados ficam guardados como texto; só rodam na v3 (abaixo).
-- ✅ Depois disso, toda pergunta do chat com `folder_id` leva no `system` as notas do `.workspace` da raiz e as da pasta, abertas por uma frase que diz que elas ganham dos padrões do modelo; sem nenhum `.workspace`, a pergunta vai sem `system` ([[Issue 73 — Create a workspace from a short description of its goal|#73]]).
+- ✅ Depois disso, toda pergunta do chat com `folder_id` leva no `system` as notas do `.workspace` da pasta (a raiz nunca tem um, 2026-11-02), abertas por uma frase que diz que elas ganham dos padrões do modelo; sem `folder_id` ou sem `.workspace`, a pergunta vai sem `system` ([[Issue 73 — Create a workspace from a short description of its goal|#73]]).
 
 ### Extrair para a KB (depois)
 
