@@ -133,8 +133,8 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   com as checagens e os erros do domínio (`FolderNotFound`). **Router**: recebe o pedido,
   chama **um** service e devolve; nunca um client nem um repository, mesmo para uma chamada
   direta. Erro do
-  domínio vira status num `exception_handler`, no `main.py` ou, no ichiro, no `handlers.py`
-  (tabela erro → status). Lint W22 (`ai/np lint`).
+  domínio vira status num `exception_handler` do `<pacote>/handlers.py` (tabela erro →
+  status, ligada no `main.py` por `add_handlers`). Lint W22 (`ai/np lint`).
 - **Explicação dentro da função** (2026-11-02): todo `def` e `class` do app (`src/`) explica o que
   faz numa docstring, primeiro comando do corpo, **grudada** na assinatura (ou na linha do
   `class`): `"""` sozinho na linha, o texto (sem ponto no fim), `"""` sozinho, e uma linha em
@@ -222,7 +222,7 @@ ai/                todo o resto do workspace de IA:
   função do lonzo (W21).
   Lonzo em camadas (2026-11-02): `routers/` → `services/` (`chat`, `workspaces`,
   `note_tools`) → `clients/` (`IchiroClient`, `AnthropicClient`, instâncias em `connections.py`,
-  fechadas no `lifespan`); erros do domínio viram status no `main.py`; modelos em `schemas/`;
+  fechadas no `lifespan`); erros do domínio viram status no `handlers.py` (branch abaixo); modelos em `schemas/`;
   o `message_start` saiu sem `model`, que foi para o `message_end` (a constante fica no cliente).
 - #98 na branch `ichiro/split-ichiro-into-routers-and-services`, sobre a `master` (sem push,
   revisão do Lucca pendente): ichiro em `routers/` → `services/` (`notes`, `health`, as regras)
@@ -230,6 +230,9 @@ ai/                todo o resto do workspace de IA:
   já sai como `TitleTaken`/`ParentNotFound`); `errors.py` com exceções do domínio, status no `handlers.py`;
   docstring em todo o `src/`; versão 0.12.0. Falta no ichiro: comentário em cima das fixtures
   do `conftest.py`, W20 em `tests/test_notes.py`.
+- Branch `lonzo/move-the-error-handlers-into-their-own-module`, empilhada sobre a da #98 (sem
+  push, #100): handlers do lonzo saem do `main.py` para `handlers.py` (tabela erro →
+  status + `notes_unavailable`); versão 0.3.0.
 - IA (2026-10-31): chat com o workspace no servidor; vault `IA no projeto/Chat com o workspace` e
   `Caminho de uma pergunta`. Workspace = pasta com `.workspace/`, vários por pessoa.
 - #31 (Ctrl+D) e #5 (chips) sem milestone, para depois; `decorations/replace.ts` (#5) fora do git.
