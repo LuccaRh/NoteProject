@@ -16,7 +16,7 @@ from ichiro.errors.notes import (
     path_empty,
     title_taken,
 )
-from ichiro.schemas.notes import Note, NoteCreate, NoteUpdate
+from ichiro.schemas.notes import Note, NoteCreate, NotePath, NoteUpdate
 
 
 # Global variables
@@ -106,6 +106,34 @@ def list_notes(
     ).mappings()
 
     return [Note.model_validate(row) for row in rows]
+
+
+@router.get("/tree")
+def list_tree(conn: Conn, parent_id: UUID | None = None) -> list[NotePath]:
+    """
+    Everything inside parent_id (the root when none), at any depth, each
+    with its path of titles from there, in the order of a file tree;
+    404 when parent_id doesn't exist
+    """
+
+    if parent_id is not None:
+        get_note(conn=conn, note_id=parent_id)
+
+    rows = conn.execute(
+        text(
+            "WITH RECURSIVE tree AS ("
+            " SELECT id, is_folder, ARRAY[title] AS names FROM notes"
+            " WHERE parent_id IS NOT DISTINCT FROM CAST(:parent_id AS uuid)"
+            " UNION ALL"
+            " SELECT n.id, n.is_folder, t.names || n.title FROM notes n"
+            " JOIN tree t ON n.parent_id = t.id"
+            ") SELECT id, is_folder, array_to_string(names, '/') AS path"
+            " FROM tree ORDER BY names"
+        ),
+        {"parent_id": parent_id},
+    ).mappings()
+
+    return [NotePath.model_validate(row) for row in rows]
 
 
 @router.get("/by-path")
