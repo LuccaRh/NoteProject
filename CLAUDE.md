@@ -218,7 +218,8 @@ ai/                todo o resto do workspace de IA:
   #70–#72, #81, #83–#85, #88, #93–#96, #99, #101, #102); `master` local = remoto; branches
   `backup/*` locais guardadas. Issues #73, #89–#92, #98 e #100 com PR mergeado: o Lucca fecha.
 - #74 pronta: `apps/lonzo` responde `POST /api/chat` em SSE (Haiku 5.5, `thinking` desligado,
-  `max_tokens` 512); o Caddy roteia `/api/notes/*` → ichiro, `/api/chat/*` →
+  `max_tokens` 512, 64000 na branch `lonzo/longer-answers-without-workspace-talk`, sem push,
+  PR do lonzo da #76, que também tira o workspace das respostas); o Caddy roteia `/api/notes/*` → ichiro, `/api/chat/*` →
   lonzo, outro `/api` → 404. Evento `status` saiu da #74 e nasce com as ferramentas (#77).
 - #73 pronta (PR #99):
   `POST /api/chat/workspaces {folder_id, description}` → o lonzo cria `.workspace/` + `kb/ skills/
