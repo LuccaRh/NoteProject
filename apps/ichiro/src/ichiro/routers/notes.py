@@ -3,9 +3,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Response
-from psycopg.errors import UniqueViolation
-from sqlalchemy import Connection, text
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import Connection
 
 from ichiro.db import get_conn
 from ichiro.errors import (
@@ -15,7 +13,17 @@ from ichiro.errors import (
     ParentNotAFolder,
     ParentNotFound,
     PathEmpty,
-    TitleTaken,
+)
+from ichiro.repositories.notes import (
+    delete_note,
+    insert_note,
+    select_by_path,
+    select_children,
+    select_is_folder,
+    select_is_inside,
+    select_note,
+    select_tree,
+    update_fields,
 )
 from ichiro.schemas.notes import Note, NoteCreate, NotePath, NoteUpdate
 
@@ -23,7 +31,6 @@ from ichiro.schemas.notes import Note, NoteCreate, NotePath, NoteUpdate
 # Global variables
 router = APIRouter(prefix="/notes")
 Conn = Annotated[Connection, Depends(get_conn)]
-COLUMNS = "id, parent_id, is_folder, title, body, created_at, updated_at"
 
 
 # Code
@@ -41,10 +48,7 @@ def check_parent(
     if parent_id is None:
         return
 
-    is_folder = conn.execute(
-        text("SELECT is_folder FROM notes WHERE id = :id"),
-        {"id": parent_id},
-    ).scalar_one_or_none()
+    is_folder = select_is_folder(conn=conn, note_id=parent_id)
 
     if is_folder is None:
         raise ParentNotFound("parent not found")
@@ -57,36 +61,12 @@ def check_parent(
         return
 
     # folder cant be moved from outside to inside
-    is_cycle = conn.execute(
-        text(
-            "WITH RECURSIVE ancestors AS ("
-            " SELECT id, parent_id FROM notes WHERE id = :parent_id"
-            " UNION"
-            " SELECT n.id, n.parent_id FROM notes n"
-            " JOIN ancestors a ON n.id = a.parent_id"
-            ") SELECT EXISTS (SELECT 1 FROM ancestors WHERE id = :note_id)"
-        ),
-        {"parent_id": parent_id, "note_id": note_id},
-    ).scalar_one()
-
-    if is_cycle:
+    if select_is_inside(conn=conn, folder_id=parent_id, note_id=note_id):
         raise ParentInsideNote("cannot move a folder inside itself")
 
 
-def integrity_error(error: IntegrityError) -> Exception:
-    """
-    The error for an insert or update the table refused: a title already
-    in the folder, or a parent deleted in the meantime
-    """
-
-    if isinstance(error.orig, UniqueViolation):
-        return TitleTaken("title already in folder")
-
-    return ParentNotFound("parent not found")
-
-
 @router.get("")
-def list_notes(
+def get_notes(
     conn: Conn,
     parent_id: UUID | None = None,
     title: str | None = None,
@@ -96,57 +76,31 @@ def list_notes(
     then by title; only the ones with this title when one is given
     """
 
-    rows = conn.execute(
-        text(
-            f"SELECT {COLUMNS} FROM notes"
-            " WHERE parent_id IS NOT DISTINCT FROM CAST(:parent_id AS uuid)"
-            " AND (CAST(:title AS text) IS NULL OR title = :title)"
-            " ORDER BY is_folder DESC, title"
-        ),
-        {"parent_id": parent_id, "title": title},
-    ).mappings()
-
-    return [Note.model_validate(row) for row in rows]
+    return select_children(conn=conn, parent_id=parent_id, title=title)
 
 
 @router.get("/tree")
-def list_tree(conn: Conn, parent_id: UUID | None = None) -> list[NotePath]:
+def get_tree(conn: Conn, parent_id: UUID | None = None) -> list[NotePath]:
     """
-    Everything inside parent_id (the root when none), at any depth, each
-    with its path of titles from there, in the order of a file tree;
-    404 when parent_id doesn't exist
+    Everything inside parent_id, at any depth, each with its path of
+    titles from there; 404 when parent_id doesn't exist
     """
 
     if parent_id is not None:
         get_note(conn=conn, note_id=parent_id)
 
-    rows = conn.execute(
-        text(
-            "WITH RECURSIVE tree AS ("
-            " SELECT id, is_folder, ARRAY[title] AS names FROM notes"
-            " WHERE parent_id IS NOT DISTINCT FROM CAST(:parent_id AS uuid)"
-            " UNION ALL"
-            " SELECT n.id, n.is_folder, t.names || n.title FROM notes n"
-            " JOIN tree t ON n.parent_id = t.id"
-            ") SELECT id, is_folder, array_to_string(names, '/') AS path"
-            " FROM tree ORDER BY names"
-        ),
-        {"parent_id": parent_id},
-    ).mappings()
-
-    return [NotePath.model_validate(row) for row in rows]
+    return select_tree(conn=conn, parent_id=parent_id)
 
 
 @router.get("/by-path")
-def get_note_by_path(
+def get_by_path(
     conn: Conn,
     path: str,
     parent_id: UUID | None = None,
 ) -> Note:
     """
     The note at a path of titles (a/b/c) from parent_id (the root when
-    none), walked down one name per level in one query; 404 when a name
-    on the way is missing
+    none); 404 when a name on the way is missing
     """
 
     names = [name for name in path.split("/") if name]
@@ -154,27 +108,12 @@ def get_note_by_path(
     if not names:
         raise PathEmpty("path is empty")
 
-    row = conn.execute(
-        text(
-            "WITH RECURSIVE walk AS ("
-            " SELECT id, 1 AS depth FROM notes"
-            " WHERE parent_id IS NOT DISTINCT FROM CAST(:parent_id AS uuid)"
-            " AND title = (CAST(:names AS text[]))[1]"
-            " UNION ALL"
-            " SELECT n.id, w.depth + 1 FROM notes n"
-            " JOIN walk w ON n.parent_id = w.id"
-            " WHERE n.title = (CAST(:names AS text[]))[w.depth + 1]"
-            f") SELECT {COLUMNS} FROM notes WHERE id = ("
-            " SELECT id FROM walk"
-            " WHERE depth = cardinality(CAST(:names AS text[])))"
-        ),
-        {"parent_id": parent_id, "names": names},
-    ).mappings().one_or_none()
+    note = select_by_path(conn=conn, names=names, parent_id=parent_id)
 
-    if row is None:
+    if note is None:
         raise NoteNotFound("note not found")
 
-    return Note.model_validate(row)
+    return note
 
 
 @router.get("/{note_id}")
@@ -183,42 +122,27 @@ def get_note(conn: Conn, note_id: UUID) -> Note:
     One note by id; 404 when it doesn't exist
     """
 
-    row = conn.execute(
-        text(f"SELECT {COLUMNS} FROM notes WHERE id = :id"),
-        {"id": note_id},
-    ).mappings().one_or_none()
+    note = select_note(conn=conn, note_id=note_id)
 
-    if row is None:
+    if note is None:
         raise NoteNotFound("note not found")
 
-    return Note.model_validate(row)
+    return note
 
 
 @router.post("", status_code=201)
-def create_note(conn: Conn, note: NoteCreate) -> Note:
+def post_note(conn: Conn, note: NoteCreate) -> Note:
     """
     Saves a new note or folder and returns it as the table keeps it
     """
 
     check_parent(conn=conn, parent_id=note.parent_id)
 
-    try:
-        row = conn.execute(
-            text(
-                "INSERT INTO notes (parent_id, is_folder, title, body)"
-                " VALUES (:parent_id, :is_folder, :title, :body)"
-                f" RETURNING {COLUMNS}"
-            ),
-            note.model_dump(),
-        ).mappings().one()
-    except IntegrityError as error:
-        raise integrity_error(error=error)
-
-    return Note.model_validate(row)
+    return insert_note(conn=conn, note=note)
 
 
 @router.patch("/{note_id}")
-def update_note(conn: Conn, note_id: UUID, patch: NoteUpdate) -> Note:
+def patch_note(conn: Conn, note_id: UUID, patch: NoteUpdate) -> Note:
     """
     Changes only the fields sent: title, body or parent (a move)
     """
@@ -234,38 +158,21 @@ def update_note(conn: Conn, note_id: UUID, patch: NoteUpdate) -> Note:
     if "parent_id" in fields:
         check_parent(conn=conn, parent_id=fields["parent_id"], note_id=note_id)
 
-    # Keys come from NoteUpdate, never from the client: safe in the SQL
-    sets = "".join(f"{key} = :{key}, " for key in fields)
+    note = update_fields(conn=conn, note_id=note_id, fields=fields)
 
-    try:
-        row = conn.execute(
-            text(
-                f"UPDATE notes SET {sets}updated_at = now()"
-                f" WHERE id = :id RETURNING {COLUMNS}"
-            ),
-            {**fields, "id": note_id},
-        ).mappings().one_or_none()
-    except IntegrityError as error:
-        raise integrity_error(error=error)
-
-    if row is None:
+    if note is None:
         raise NoteNotFound("note not found")
 
-    return Note.model_validate(row)
+    return note
 
 
 @router.delete("/{note_id}", status_code=204)
-def delete_note(conn: Conn, note_id: UUID) -> Response:
+def remove_note(conn: Conn, note_id: UUID) -> Response:
     """
     Deletes a note, or a folder with everything inside it
     """
 
-    result = conn.execute(
-        text("DELETE FROM notes WHERE id = :id RETURNING id"),
-        {"id": note_id},
-    )
-
-    if result.one_or_none() is None:
+    if not delete_note(conn=conn, note_id=note_id):
         raise NoteNotFound("note not found")
 
     return Response(status_code=204)
