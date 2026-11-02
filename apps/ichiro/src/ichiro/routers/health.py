@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import Connection
 
 from ichiro.db import get_conn
-from ichiro.repositories.health import select_one
+from ichiro.services.health import check_database
 
 
 # Global variables
@@ -19,6 +19,6 @@ def health(conn: Annotated[Connection, Depends(get_conn)]) -> dict[str, str]:
     Answers ok while the service and its database are up
     """
 
-    select_one(conn=conn)
+    check_database(conn=conn)
 
     return {"status": "ok"}
