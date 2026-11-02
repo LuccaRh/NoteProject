@@ -26,6 +26,14 @@ avisa; reconfira as linhas antes de confiar no card. Escolhida em 2026-11-01 no 
   `pause_turn`, `refusal`, `model_context_window_exceeded`.
 - `usage.input_tokens`, `usage.output_tokens` (`types/usage.py:25,28`).
 
+## Saída estruturada (`resources/messages/messages.py`), para a #73
+- `await client.messages.parse(model=, max_tokens=, messages=, system=, output_format=<classe
+  Pydantic>, ...)` (2785): a lib converte a classe em JSON schema, manda em `output_config`
+  (`format: {type: "json_schema", schema}`, `types/json_output_format_param.py`) e valida a volta.
+- `message.parsed_output` (`types/parsed_message.py:78`): a instância da classe, ou `None` sem
+  bloco de texto válido. Conferido com o Haiku 5.5 em 2026-11-02 (rota `/chat/workspaces`).
+- HTTP por baixo: `httpx2` (`_base_client.py:40`), não `httpx` (card `httpx2`).
+
 ## Modelos (`types/model.py`)
 - `claude-haiku-5-5` (8): o do lonzo no dev, `max_tokens` 512.
 
