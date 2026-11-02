@@ -140,6 +140,13 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   `class`): `"""` sozinho na linha, o texto (sem ponto no fim), `"""` sozinho, e uma linha em
   branco só entre ela e o código (W14 confere). Nada de comentário em cima do `def`; comentário
   dentro do corpo é para o porquê de um trecho. Lint W21 (`ai/np lint`).
+- **Comentário de uma linha** (2026-11-02): comentário no código do app tem uma linha só; o
+  que precisa de mais vai para a docstring ou sai. Lint W23 (`ai/np lint`).
+- **Nada de código repetido** (2026-11-02): preferência por escrever cada coisa uma vez; dois
+  caminhos que acabam na mesma chamada viram `if`s que preparam os valores, e a chamada
+  aparece uma vez só.
+- **Variável perto do uso** (2026-11-02): cada variável nasce o mais perto possível da linha
+  que a usa, e `if`s que tratam do mesmo valor ficam juntos.
 - **Função e classe tipadas** (2026-10-26): todo parâmetro e retorno com tipo, e atributo de
   classe com `nome: tipo`. Python: mypy `strict = true` no `pyproject.toml` do serviço e lint
   W15 (atributo de classe sem tipo).
@@ -167,7 +174,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 | `ai/np contexto <área>` / `areas` | o que ler para uma área / o vocabulário |
 | `ai/np obsidian [-q]` / `duvidas [pág]` | sincronia vault ↔ `ai/obsidian/` / marcas `[!duvida]` `[fix]` `[coment]` |
 | `ai/np diagrama <spec> [--png]` | YAML → draw.io (`ai/tools/diagrama.py`, nó `banco` para BD) |
-| `ai/np lint` / `test` | regras do workspace (W01–W22) / testes das ferramentas |
+| `ai/np lint` / `test` | regras do workspace (W01–W23) / testes das ferramentas |
 
 Ambiente: Arch Linux, Python 3.14 + uv, Node 22, Docker, `drawio` CLI, poppler (`pdftotext`).
 Hooks do Claude Code em `.claude/settings.json`; do git em `ai/tools/githooks/` (`ai/tools/instalar.sh`).
