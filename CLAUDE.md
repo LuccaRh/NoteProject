@@ -216,7 +216,7 @@ ai/                todo o resto do workspace de IA:
 
 - M0, #46, #62, #64, #65, #69, #16, #80, #82, #74, #73, #98 e #100 mergeados (PRs #66–#68,
   #70–#72, #81, #83–#85, #88, #93–#96, #99, #101, #102); `master` local = remoto; branches
-  `backup/*` locais guardadas. Issues #73, #89–#92, #98 e #100 com PR mergeado: o Lucca fecha.
+  `backup/*` apagadas (2026-11-02). Issues #73, #89–#92, #98 e #100 com PR mergeado: o Lucca fecha.
 - #74 pronta: `apps/lonzo` responde `POST /api/chat` em SSE (Haiku 5.5, `thinking` desligado,
   `max_tokens` 512, 64000 na branch `lonzo/longer-answers-without-workspace-talk`, sem push,
   PR do lonzo da #76, que também tira o workspace das respostas); o Caddy roteia `/api/notes/*` → ichiro, `/api/chat/*` →
@@ -235,7 +235,7 @@ ai/                todo o resto do workspace de IA:
   o `message_start` saiu sem `model`, que foi para o `message_end` (a constante fica no cliente).
 - #98 (ichiro em `routers/` → `services/` → `repositories/`, PR #101) e #100 (handlers do lonzo
   em `handlers.py`, PR #102) mergeados. Falta no ichiro: comentário em cima das fixtures do
-  `conftest.py`, W20 em `tests/test_notes.py`.
+  `conftest.py` (o W20 de `tests/test_notes.py` sai na #56).
 - #75 em duas branches sobre a `master` (sem push, revisão do Lucca pendente):
   - `postgres/create-the-lonzo-database`: `postgres/init/create-lonzo-database.sh` cria o
     usuário e o banco `lonzo` na primeira subida (volume vazio); no volume do dev, já rodado à
@@ -252,6 +252,12 @@ ai/                todo o resto do workspace de IA:
   pop-up "Create workspace" (`chat/workspace-dialog.ts`, texto já preenchido); chimchar
   0.7.0. Conferido no navegador pelo Caddy (Playwright). Escrita pela sessão, cliente-api
   incluso (o Lucca pediu pronto).
+- #56 na branch `ichiro/search-notes-with-postgres-full-text-search` (sem push):
+  `GET /notes/search?q=&parent_id=` → `[{id, title}]` por título, notas (não pastas) com as
+  palavras no título ou corpo, só dentro de `parent_id` (qualquer profundidade) quando vem;
+  índice GIN sobre `to_tsvector('simple', title || ' ' || body)`, sem coluna (migration
+  `4f274e14b79c`); sem ranking, trecho nem limite; ichiro 0.13.0. Vault: `Conceitos/Banco
+  de dados/Índice` e `Busca full-text no Postgres`.
 - IA (2026-10-31): chat com o workspace no servidor; vault `IA no projeto/Chat com o workspace` e
   `Caminho de uma pergunta`. Workspace = pasta com `.workspace/`, vários por pessoa.
 - #31 (Ctrl+D) e #5 (chips) sem milestone, para depois; `decorations/replace.ts` (#5) fora do git.
@@ -265,7 +271,7 @@ ai/                todo o resto do workspace de IA:
 Plano: vault `Plano do projeto/Roadmap` (navegador → app desktop → celular) + issues/milestones no GitHub.
 
 1. Entrega de 2026-11-06 (vault `Plano do projeto/Entrega de 2026-11-06`): #74 ✅ → #73 ✅ workspace criado pela IA a partir de um texto breve
-   (esqueleto; vault `Workspace no app#Como nasce`) → #98 ✅ ichiro em camadas → #75 conversas (2 branches prontas, falta PR), #76 tela do chat (branch pronta, falta PR) → #56 busca, #77 ler/buscar
+   (esqueleto; vault `Workspace no app#Como nasce`) → #98 ✅ ichiro em camadas → #75 conversas (2 branches prontas, falta PR), #76 tela do chat (branch pronta, falta PR) → #56 busca (branch pronta, falta PR), #77 ler/buscar
    → #78 criar/editar/apagar, #51 → #6 pastas, #79 importar o vault → #17 se sobrar.
 2. M2 login (#48, #17) → M3 AWS (#18–#25, #47) → M4 edição ao vivo (#26, #27, #30).
 - v1 = ler notas no navegador com o servidor na AWS (vault `Plano do projeto/Objetivo do app`);
