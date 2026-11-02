@@ -21,3 +21,9 @@ class NotAFolder(Exception):
     """
     The id asked for is a note, not a folder
     """
+
+
+class ConversationNotFound(Exception):
+    """
+    No conversation has the id asked for
+    """
