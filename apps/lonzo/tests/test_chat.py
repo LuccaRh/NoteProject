@@ -133,7 +133,8 @@ def test_chat_without_key() -> None:
 
 def test_chat_with_notes_service_down() -> None:
 
-    response = post(body={"question": "Hi"}, http=unreachable())
+    body = {"question": "Hi", "folder_id": str(uuid4())}
+    response = post(body=body, http=unreachable())
 
     assert response.status_code == 502
 
@@ -145,11 +146,9 @@ def test_chat_without_workspace_has_no_rules() -> None:
     assert FakeMessages.params["system"] is omit
 
 
-def test_chat_uses_root_and_folder_workspace_rules() -> None:
+def test_chat_uses_the_folder_workspace_rules() -> None:
 
     ichiro = FakeIchiro()
-    root = ichiro.add(title=".workspace", is_folder=True)
-    ichiro.add(title="How to answer", parent_id=root, body="Be short.")
     folder = ichiro.add(title="Baseball", is_folder=True)
     workspace = ichiro.add(title=".workspace", parent_id=folder, is_folder=True)
     ichiro.add(title="Fixed facts", parent_id=workspace, body="Bats left.")
@@ -161,9 +160,7 @@ def test_chat_uses_root_and_folder_workspace_rules() -> None:
     post(body=body, http=ichiro.client())
 
     system = str(FakeMessages.params["system"])
-    assert system.endswith(
-        "# How to answer\n\nBe short.\n\n# Fixed facts\n\nBats left."
-    )
+    assert system.endswith("# Fixed facts\n\nBats left.")
     assert "Exam soon." not in system
 
 
