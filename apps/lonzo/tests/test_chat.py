@@ -7,8 +7,8 @@ from typing import Self
 import pytest
 from fastapi.testclient import TestClient
 
+from lonzo.clients.anthropic import get_client
 from lonzo.main import app
-from lonzo.routers.chat import get_client
 
 
 # Global variables
@@ -42,7 +42,11 @@ class FakeStream:
 
         usage = SimpleNamespace(input_tokens=10, output_tokens=2)
 
-        return SimpleNamespace(stop_reason="end_turn", usage=usage)
+        return SimpleNamespace(
+            model="claude-haiku-5-5",
+            stop_reason="end_turn",
+            usage=usage,
+        )
 
 
 class FakeMessages:
@@ -76,7 +80,7 @@ def test_chat_streams_named_events() -> None:
     app.dependency_overrides.clear()
 
     assert response.headers["content-type"].startswith("text/event-stream")
-    events = parse(response.text)
+    events = parse(body=response.text)
     assert [name for name, _ in events] == [
         "message_start", "text_delta", "text_delta", "message_end"
     ]
