@@ -66,6 +66,9 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   commit só dela, um por serviço, depois dos commits do app: `Update ichiro version to 0.2.0`
   (manifesto + lockfile, nada mais).
 - **Commit = uma mudança nova**, atômico, cronológico, e **todo commit passa no `make check`**.
+  (2026-11-02) **Commit pequeno**: dependência, config (compose), módulo novo, o uso dele na rota,
+  handler de erro e testes novos são commits separados (a #74 teve 12 commits no app); um commit
+  que mexe em várias camadas ou traz rota + cliente + testes juntos está grande demais.
   Conserto de commit ainda não enviado ao remoto (mesmo já na `master` local) → rebase/fixup
   no original, não commit novo. Ordem na
   branch: schema → regra → rota → front → `[ai-workspace]` → `[docs]` (2026-10-27: o `[docs]` é
@@ -98,6 +101,16 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   quando abrem o corpo) e o comando depois de um bloco também; a primeira linha do corpo de
   um `def` também fica separada da assinatura. Vale para código novo; arquivo antigo só quando
   for mexido. Python: lint W14 (`ai/np lint`).
+- **Argumento com nome** (2026-11-02): chamada a função ou método do próprio serviço passa
+  cada argumento com o nome do parâmetro (`create_note(ichiro=ichiro, title=title)`), nunca
+  só pela ordem. Lib fica como a doc dela usa. Lint W19 (`ai/np lint`).
+- **Constante fica no módulo dela** (2026-11-02): constante global (`NOME_EM_MAIÚSCULA`) é
+  usada direto pelas funções do próprio módulo; outro módulo importa a função, nunca a
+  constante, e a constante não vira argumento de chamada (`create_workspace_folder(ichiro=...)`
+  em vez de `create_note(title=WORKSPACE, ...)`). Lint W18 (`ai/np lint`).
+- **Chamada a outra API em `clients/`** (2026-11-02): função que fala com outro serviço ou
+  provedor (ichiro, Anthropic) mora em `apps/<serviço>/src/<pacote>/clients/<api>.py`; o
+  modelo Pydantic que ela devolve, em `schemas/`; a rota em `routers/` só usa as duas.
 - **Função e classe tipadas** (2026-10-26): todo parâmetro e retorno com tipo, e atributo de
   classe com `nome: tipo`. Python: mypy `strict = true` no `pyproject.toml` do serviço e lint
   W15 (atributo de classe sem tipo).
@@ -125,7 +138,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 | `ai/np contexto <área>` / `areas` | o que ler para uma área / o vocabulário |
 | `ai/np obsidian [-q]` / `duvidas [pág]` | sincronia vault ↔ `ai/obsidian/` / marcas `[!duvida]` `[fix]` `[coment]` |
 | `ai/np diagrama <spec> [--png]` | YAML → draw.io (`ai/tools/diagrama.py`, nó `banco` para BD) |
-| `ai/np lint` / `test` | regras do workspace (W01–W16) / testes das ferramentas |
+| `ai/np lint` / `test` | regras do workspace (W01–W19) / testes das ferramentas |
 
 Ambiente: Arch Linux, Python 3.14 + uv, Node 22, Docker, `drawio` CLI, poppler (`pdftotext`).
 Hooks do Claude Code em `.claude/settings.json`; do git em `ai/tools/githooks/` (`ai/tools/instalar.sh`).

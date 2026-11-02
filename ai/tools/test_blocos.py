@@ -1,6 +1,12 @@
 import unittest
 
-from np import checar_atributos, checar_blocos, checar_layout
+from np import (
+    checar_atributos,
+    checar_blocos,
+    checar_constantes,
+    checar_layout,
+    checar_posicionais,
+)
 
 
 class TestBlocos(unittest.TestCase):
@@ -60,6 +66,16 @@ class TestBlocos(unittest.TestCase):
     def test_layout_global_depois_do_codigo(self) -> None:
         texto = "# Code\ndef f():\n\n    return 1\n\n\nX = 1\n"
         self.assertEqual(checar_layout(texto), [7])
+
+
+    def test_constante_importada(self) -> None:
+        texto = "from lonzo.a import MODEL, get\nfrom os import SEEK_SET\nfrom lonzo.b import f\n"
+        self.assertEqual(checar_constantes(texto, "lonzo"), [1])
+
+    def test_chamada_posicional(self) -> None:
+        texto = ("def f(a, b):\n    return a\n\n\nf(1, b=2)\nf(a=1, b=2)\nprint(1)\n"
+                 "class C:\n    def g(self, x):\n        self.g(1)\n        x.g(1)\n")
+        self.assertEqual(checar_posicionais(texto, {"f", "g"}), [5, 10])
 
 
 if __name__ == "__main__":

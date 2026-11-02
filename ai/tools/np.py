@@ -7,7 +7,7 @@
     ai/np obsidian [-q] [--simular] sincronia vault Note Project/ ↔ obsidian/
     ai/np duvidas [trecho da pág]   marcas [!duvida] [duvidas] [fix] [coment] nas notas
     ai/np diagrama <spec.yaml> [--png]   YAML → draw.io; `destino:` no spec copia o .drawio.svg para obsidian/
-    ai/np lint                      regras do workspace que viraram código (W01–W17)
+    ai/np lint                      regras do workspace que viraram código (W01–W19)
     ai/np test                      testes das ferramentas (tools/test_*.py)
     ai/np check                     o check do app (make check: ruff, mypy, pytest, tsc, build)
 
@@ -207,6 +207,7 @@ def problemas() -> list[str]:
     out += _blocos()
     out += _branch_servico()
     out += _compose()
+    out += _chamadas()
     return out
 
 
@@ -370,6 +371,69 @@ def _blocos() -> list[str]:
         for i in checar_layout(f.read_text(encoding="utf-8")):
             out.append(f"W16 {n}:{i}: partes imports → globais → código, cada uma com o comentário"
                        " dela (# Imports, # Global variables, # Code) e duas linhas entre elas")
+    return out
+
+
+_CONSTANTE = re.compile(r"[A-Z][A-Z0-9_]*")
+
+
+def checar_constantes(texto: str, pacote: str) -> list[int]:
+    """Linhas que importam uma constante (NOME_EM_MAIÚSCULA) do próprio pacote do serviço: a
+    constante fica no módulo dela, usada direto pelas funções de lá (2026-11-02)."""
+    return sorted(
+        no.lineno
+        for no in ast.walk(ast.parse(texto))
+        if isinstance(no, ast.ImportFrom) and (no.module or "").split(".")[0] == pacote
+        and any(_CONSTANTE.fullmatch(a.name) for a in no.names)
+    )
+
+
+def funcoes_do_servico(textos: list[str]) -> set[str]:
+    """Nomes de toda função e método definidos no serviço (src e tests)."""
+    return {
+        no.name
+        for t in textos for no in ast.walk(ast.parse(t))
+        if isinstance(no, (ast.FunctionDef, ast.AsyncFunctionDef))
+    }
+
+
+def checar_posicionais(texto: str, funcoes: set[str]) -> list[int]:
+    """Linhas com chamada a função do próprio serviço (`f(...)` ou `self.f(...)`) que passa
+    argumento por posição: todo argumento vai com o nome do parâmetro (2026-11-02)."""
+    out = []
+    for no in ast.walk(ast.parse(texto)):
+        if not isinstance(no, ast.Call) or not no.args:
+            continue
+        f = no.func
+        nome = f.id if isinstance(f, ast.Name) else (
+            f.attr if isinstance(f, ast.Attribute) and isinstance(f.value, ast.Name)
+            and f.value.id == "self" else None)
+        if nome in funcoes:
+            out.append(no.lineno)
+    return sorted(set(out))
+
+
+def _chamadas() -> list[str]:
+    """W18–W19 no Python do app criado ou mexido na branch."""
+    base = git("merge-base", "master", "HEAD")
+    mexidos = git("diff", "--name-only", "--diff-filter=AM", base, "--", "apps").splitlines()
+    mexidos += git("ls-files", "--others", "--exclude-standard", "apps").splitlines()
+    out = []
+    for n in sorted(set(mexidos)):
+        f = REPO / n
+        if f.suffix != ".py" or not f.is_file() or "/migrations/" in n:
+            continue
+        servico = REPO / "apps" / n.split("/")[1]
+        pacote = n.split("/")[1]
+        textos = [g.read_text(encoding="utf-8") for d in ("src", "tests")
+                  for g in (servico / d).rglob("*.py") if ".venv" not in g.parts]
+        texto = f.read_text(encoding="utf-8")
+        for i in checar_constantes(texto, pacote):
+            out.append(f"W18 {n}:{i}: constante importada de outro módulo; use-a numa função"
+                       " do módulo dela e importe a função")
+        for i in checar_posicionais(texto, funcoes_do_servico(textos)):
+            out.append(f"W19 {n}:{i}: chamada a função do serviço com argumento por posição;"
+                       " passe cada um com o nome do parâmetro")
     return out
 
 
