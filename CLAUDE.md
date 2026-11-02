@@ -69,6 +69,9 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   (2026-11-02) **Commit pequeno**: dependência, config (compose), módulo novo, o uso dele na rota,
   handler de erro e testes novos são commits separados (a #74 teve 12 commits no app); um commit
   que mexe em várias camadas ou traz rota + cliente + testes juntos está grande demais.
+  (2026-11-02) **Teste em commit próprio**: teste novo (e o fake que só ele usa) vai num
+  commit `Test ...` logo depois do código que ele testa; no commit do código só fica o ajuste
+  de teste antigo que a mudança quebraria (import, override), para ele passar no `make check`.
   Conserto de commit ainda não enviado ao remoto (mesmo já na `master` local) → rebase/fixup
   no original, não commit novo. Ordem na
   branch: schema → regra → rota → front → `[ai-workspace]` → `[docs]` (2026-10-27: o `[docs]` é
