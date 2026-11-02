@@ -79,8 +79,14 @@ export class Page {
         this.els.empty.hidden = true
     }
 
-    /** Hide the note and show the empty page. */
-    close(): void {
+    /** Save pending edits, then hide the note and show the empty page. */
+    async close(): Promise<void> {
+
+        const id = this.note?.id
+        await this.flush()
+
+        // Another note opened while saving: that one stays
+        if (this.note?.id !== id) return
 
         clearTimeout(this.timer)
         this.note = null

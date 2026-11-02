@@ -47,28 +47,40 @@
 
             </aside>
 
-            <!-- Page: the open note, driven by notes/page.ts -->
-            <main class="page">
-                <div class="column">
+            <!-- Work area: the tab bar and the panel of the active tab -->
+            <div id="work" class="work">
 
-                    <!-- Path of the open note and save status -->
-                    <div class="topbar">
-                        <span id="path"></span>
-                        <span id="save-status" role="status"></span>
+                <!-- Open notes and chats, filled by tabs.ts -->
+                <div id="tabs" class="tabs" role="tablist"
+                    aria-label="Open tabs" hidden></div>
+
+                <!-- Page: the open note, driven by notes/page.ts -->
+                <main id="note-panel" class="page">
+                    <div class="column">
+
+                        <!-- Path of the open note and save status -->
+                        <div class="topbar">
+                            <span id="path"></span>
+                            <span id="save-status" role="status"></span>
+                        </div>
+
+                        <!-- Shown while no note is open -->
+                        <p id="empty" class="empty">
+                            Open a note or create one.
+                        </p>
+
+                        <!-- The open note: title and CodeMirror editor -->
+                        <div id="note" hidden>
+                            <input id="title" class="title" aria-label="Title"
+                                placeholder="Untitled" />
+                            <div id="editor"></div>
+                        </div>
+
                     </div>
+                </main>
 
-                    <!-- Shown while no note is open -->
-                    <p id="empty" class="empty">Open a note or create one.</p>
-
-                    <!-- The open note: title and CodeMirror editor -->
-                    <div id="note" hidden>
-                        <input id="title" class="title" aria-label="Title"
-                            placeholder="Untitled" />
-                        <div id="editor"></div>
-                    </div>
-
-                </div>
-            </main>
+                <!-- Chat tabs add their panels here, from chat/chat.ts -->
+            </div>
 
         </div>
 
