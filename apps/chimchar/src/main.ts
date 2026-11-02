@@ -1,6 +1,7 @@
 // Imports
 import './style.css'
 import { Chat } from './chat/chat.ts'
+import { WorkspaceDialog } from './chat/workspace-dialog.ts'
 import { createNote, deleteNote, updateNote } from './notes/api.ts'
 import { Page } from './notes/page.ts'
 import { Tree } from './notes/tree.ts'
@@ -33,6 +34,20 @@ const tree = new Tree(
                 rename: (note, title) => void rename(note, title),
                 remove: note => void remove(note),
         }
+)
+
+const workspaceDialog = new WorkspaceDialog(
+    {
+        dialog: byId('workspace-dialog'),
+        form: byId('workspace-form'),
+        folder: byId('workspace-folder'),
+        description: byId('workspace-description'),
+        status: byId('workspace-status'),
+        create: byId('workspace-create'),
+        cancel: byId('workspace-cancel'),
+    },
+    () => tree.folders(),
+    folderId => void workspaceCreated(folderId),
 )
 
 // The note panel doubles as the empty page when no tab is open
@@ -80,6 +95,13 @@ function openChat(folderId: string | null): void {
         show: () => chat.question.focus(),
         close: () => chat.panel.remove(),
     })
+}
+
+/** Show the new .workspace in the tree and open a chat in it. */
+async function workspaceCreated(folderId: string): Promise<void> {
+
+    await tree.load(folderId)
+    openChat(folderId)
 }
 
 /** Show a saved note in the tree and on its tab. */
@@ -156,6 +178,9 @@ document.addEventListener('visibilitychange', () => {
 byId('new-note').addEventListener('click', () => void create(false))
 byId('new-folder').addEventListener('click', () => void create(true))
 byId('new-chat').addEventListener('click', () => openChat(tree.target()))
+byId('new-workspace').addEventListener('click', () => {
+    workspaceDialog.open(tree.target())
+})
 
 void tree.load(null).then(() => {
     serverStatus.textContent = ''
