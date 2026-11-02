@@ -195,3 +195,27 @@ def test_delete_missing_note(client: TestClient) -> None:
     response = client.delete(f"/notes/{MISSING_ID}")
 
     assert response.status_code == 404
+
+
+# With title, the list has only the note with that title in the folder
+def test_list_by_title(client: TestClient) -> None:
+
+    folder = create(client=client, title="Work", is_folder=True)
+    note = create(client=client, title="Plan", parent_id=folder["id"])
+    create(client=client, title="Other", parent_id=folder["id"])
+    create(client=client, title="Plan")
+
+    params = {"parent_id": folder["id"], "title": "Plan"}
+    response = client.get("/notes", params=params)
+
+    assert response.json() == [note]
+
+
+# A title that isn't in the folder gives an empty list
+def test_list_by_missing_title(client: TestClient) -> None:
+
+    create(client=client, title="Plan")
+
+    response = client.get("/notes", params={"title": "Nothing here"})
+
+    assert response.json() == []
