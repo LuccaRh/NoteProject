@@ -3,6 +3,7 @@ import unittest
 from np import (
     checar_atributos,
     checar_blocos,
+    checar_docstrings,
     checar_constantes,
     checar_layout,
     checar_parametros,
@@ -97,3 +98,22 @@ class TestParametros(unittest.TestCase):
 
     def test_um_so_abraca(self) -> None:
         self.assertEqual(checar_parametros("g(h(\n    x=1,\n    y=2,\n))\n"), [])
+
+
+class TestDocstrings(unittest.TestCase):
+    def test_com_docstring(self) -> None:
+        texto = 'def f() -> None:\n    """\n    Faz algo\n    """\n\n    return\n'
+        self.assertEqual(checar_docstrings(texto), [])
+        self.assertEqual(checar_blocos(texto), [])
+
+    def test_docstring_separada_da_assinatura(self) -> None:
+        texto = 'def f() -> None:\n\n    """\n    Faz algo\n    """\n\n    return\n'
+        self.assertEqual(checar_blocos(texto), [3])
+
+    def test_codigo_grudado_na_docstring(self) -> None:
+        texto = 'class A:\n    """\n    Algo\n    """\n    x: int\n'
+        self.assertEqual(checar_blocos(texto), [5])
+
+    def test_comentario_em_cima(self) -> None:
+        texto = "# Faz algo\ndef f() -> None:\n    return\n\nclass A:\n    x: int\n"
+        self.assertEqual(checar_docstrings(texto), [2, 5])

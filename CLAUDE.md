@@ -117,6 +117,11 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 - **Chamada a outra API em `clients/`** (2026-11-02): função que fala com outro serviço ou
   provedor (ichiro, Anthropic) mora em `apps/<serviço>/src/<pacote>/clients/<api>.py`; o
   modelo Pydantic que ela devolve, em `schemas/`; a rota em `routers/` só usa as duas.
+- **Explicação dentro da função** (2026-11-02): todo `def` e `class` do app (`src/`) explica o que
+  faz numa docstring, primeiro comando do corpo, **grudada** na assinatura (ou na linha do
+  `class`): `"""` sozinho na linha, o texto (sem ponto no fim), `"""` sozinho, e uma linha em
+  branco só entre ela e o código (W14 confere). Nada de comentário em cima do `def`; comentário
+  dentro do corpo é para o porquê de um trecho. Lint W21 (`ai/np lint`).
 - **Função e classe tipadas** (2026-10-26): todo parâmetro e retorno com tipo, e atributo de
   classe com `nome: tipo`. Python: mypy `strict = true` no `pyproject.toml` do serviço e lint
   W15 (atributo de classe sem tipo).
@@ -144,7 +149,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 | `ai/np contexto <área>` / `areas` | o que ler para uma área / o vocabulário |
 | `ai/np obsidian [-q]` / `duvidas [pág]` | sincronia vault ↔ `ai/obsidian/` / marcas `[!duvida]` `[fix]` `[coment]` |
 | `ai/np diagrama <spec> [--png]` | YAML → draw.io (`ai/tools/diagrama.py`, nó `banco` para BD) |
-| `ai/np lint` / `test` | regras do workspace (W01–W20) / testes das ferramentas |
+| `ai/np lint` / `test` | regras do workspace (W01–W21) / testes das ferramentas |
 
 Ambiente: Arch Linux, Python 3.14 + uv, Node 22, Docker, `drawio` CLI, poppler (`pdftotext`).
 Hooks do Claude Code em `.claude/settings.json`; do git em `ai/tools/githooks/` (`ai/tools/instalar.sh`).

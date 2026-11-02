@@ -7,7 +7,7 @@
     ai/np obsidian [-q] [--simular] sincronia vault Note Project/ ↔ obsidian/
     ai/np duvidas [trecho da pág]   marcas [!duvida] [duvidas] [fix] [coment] nas notas
     ai/np diagrama <spec.yaml> [--png]   YAML → draw.io; `destino:` no spec copia o .drawio.svg para obsidian/
-    ai/np lint                      regras do workspace que viraram código (W01–W20)
+    ai/np lint                      regras do workspace que viraram código (W01–W21)
     ai/np test                      testes das ferramentas (tools/test_*.py)
     ai/np check                     o check do app (make check: ruff, mypy, pytest, tsc, build)
 
@@ -277,11 +277,19 @@ _BLOCO_PY = (ast.If, ast.For, ast.While, ast.Try, ast.With, ast.Match, ast.Retur
 
 def checar_blocos(texto: str) -> list[int]:
     """Linhas de comandos grudados no de cima quando um dos dois é bloco ou return/raise,
-    e a primeira do corpo de um def grudada na assinatura."""
+    e a primeira do corpo de um def grudada na assinatura. Docstring (2026-11-02) fica
+    grudada na assinatura do def ou na linha do class, com uma linha em branco antes do código."""
     linhas = texto.splitlines()
     out = []
     for no in ast.walk(ast.parse(texto)):
-        if isinstance(no, (ast.FunctionDef, ast.AsyncFunctionDef)) and no.body[0].lineno > no.lineno:
+        if isinstance(no, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and _docstring(no):
+            doc = no.body[0]
+            if any(not x.strip() for x in linhas[no.lineno:doc.lineno - 1]):
+                out.append(doc.lineno)
+            if len(no.body) > 1 and not any(
+                    not x.strip() for x in linhas[doc.end_lineno:no.body[1].lineno - 1]):  # type: ignore[misc]
+                out.append(no.body[1].lineno)
+        elif isinstance(no, (ast.FunctionDef, ast.AsyncFunctionDef)) and no.body[0].lineno > no.lineno:
             if not any(not x.strip() for x in linhas[no.lineno:no.body[0].lineno - 1]):
                 out.append(no.body[0].lineno)
         for campo in ("body", "orelse", "finalbody"):
@@ -438,8 +446,28 @@ def checar_parametros(texto: str) -> list[int]:
     return sorted(set(out))
 
 
+def _docstring(no: ast.AST) -> bool:
+    """Se o primeiro comando do corpo é uma string solta (a docstring)."""
+    corpo = getattr(no, "body", None) or [None]
+    primeiro = corpo[0]
+    return (isinstance(primeiro, ast.Expr) and isinstance(primeiro.value, ast.Constant)
+            and isinstance(primeiro.value.value, str))
+
+
+def checar_docstrings(texto: str) -> list[int]:
+    """Linhas de `def` ou `class` sem docstring como primeiro comando: a explicação de cada
+    função e classe fica dentro dela, não num comentário em cima (2026-11-02)."""
+    out = []
+    for no in ast.walk(ast.parse(texto)):
+        if not isinstance(no, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        if not _docstring(no):
+            out.append(no.lineno)
+    return out
+
+
 def _chamadas() -> list[str]:
-    """W18–W20 no Python do app criado ou mexido na branch."""
+    """W18–W21 no Python do app criado ou mexido na branch."""
     base = git("merge-base", "master", "HEAD")
     mexidos = git("diff", "--name-only", "--diff-filter=AM", base, "--", "apps").splitlines()
     mexidos += git("ls-files", "--others", "--exclude-standard", "apps").splitlines()
@@ -462,6 +490,10 @@ def _chamadas() -> list[str]:
         for i in checar_parametros(texto):
             out.append(f"W20 {n}:{i}: parâmetros quebrados sem ser um por linha;"
                        " cabe em uma, fica em uma; senão, um por linha")
+        if "/src/" in n:
+            for i in checar_docstrings(texto):
+                out.append(f"W21 {n}:{i}: função ou classe sem docstring; explique dentro"
+                           " dela, não em comentário em cima")
     return out
 
 
