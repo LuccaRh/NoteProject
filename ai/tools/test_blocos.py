@@ -4,6 +4,7 @@ from np import (
     checar_atributos,
     checar_blocos,
     checar_docstrings,
+    checar_camadas,
     checar_constantes,
     checar_layout,
     checar_parametros,
@@ -117,3 +118,18 @@ class TestDocstrings(unittest.TestCase):
     def test_comentario_em_cima(self) -> None:
         texto = "# Faz algo\ndef f() -> None:\n    return\n\nclass A:\n    x: int\n"
         self.assertEqual(checar_docstrings(texto), [2, 5])
+
+
+class TestCamadas(unittest.TestCase):
+    def test_router_com_service(self) -> None:
+        texto = "from lonzo.services.chat import answer\n"
+        self.assertEqual(checar_camadas(texto, "lonzo"), [])
+
+    def test_router_com_client_ou_conexao(self) -> None:
+        texto = (
+            "from lonzo.clients.ichiro import IchiroClient\n"
+            "from lonzo.connections import ichiro\n"
+            "from lonzo import connections\n"
+            "from fastapi import APIRouter\n"
+        )
+        self.assertEqual(checar_camadas(texto, "lonzo"), [1, 2, 3])

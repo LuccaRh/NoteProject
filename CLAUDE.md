@@ -114,9 +114,13 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   usada direto pelas funções do próprio módulo; outro módulo importa a função, nunca a
   constante, e a constante não vira argumento de chamada (`create_workspace_folder(ichiro=...)`
   em vez de `create_note(title=WORKSPACE, ...)`). Lint W18 (`ai/np lint`).
-- **Chamada a outra API em `clients/`** (2026-11-02): função que fala com outro serviço ou
-  provedor (ichiro, Anthropic) mora em `apps/<serviço>/src/<pacote>/clients/<api>.py`; o
-  modelo Pydantic que ela devolve, em `schemas/`; a rota em `routers/` só usa as duas.
+- **Backend em camadas** (2026-11-02): `routers/` → `services/` → `clients/`, cada uma só
+  chama a de baixo. **Client** (`clients/<api>.py`): uma classe por API externa (ichiro,
+  Anthropic), um método por endpoint, devolvendo o modelo de `schemas/`, sem regra do
+  serviço. **Service** (`services/<assunto>.py`): as funções do serviço em cima dos clients,
+  com as checagens e os erros do domínio (`FolderNotFound`). **Router**: recebe o pedido,
+  chama **um** service e devolve; nunca um client, mesmo para uma chamada direta. Erro do
+  domínio vira status num `exception_handler` do `main.py`. Lint W22 (`ai/np lint`).
 - **Explicação dentro da função** (2026-11-02): todo `def` e `class` do app (`src/`) explica o que
   faz numa docstring, primeiro comando do corpo, **grudada** na assinatura (ou na linha do
   `class`): `"""` sozinho na linha, o texto (sem ponto no fim), `"""` sozinho, e uma linha em
@@ -149,7 +153,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 | `ai/np contexto <área>` / `areas` | o que ler para uma área / o vocabulário |
 | `ai/np obsidian [-q]` / `duvidas [pág]` | sincronia vault ↔ `ai/obsidian/` / marcas `[!duvida]` `[fix]` `[coment]` |
 | `ai/np diagrama <spec> [--png]` | YAML → draw.io (`ai/tools/diagrama.py`, nó `banco` para BD) |
-| `ai/np lint` / `test` | regras do workspace (W01–W21) / testes das ferramentas |
+| `ai/np lint` / `test` | regras do workspace (W01–W22) / testes das ferramentas |
 
 Ambiente: Arch Linux, Python 3.14 + uv, Node 22, Docker, `drawio` CLI, poppler (`pdftotext`).
 Hooks do Claude Code em `.claude/settings.json`; do git em `ai/tools/githooks/` (`ai/tools/instalar.sh`).

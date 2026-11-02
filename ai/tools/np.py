@@ -7,7 +7,7 @@
     ai/np obsidian [-q] [--simular] sincronia vault Note Project/ ↔ obsidian/
     ai/np duvidas [trecho da pág]   marcas [!duvida] [duvidas] [fix] [coment] nas notas
     ai/np diagrama <spec.yaml> [--png]   YAML → draw.io; `destino:` no spec copia o .drawio.svg para obsidian/
-    ai/np lint                      regras do workspace que viraram código (W01–W21)
+    ai/np lint                      regras do workspace que viraram código (W01–W22)
     ai/np test                      testes das ferramentas (tools/test_*.py)
     ai/np check                     o check do app (make check: ruff, mypy, pytest, tsc, build)
 
@@ -466,8 +466,26 @@ def checar_docstrings(texto: str) -> list[int]:
     return out
 
 
+_CAMADA_BAIXA = ("clients", "connections")
+
+
+def checar_camadas(texto: str, pacote: str) -> list[int]:
+    """Linhas de um router que importam de clients/ ou connections: o router só usa services,
+    que fazem as checagens e chamam os clients (2026-11-02)."""
+    return sorted(
+        no.lineno
+        for no in ast.walk(ast.parse(texto))
+        if isinstance(no, ast.ImportFrom)
+        and (no.module or "").split(".")[0] == pacote
+        and (
+            (no.module or "").split(".")[1:2] and (no.module or "").split(".")[1] in _CAMADA_BAIXA
+            or any(a.name in _CAMADA_BAIXA for a in no.names)
+        )
+    )
+
+
 def _chamadas() -> list[str]:
-    """W18–W21 no Python do app criado ou mexido na branch."""
+    """W18–W22 no Python do app criado ou mexido na branch."""
     base = git("merge-base", "master", "HEAD")
     mexidos = git("diff", "--name-only", "--diff-filter=AM", base, "--", "apps").splitlines()
     mexidos += git("ls-files", "--others", "--exclude-standard", "apps").splitlines()
@@ -494,6 +512,10 @@ def _chamadas() -> list[str]:
             for i in checar_docstrings(texto):
                 out.append(f"W21 {n}:{i}: função ou classe sem docstring; explique dentro"
                            " dela, não em comentário em cima")
+        if "/routers/" in n:
+            for i in checar_camadas(texto, pacote):
+                out.append(f"W22 {n}:{i}: router importa de clients/ ou connections;"
+                           " chame uma função de services/")
     return out
 
 
