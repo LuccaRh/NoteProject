@@ -107,6 +107,10 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   quando abrem o corpo) e o comando depois de um bloco também; a primeira linha do corpo de
   um `def` também fica separada da assinatura. Vale para código novo; arquivo antigo só quando
   for mexido. Python: lint W14 (`ai/np lint`).
+- **Código primeiro, teste depois** (2026-11-02): o desenho do código do app sai do que é
+  melhor para ele (clareza, desempenho, regras daqui), nunca do que facilita o teste. O teste
+  se adapta ao código (monkeypatch, fake, transport), não o contrário; "fica mais fácil de
+  testar" não é argumento a favor de um desenho.
 - **Argumento com nome** (2026-11-02): chamada a função ou método do próprio serviço passa
   cada argumento com o nome do parâmetro (`create_note(ichiro=ichiro, title=title)`), nunca
   só pela ordem. Lib fica como a doc dela usa. Lint W19 (`ai/np lint`).
@@ -114,6 +118,11 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   usada direto pelas funções do próprio módulo; outro módulo importa a função, nunca a
   constante, e a constante não vira argumento de chamada (`create_workspace_folder(ichiro=...)`
   em vez de `create_note(title=WORKSPACE, ...)`). Lint W18 (`ai/np lint`).
+- **Valor fixo vira global, não parâmetro** (2026-11-02): o que não muda durante a vida do
+  processo (cliente de outro serviço, URL, config) e seria passado de função em função vira
+  global, e as funções usam direto; parâmetro fica para o que muda a cada chamada. Instância
+  de client fica em `<pacote>/connections.py` (`ichiro`, `claude`); recurso aberto fecha no
+  `lifespan` do app.
 - **Backend em camadas** (2026-11-02): `routers/` → `services/` → `clients/`, cada uma só
   chama a de baixo. **Client** (`clients/<api>.py`): uma classe por API externa (ichiro,
   Anthropic), um método por endpoint, devolvendo o modelo de `schemas/`, sem regra do
