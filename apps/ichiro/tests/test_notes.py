@@ -390,3 +390,76 @@ def test_tree_of_a_missing_folder(client: TestClient) -> None:
     response = client.get("/notes/tree", params=params)
 
     assert response.status_code == 404
+
+
+# Search finds the word in the title or the body, notes only, by title
+def test_search_title_and_body(client: TestClient) -> None:
+
+    in_body = create(client=client, title="Beta", body="the Zorblax, again")
+    in_title = create(client=client, title="Alpha zorblax")
+    create(client=client, title="Zorblax", is_folder=True)
+    create(client=client, title="Other", body="zorbl zorblaxes")
+
+    response = client.get("/notes/search", params={"q": "zorblax"})
+
+    assert response.status_code == 200
+    assert response.json() == [
+        {"id": in_title["id"], "title": "Alpha zorblax"},
+        {"id": in_body["id"], "title": "Beta"},
+    ]
+
+
+# Two words: only the notes that have both
+def test_search_two_words(client: TestClient) -> None:
+
+    both = create(client=client, title="Both", body="quixel and vormic")
+    create(client=client, title="One", body="quixel only")
+
+    response = client.get("/notes/search", params={"q": "vormic quixel"})
+
+    assert response.json() == [{"id": both["id"], "title": "Both"}]
+
+
+# With parent_id, only the notes inside that folder, at any depth
+def test_search_inside_a_folder(client: TestClient) -> None:
+
+    folder = create(client=client, title="Search", is_folder=True)
+    sub = create(
+        client=client,
+        title="Sub",
+        is_folder=True,
+        parent_id=folder["id"],
+    )
+    deep = create(
+        client=client,
+        title="Deep",
+        body="plonkite",
+        parent_id=sub["id"],
+    )
+    create(client=client, title="Outside", body="plonkite")
+
+    response = client.get(
+        "/notes/search",
+        params={"q": "plonkite", "parent_id": folder["id"]},
+    )
+
+    assert response.json() == [{"id": deep["id"], "title": "Deep"}]
+
+
+# A parent_id that doesn't exist is 404
+def test_search_inside_a_missing_folder(client: TestClient) -> None:
+
+    response = client.get(
+        "/notes/search",
+        params={"q": "plonkite", "parent_id": MISSING_ID},
+    )
+
+    assert response.status_code == 404
+
+
+# An empty query is 422
+def test_search_empty_query(client: TestClient) -> None:
+
+    response = client.get("/notes/search", params={"q": ""})
+
+    assert response.status_code == 422
