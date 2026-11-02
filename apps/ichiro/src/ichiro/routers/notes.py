@@ -28,7 +28,6 @@ def check_parent(
     parent_id: UUID | None,
     note_id: UUID | None = None,
 ) -> None:
-
     """
     Refuse a parent that doesn't exist, isn't a folder or, when moving,
     is the note itself or one of its subfolders
@@ -71,15 +70,24 @@ def check_parent(
 
 
 @router.get("")
-def list_notes(conn: Conn, parent_id: UUID | None = None) -> list[Note]:
+def list_notes(
+    conn: Conn,
+    parent_id: UUID | None = None,
+    title: str | None = None,
+) -> list[Note]:
+    """
+    Notes right inside parent_id (the root when none), folders first,
+    then by title; only the ones with this title when one is given
+    """
 
     rows = conn.execute(
         text(
             f"SELECT {COLUMNS} FROM notes"
             " WHERE parent_id IS NOT DISTINCT FROM CAST(:parent_id AS uuid)"
+            " AND (CAST(:title AS text) IS NULL OR title = :title)"
             " ORDER BY is_folder DESC, title"
         ),
-        {"parent_id": parent_id},
+        {"parent_id": parent_id, "title": title},
     ).mappings()
 
     return [Note.model_validate(row) for row in rows]
@@ -87,6 +95,9 @@ def list_notes(conn: Conn, parent_id: UUID | None = None) -> list[Note]:
 
 @router.get("/{note_id}")
 def get_note(conn: Conn, note_id: UUID) -> Note:
+    """
+    One note by id; 404 when it doesn't exist
+    """
 
     row = conn.execute(
         text(f"SELECT {COLUMNS} FROM notes WHERE id = :id"),
@@ -101,8 +112,11 @@ def get_note(conn: Conn, note_id: UUID) -> Note:
 
 @router.post("", status_code=201)
 def create_note(conn: Conn, note: NoteCreate) -> Note:
+    """
+    Saves a new note or folder and returns it as the table keeps it
+    """
 
-    check_parent(conn, note.parent_id)
+    check_parent(conn=conn, parent_id=note.parent_id)
 
     try:
         row = conn.execute(
@@ -121,6 +135,9 @@ def create_note(conn: Conn, note: NoteCreate) -> Note:
 
 @router.patch("/{note_id}")
 def update_note(conn: Conn, note_id: UUID, patch: NoteUpdate) -> Note:
+    """
+    Changes only the fields sent: title, body or parent (a move)
+    """
 
     # Only the fields sent in the request: parent_id null moves to the root
     fields = patch.model_dump(exclude_unset=True)
@@ -131,7 +148,7 @@ def update_note(conn: Conn, note_id: UUID, patch: NoteUpdate) -> Note:
 
     # check if the new parent_id exists
     if "parent_id" in fields:
-        check_parent(conn, fields["parent_id"], note_id)
+        check_parent(conn=conn, parent_id=fields["parent_id"], note_id=note_id)
 
     # Keys come from NoteUpdate, never from the client: safe in the SQL
     sets = "".join(f"{key} = :{key}, " for key in fields)
@@ -155,6 +172,9 @@ def update_note(conn: Conn, note_id: UUID, patch: NoteUpdate) -> Note:
 
 @router.delete("/{note_id}", status_code=204)
 def delete_note(conn: Conn, note_id: UUID) -> Response:
+    """
+    Deletes a note, or a folder with everything inside it
+    """
 
     result = conn.execute(
         text("DELETE FROM notes WHERE id = :id RETURNING id"),

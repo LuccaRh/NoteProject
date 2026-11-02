@@ -27,7 +27,7 @@ def create(
 # A created note comes back the same from GET, at the root
 def test_create_returns_the_note(client: TestClient) -> None:
 
-    note = create(client, "Groceries", body="milk")
+    note = create(client=client, title="Groceries", body="milk")
     response = client.get(f"/notes/{note['id']}")
 
     assert response.status_code == 200
@@ -47,10 +47,15 @@ def test_get_missing_note(client: TestClient) -> None:
 # Inside a folder: folders first, then the rest by title
 def test_list_folders_first_then_by_title(client: TestClient) -> None:
 
-    folder = create(client, "Work", is_folder=True)
-    create(client, "b note", parent_id=folder["id"])
-    create(client, "a note", parent_id=folder["id"])
-    create(client, "c folder", parent_id=folder["id"], is_folder=True)
+    folder = create(client=client, title="Work", is_folder=True)
+    create(client=client, title="b note", parent_id=folder["id"])
+    create(client=client, title="a note", parent_id=folder["id"])
+    create(
+        client=client,
+        title="c folder",
+        parent_id=folder["id"],
+        is_folder=True,
+    )
 
     response = client.get("/notes", params={"parent_id": folder["id"]})
     titles = [note["title"] for note in response.json()]
@@ -61,8 +66,8 @@ def test_list_folders_first_then_by_title(client: TestClient) -> None:
 # Without parent_id the list has only the root
 def test_list_root(client: TestClient) -> None:
 
-    folder = create(client, "Work", is_folder=True)
-    create(client, "Inside", parent_id=folder["id"])
+    folder = create(client=client, title="Work", is_folder=True)
+    create(client=client, title="Inside", parent_id=folder["id"])
 
     titles = [note["title"] for note in client.get("/notes").json()]
 
@@ -84,7 +89,7 @@ def test_create_in_missing_parent(client: TestClient) -> None:
 # POST into a note that isn't a folder is 422
 def test_create_inside_a_note(client: TestClient) -> None:
 
-    note = create(client, "Plain note")
+    note = create(client=client, title="Plain note")
     response = client.post(
         "/notes", json={"title": "Child", "parent_id": note["id"]}
     )
@@ -96,7 +101,7 @@ def test_create_inside_a_note(client: TestClient) -> None:
 # PATCH changes only the fields sent and bumps updated_at
 def test_update_only_the_fields_sent(client: TestClient) -> None:
 
-    note = create(client, "Old", body="kept")
+    note = create(client=client, title="Old", body="kept")
     response = client.patch(f"/notes/{note['id']}", json={"title": "New"})
     updated = response.json()
 
@@ -109,7 +114,7 @@ def test_update_only_the_fields_sent(client: TestClient) -> None:
 # PATCH can't set title to null
 def test_update_title_to_null(client: TestClient) -> None:
 
-    note = create(client, "Title")
+    note = create(client=client, title="Title")
     response = client.patch(f"/notes/{note['id']}", json={"title": None})
 
     assert response.status_code == 422
@@ -126,8 +131,8 @@ def test_update_missing_note(client: TestClient) -> None:
 # parent_id moves the note; null moves it back to the root
 def test_move_to_folder_and_back_to_root(client: TestClient) -> None:
 
-    folder = create(client, "Folder", is_folder=True)
-    note = create(client, "Note")
+    folder = create(client=client, title="Folder", is_folder=True)
+    note = create(client=client, title="Note")
     url = f"/notes/{note['id']}"
 
     moved = client.patch(url, json={"parent_id": folder["id"]}).json()
@@ -140,7 +145,7 @@ def test_move_to_folder_and_back_to_root(client: TestClient) -> None:
 # A folder can't be its own parent
 def test_move_folder_inside_itself(client: TestClient) -> None:
 
-    folder = create(client, "Folder", is_folder=True)
+    folder = create(client=client, title="Folder", is_folder=True)
     response = client.patch(
         f"/notes/{folder['id']}", json={"parent_id": folder["id"]}
     )
@@ -152,9 +157,19 @@ def test_move_folder_inside_itself(client: TestClient) -> None:
 # A folder can't go below itself, and stays where it was
 def test_move_folder_inside_its_subfolder(client: TestClient) -> None:
 
-    top = create(client, "Top", is_folder=True)
-    middle = create(client, "Middle", parent_id=top["id"], is_folder=True)
-    bottom = create(client, "Bottom", parent_id=middle["id"], is_folder=True)
+    top = create(client=client, title="Top", is_folder=True)
+    middle = create(
+        client=client,
+        title="Middle",
+        parent_id=top["id"],
+        is_folder=True,
+    )
+    bottom = create(
+        client=client,
+        title="Bottom",
+        parent_id=middle["id"],
+        is_folder=True,
+    )
 
     response = client.patch(
         f"/notes/{top['id']}", json={"parent_id": bottom["id"]}
@@ -167,8 +182,8 @@ def test_move_folder_inside_its_subfolder(client: TestClient) -> None:
 # Deleting a folder deletes what is inside it
 def test_delete_folder_deletes_its_notes(client: TestClient) -> None:
 
-    folder = create(client, "Folder", is_folder=True)
-    note = create(client, "Inside", parent_id=folder["id"])
+    folder = create(client=client, title="Folder", is_folder=True)
+    note = create(client=client, title="Inside", parent_id=folder["id"])
 
     assert client.delete(f"/notes/{folder['id']}").status_code == 204
     assert client.get(f"/notes/{note['id']}").status_code == 404
@@ -180,3 +195,27 @@ def test_delete_missing_note(client: TestClient) -> None:
     response = client.delete(f"/notes/{MISSING_ID}")
 
     assert response.status_code == 404
+
+
+# With title, the list has only the note with that title in the folder
+def test_list_by_title(client: TestClient) -> None:
+
+    folder = create(client=client, title="Work", is_folder=True)
+    note = create(client=client, title="Plan", parent_id=folder["id"])
+    create(client=client, title="Other", parent_id=folder["id"])
+    create(client=client, title="Plan")
+
+    params = {"parent_id": folder["id"], "title": "Plan"}
+    response = client.get("/notes", params=params)
+
+    assert response.json() == [note]
+
+
+# A title that isn't in the folder gives an empty list
+def test_list_by_missing_title(client: TestClient) -> None:
+
+    create(client=client, title="Plan")
+
+    response = client.get("/notes", params={"title": "Nothing here"})
+
+    assert response.json() == []
