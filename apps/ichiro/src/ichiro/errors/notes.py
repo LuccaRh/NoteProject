@@ -36,3 +36,11 @@ def parent_inside_note() -> HTTPException:
         status_code=422,
         detail="cannot move a folder inside itself",
     )
+
+
+def title_taken() -> HTTPException:
+    """
+    409 for a title that another note already has in the same folder
+    """
+
+    return HTTPException(status_code=409, detail="title already in folder")
