@@ -1,77 +1,91 @@
 # Imports
-import os
-from datetime import date
-from pathlib import Path
 from typing import Any
 
 from anthropic import AsyncAnthropic, omit
 from anthropic.lib.streaming import AsyncMessageStreamManager
 from anthropic.lib.tools import BetaAsyncFunctionTool
-from fastapi import HTTPException
+
+from lonzo.errors import MissingApiKey
 
 
 # Global variables
 MODEL = "claude-haiku-5-5"
 CHAT_MAX_TOKENS = 512
-WORKSPACE_MAX_TOKENS = 16000
-WORKSPACE_MAX_TURNS = 20
-PROMPT_PATH = Path(__file__).parent.parent / "create_workspace.md"
+TOOLS_MAX_TOKENS = 16000
+TOOLS_MAX_TURNS = 20
 
 
 # Code
-def get_client() -> AsyncAnthropic:
+class AnthropicClient:
     """
-    Client of the Anthropic API, with one key for the whole service until
-    there is a login
-    """
-
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        raise HTTPException(503, "ANTHROPIC_API_KEY is not set")
-
-    return AsyncAnthropic()
-
-
-def stream_answer(
-    client: AsyncAnthropic,
-    system: str,
-    question: str,
-) -> AsyncMessageStreamManager[None]:
-    """
-    The answer to one question, streamed while the model writes; without
-    workspace rules the call goes with no system prompt
+    The Anthropic API: one method per kind of call lonzo makes, with the
+    model and limits fixed here
     """
 
-    return client.messages.stream(
-        model=MODEL,
-        max_tokens=CHAT_MAX_TOKENS,
-        thinking={"type": "disabled"},
-        system=system or omit,
-        messages=[{"role": "user", "content": question}],
-    )
+    sdk: AsyncAnthropic
 
+    def __init__(self) -> None:
+        """
+        One SDK client for the whole service, with the key of the
+        environment, until there is a login
+        """
 
-async def write_workspace(
-    client: AsyncAnthropic,
-    description: str,
-    tools: list[BetaAsyncFunctionTool[Any]],
-) -> None:
-    """
-    The tool loop, run by the tool runner of the SDK: from the person's
-    text, the model saves the workspace one note per tool call, until it
-    stops calling tools or reaches WORKSPACE_MAX_TURNS
-    """
+        self.sdk = AsyncAnthropic()
 
-    # The prompt never changes, so the system prompt stays the same for
-    # the cache; the date goes with the text
-    system = PROMPT_PATH.read_text(encoding="utf-8")
-    request = f"Today is {date.today().isoformat()}.\n\n{description}"
-    runner = client.beta.messages.tool_runner(
-        model=MODEL,
-        max_tokens=WORKSPACE_MAX_TOKENS,
-        thinking={"type": "disabled"},
-        system=system,
-        messages=[{"role": "user", "content": request}],
-        tools=tools,
-        max_iterations=WORKSPACE_MAX_TURNS,
-    )
-    await runner.until_done()
+    async def close(self) -> None:
+        """
+        Closes the connections kept open to the API
+        """
+
+        await self.sdk.close()
+
+    def check_key(self) -> None:
+        """
+        MissingApiKey when the service has no key, before any call
+        """
+
+        if self.sdk.api_key is None:
+            raise MissingApiKey("ANTHROPIC_API_KEY is not set")
+
+    def stream_answer(
+        self,
+        system: str,
+        question: str,
+    ) -> AsyncMessageStreamManager[None]:
+        """
+        The answer to one question, streamed while the model writes; an
+        empty system goes as no system prompt
+        """
+
+        self.check_key()
+
+        return self.sdk.messages.stream(
+            model=MODEL,
+            max_tokens=CHAT_MAX_TOKENS,
+            thinking={"type": "disabled"},
+            system=system or omit,
+            messages=[{"role": "user", "content": question}],
+        )
+
+    async def run_tools(
+        self,
+        system: str,
+        request: str,
+        tools: list[BetaAsyncFunctionTool[Any]],
+    ) -> None:
+        """
+        The tool loop, run by the tool runner of the SDK: the model calls
+        the tools until it stops or reaches TOOLS_MAX_TURNS
+        """
+
+        self.check_key()
+        runner = self.sdk.beta.messages.tool_runner(
+            model=MODEL,
+            max_tokens=TOOLS_MAX_TOKENS,
+            thinking={"type": "disabled"},
+            system=system,
+            messages=[{"role": "user", "content": request}],
+            tools=tools,
+            max_iterations=TOOLS_MAX_TURNS,
+        )
+        await runner.until_done()

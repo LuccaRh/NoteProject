@@ -5,11 +5,12 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from lonzo.errors import FolderNotFound, MissingApiKey, NotAFolder
+from lonzo.lifespan import lifespan
 from lonzo.routers import chat, health, workspaces
 
 
 # Global variables
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 app.include_router(health.router)
 app.include_router(workspaces.router)
 app.include_router(chat.router)

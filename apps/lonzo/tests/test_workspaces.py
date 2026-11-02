@@ -2,14 +2,15 @@
 from collections.abc import Mapping
 from types import SimpleNamespace
 from typing import Any, ClassVar
+from unittest.mock import patch
 from uuid import uuid4
 
 from fakes import FakeIchiro
 from fastapi.testclient import TestClient
 from httpx2 import Response
 
-from lonzo.clients.anthropic import get_client
-from lonzo.clients.ichiro import get_ichiro
+from lonzo import connections
+from lonzo.errors import TitleTaken
 from lonzo.main import app
 
 
@@ -29,8 +30,8 @@ def call(name: str, **arguments: object) -> SimpleNamespace:
 
 
 # Stands in for the tool runner: runs each turn of tool calls with the
-# real tools, keeping what each answered; a ValueError goes back as an
-# error, as the SDK does with any exception
+# real tools, keeping what each answered; an error of a tool goes back
+# to the model, as the SDK does with any exception
 class FakeRunner:
     turns: ClassVar[list[list[SimpleNamespace]]] = []
     params: ClassVar[dict[str, Any]] = {}
@@ -49,7 +50,7 @@ class FakeRunner:
             for block in turn:
                 try:
                     content = await tools[block.name].call(block.input)
-                except ValueError as error:
+                except (ValueError, TitleTaken) as error:
                     result = {"content": str(error), "is_error": True}
                 else:
                     result = {"content": content, "is_error": False}
@@ -58,6 +59,7 @@ class FakeRunner:
 
 
 class FakeClient:
+    api_key: str = "test-key"
     messages: SimpleNamespace = SimpleNamespace(tool_runner=FakeRunner)
     beta: SimpleNamespace = SimpleNamespace(messages=messages)
 
@@ -69,12 +71,12 @@ def post(
 ) -> Response:
 
     FakeRunner.turns = turns or []
-    app.dependency_overrides[get_client] = FakeClient
-    app.dependency_overrides[get_ichiro] = ichiro.client
-    response = client.post("/chat/workspaces", json=body)
-    app.dependency_overrides.clear()
 
-    return response
+    with (
+        patch.object(connections.claude, "sdk", FakeClient()),
+        patch.object(connections.ichiro, "http", ichiro.client()),
+    ):
+        return client.post("/chat/workspaces", json=body)
 
 
 def test_workspace_saves_rules_and_skills_in_the_folder() -> None:

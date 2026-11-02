@@ -1,16 +1,17 @@
 # Imports
 import json
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Mapping
 from types import SimpleNamespace, TracebackType
 from typing import ClassVar, Self
+from unittest.mock import patch
 
-import pytest
+import httpx2
 from anthropic import omit
 from fakes import FakeIchiro, unreachable
 from fastapi.testclient import TestClient
+from httpx2 import Response
 
-from lonzo.clients.anthropic import get_client
-from lonzo.clients.ichiro import get_ichiro
+from lonzo import connections
 from lonzo.main import app
 
 
@@ -64,6 +65,7 @@ class FakeMessages:
 
 
 class FakeClient:
+    api_key: str = "test-key"
     messages: FakeMessages = FakeMessages()
 
 
@@ -80,12 +82,23 @@ def parse(body: str) -> list[tuple[str, dict[str, object]]]:
     return events
 
 
+def post(
+    body: Mapping[str, object],
+    http: httpx2.AsyncClient | None = None,
+) -> Response:
+
+    http = http or FakeIchiro().client()
+
+    with (
+        patch.object(connections.claude, "sdk", FakeClient()),
+        patch.object(connections.ichiro, "http", http),
+    ):
+        return client.post("/chat", json=body)
+
+
 def test_chat_streams_named_events() -> None:
 
-    app.dependency_overrides[get_client] = FakeClient
-    app.dependency_overrides[get_ichiro] = FakeIchiro().client
-    response = client.post("/chat", json={"question": "Hi"})
-    app.dependency_overrides.clear()
+    response = post(body={"question": "Hi"})
 
     assert response.headers["content-type"].startswith("text/event-stream")
     events = parse(body=response.text)
@@ -100,38 +113,31 @@ def test_chat_streams_named_events() -> None:
 
 def test_chat_needs_a_question() -> None:
 
-    app.dependency_overrides[get_client] = FakeClient
-    app.dependency_overrides[get_ichiro] = FakeIchiro().client
-    response = client.post("/chat", json={})
-    app.dependency_overrides.clear()
+    response = post(body={})
 
     assert response.status_code == 422
 
 
-def test_chat_without_key(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_chat_without_key() -> None:
 
-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
-    response = client.post("/chat", json={"question": "Hi"})
+    no_key = SimpleNamespace(api_key=None)
+
+    with patch.object(connections.claude, "sdk", no_key):
+        response = client.post("/chat", json={"question": "Hi"})
 
     assert response.status_code == 503
 
 
 def test_chat_with_notes_service_down() -> None:
 
-    app.dependency_overrides[get_client] = FakeClient
-    app.dependency_overrides[get_ichiro] = unreachable
-    response = client.post("/chat", json={"question": "Hi"})
-    app.dependency_overrides.clear()
+    response = post(body={"question": "Hi"}, http=unreachable())
 
     assert response.status_code == 502
 
 
 def test_chat_without_workspace_has_no_rules() -> None:
 
-    app.dependency_overrides[get_client] = FakeClient
-    app.dependency_overrides[get_ichiro] = FakeIchiro().client
-    client.post("/chat", json={"question": "Hi"})
-    app.dependency_overrides.clear()
+    post(body={"question": "Hi"})
 
     assert FakeMessages.params["system"] is omit
 
@@ -148,11 +154,8 @@ def test_chat_uses_root_and_folder_workspace_rules() -> None:
     elsewhere = ichiro.add(title=".workspace", parent_id=other, is_folder=True)
     ichiro.add(title="Fixed facts", parent_id=elsewhere, body="Exam soon.")
 
-    app.dependency_overrides[get_client] = FakeClient
-    app.dependency_overrides[get_ichiro] = ichiro.client
     body = {"question": "Hi", "folder_id": str(folder)}
-    client.post("/chat", json=body)
-    app.dependency_overrides.clear()
+    post(body=body, http=ichiro.client())
 
     system = str(FakeMessages.params["system"])
     assert system.endswith(

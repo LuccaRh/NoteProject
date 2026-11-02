@@ -2,10 +2,9 @@
 from typing import Any
 from uuid import UUID
 
-import httpx2
 from anthropic.lib.tools import BetaAsyncFunctionTool, beta_async_tool
 
-from lonzo.clients.ichiro import create_note, find_by_path
+from lonzo.connections import ichiro
 from lonzo.schemas.notes import Note
 
 
@@ -16,16 +15,14 @@ class NoteTools:
     to it, as a coding agent does with files; it never leaves that folder
     """
 
-    ichiro: httpx2.AsyncClient
     root_id: UUID
     created: list[Note]
 
-    def __init__(self, ichiro: httpx2.AsyncClient, root_id: UUID) -> None:
+    def __init__(self, root_id: UUID) -> None:
         """
         Tools on the notes inside root_id, the folder of the workspace
         """
 
-        self.ichiro = ichiro
         self.root_id = root_id
         self.created = []
 
@@ -91,11 +88,7 @@ class NoteTools:
             return self.root_id
 
         path = "/".join(names)
-        note = await find_by_path(
-            ichiro=self.ichiro,
-            parent_id=self.root_id,
-            path=path,
-        )
+        note = await ichiro.get_note_by_path(parent_id=self.root_id, path=path)
 
         if note is None:
             parent_id = await self.folder(names=names[:-1])
@@ -118,11 +111,10 @@ class NoteTools:
     ) -> Note:
         """
         Saves a new note or folder in ichiro and keeps it in created;
-        ValueError when the title is already taken there (ichiro's 409)
+        TitleTaken when the title is already taken there
         """
 
-        note = await create_note(
-            ichiro=self.ichiro,
+        note = await ichiro.create_note(
             title=title,
             parent_id=parent_id,
             body=body,
