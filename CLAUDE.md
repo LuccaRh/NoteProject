@@ -123,13 +123,18 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   global, e as funções usam direto; parâmetro fica para o que muda a cada chamada. Instância
   de client fica em `<pacote>/connections.py` (`ichiro`, `claude`); recurso aberto fecha no
   `lifespan` do app.
-- **Backend em camadas** (2026-11-02): `routers/` → `services/` → `clients/`, cada uma só
+- **Backend em camadas** (2026-11-02): `routers/` → `services/` → `clients/` ou `repositories/`, cada uma só
   chama a de baixo. **Client** (`clients/<api>.py`): uma classe por API externa (ichiro,
   Anthropic), um método por endpoint, devolvendo o modelo de `schemas/`, sem regra do
-  serviço. **Service** (`services/<assunto>.py`): as funções do serviço em cima dos clients,
+  serviço. **Repository** (`repositories/<tabela>.py`, no lugar do client quando embaixo é o
+  banco): uma função por consulta SQL, devolvendo o modelo de `schemas/` ou `None`, sem regra;
+  erro do banco (`IntegrityError`) já sai como erro do domínio. **Service**
+  (`services/<assunto>.py`): as funções do serviço em cima dos clients e repositories,
   com as checagens e os erros do domínio (`FolderNotFound`). **Router**: recebe o pedido,
-  chama **um** service e devolve; nunca um client, mesmo para uma chamada direta. Erro do
-  domínio vira status num `exception_handler` do `main.py`. Lint W22 (`ai/np lint`).
+  chama **um** service e devolve; nunca um client nem um repository, mesmo para uma chamada
+  direta. Erro do
+  domínio vira status num `exception_handler`, no `main.py` ou, no ichiro, no `handlers.py`
+  (tabela erro → status). Lint W22 (`ai/np lint`).
 - **Explicação dentro da função** (2026-11-02): todo `def` e `class` do app (`src/`) explica o que
   faz numa docstring, primeiro comando do corpo, **grudada** na assinatura (ou na linha do
   `class`): `"""` sozinho na linha, o texto (sem ponto no fim), `"""` sozinho, e uma linha em
@@ -202,24 +207,29 @@ ai/                todo o resto do workspace de IA:
 
 ## Estado (2026-11-02)
 
-- M0, #46, #62, #64, #65, #69, #16, #80, #82 e #74 mergeados (PRs #66–#68, #70–#72, #81, #83–#85);
-  `master` local = remoto, sem branches locais além dela.
+- M0, #46, #62, #64, #65, #69, #16, #80, #82, #74 e #73 mergeados (PRs #66–#68, #70–#72, #81,
+  #83–#85, #88, #93–#96, #99); `master` local = remoto; branches `backup/*` locais guardadas.
 - #74 pronta: `apps/lonzo` responde `POST /api/chat` em SSE (Haiku 5.5, `thinking` desligado,
   `max_tokens` 512); o Caddy roteia `/api/notes/*` → ichiro, `/api/chat/*` →
   lonzo, outro `/api` → 404. Evento `status` saiu da #74 e nasce com as ferramentas (#77).
-- #73 na branch `lonzo/create-a-workspace-from-a-short-description-of-its-goal` (sem push):
+- #73 pronta (PR #99):
   `POST /api/chat/workspaces {folder_id, description}` → o lonzo cria `.workspace/` + `kb/ skills/
   scripts/ hooks/` (reaproveita as que existem) e o `tool_runner` da SDK roda o laço com o prompt
   (`create_workspace.md`, sem `CLAUDE.md` base) e as ferramentas `create_note`/`create_folder`
   (`lonzo/services/note_tools.py`, caminho relativo à pasta), que gravam `CLAUDE.md` e as notas no ichiro
   (`httpx2`, `http://ichiro:8000`); o chat aceita `folder_id` e usa as regras do `.workspace` da
   raiz + pasta, e sem nenhum vai sem `system` (o `rules.md` da #74 saiu). Docstring em toda
-  função do lonzo (W21); o ichiro ainda tem comentário em cima do `def` (o `check_parent` tem
-  docstring, mas separada da assinatura): arrumar numa branch do `ichiro`.
+  função do lonzo (W21).
   Lonzo em camadas (2026-11-02): `routers/` → `services/` (`chat`, `workspaces`,
   `note_tools`) → `clients/` (`IchiroClient`, `AnthropicClient`, instâncias em `connections.py`,
   fechadas no `lifespan`); erros do domínio viram status no `main.py`; modelos em `schemas/`;
   o `message_start` saiu sem `model`, que foi para o `message_end` (a constante fica no cliente).
+- #98 na branch `ichiro/split-ichiro-into-routers-and-services`, sobre a `master` (sem push,
+  revisão do Lucca pendente): ichiro em `routers/` → `services/` (`notes`, `health`, as regras)
+  → `repositories/` (`notes`, `health`: só o SQL, devolvem `Note` ou `None`; o `IntegrityError`
+  já sai como `TitleTaken`/`ParentNotFound`); `errors.py` com exceções do domínio, status no `handlers.py`;
+  docstring em todo o `src/`; versão 0.12.0. Falta no ichiro: comentário em cima das fixtures
+  do `conftest.py`, W20 em `tests/test_notes.py`.
 - IA (2026-10-31): chat com o workspace no servidor; vault `IA no projeto/Chat com o workspace` e
   `Caminho de uma pergunta`. Workspace = pasta com `.workspace/`, vários por pessoa.
 - #31 (Ctrl+D) e #5 (chips) sem milestone, para depois; `decorations/replace.ts` (#5) fora do git.
@@ -232,8 +242,8 @@ ai/                todo o resto do workspace de IA:
 
 Plano: vault `Plano do projeto/Roadmap` (navegador → app desktop → celular) + issues/milestones no GitHub.
 
-1. Entrega de 2026-11-06 (vault `Plano do projeto/Entrega de 2026-11-06`): #74 ✅ → #73 (branch pronta, falta PR) workspace criado pela IA a partir de um texto breve
-   (esqueleto; vault `Workspace no app#Como nasce`) → #75 conversas, #76 tela do chat → #56 busca, #77 ler/buscar
+1. Entrega de 2026-11-06 (vault `Plano do projeto/Entrega de 2026-11-06`): #74 ✅ → #73 ✅ workspace criado pela IA a partir de um texto breve
+   (esqueleto; vault `Workspace no app#Como nasce`) → #98 ichiro em camadas (branch pronta, falta PR) → #75 conversas, #76 tela do chat → #56 busca, #77 ler/buscar
    → #78 criar/editar/apagar, #51 → #6 pastas, #79 importar o vault → #17 se sobrar.
 2. M2 login (#48, #17) → M3 AWS (#18–#25, #47) → M4 edição ao vivo (#26, #27, #30).
 - v1 = ler notas no navegador com o servidor na AWS (vault `Plano do projeto/Objetivo do app`);

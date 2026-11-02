@@ -133,3 +133,7 @@ class TestCamadas(unittest.TestCase):
             "from fastapi import APIRouter\n"
         )
         self.assertEqual(checar_camadas(texto, "lonzo"), [1, 2, 3])
+
+    def test_router_com_repository(self) -> None:
+        texto = "from ichiro.repositories.notes import select_note\n"
+        self.assertEqual(checar_camadas(texto, "ichiro"), [1])
