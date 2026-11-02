@@ -2,19 +2,20 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, Response
 from psycopg.errors import UniqueViolation
 from sqlalchemy import Connection, text
 from sqlalchemy.exc import IntegrityError
 
 from ichiro.db import get_conn
-from ichiro.errors.notes import (
-    not_found,
-    parent_inside_note,
-    parent_not_folder,
-    parent_not_found,
-    path_empty,
-    title_taken,
+from ichiro.errors import (
+    FieldNull,
+    NoteNotFound,
+    ParentInsideNote,
+    ParentNotAFolder,
+    ParentNotFound,
+    PathEmpty,
+    TitleTaken,
 )
 from ichiro.schemas.notes import Note, NoteCreate, NotePath, NoteUpdate
 
@@ -46,10 +47,10 @@ def check_parent(
     ).scalar_one_or_none()
 
     if is_folder is None:
-        raise parent_not_found()
+        raise ParentNotFound("parent not found")
 
     if not is_folder:
-        raise parent_not_folder()
+        raise ParentNotAFolder("parent is not a folder")
 
     # Check to see if note is being created (null id yet) or updated
     if note_id is None:
@@ -69,19 +70,19 @@ def check_parent(
     ).scalar_one()
 
     if is_cycle:
-        raise parent_inside_note()
+        raise ParentInsideNote("cannot move a folder inside itself")
 
 
-def integrity_error(error: IntegrityError) -> HTTPException:
+def integrity_error(error: IntegrityError) -> Exception:
     """
     The error for an insert or update the table refused: a title already
     in the folder, or a parent deleted in the meantime
     """
 
     if isinstance(error.orig, UniqueViolation):
-        return title_taken()
+        return TitleTaken("title already in folder")
 
-    return parent_not_found()
+    return ParentNotFound("parent not found")
 
 
 @router.get("")
@@ -151,7 +152,7 @@ def get_note_by_path(
     names = [name for name in path.split("/") if name]
 
     if not names:
-        raise path_empty()
+        raise PathEmpty("path is empty")
 
     row = conn.execute(
         text(
@@ -171,7 +172,7 @@ def get_note_by_path(
     ).mappings().one_or_none()
 
     if row is None:
-        raise not_found()
+        raise NoteNotFound("note not found")
 
     return Note.model_validate(row)
 
@@ -188,7 +189,7 @@ def get_note(conn: Conn, note_id: UUID) -> Note:
     ).mappings().one_or_none()
 
     if row is None:
-        raise not_found()
+        raise NoteNotFound("note not found")
 
     return Note.model_validate(row)
 
@@ -227,7 +228,7 @@ def update_note(conn: Conn, note_id: UUID, patch: NoteUpdate) -> Note:
 
     # cant update title or body to null
     if fields.get("title", "") is None or fields.get("body", "") is None:
-        raise HTTPException(status_code=422, detail="title and body not null")
+        raise FieldNull("title and body not null")
 
     # check if the new parent_id exists
     if "parent_id" in fields:
@@ -248,7 +249,7 @@ def update_note(conn: Conn, note_id: UUID, patch: NoteUpdate) -> Note:
         raise integrity_error(error=error)
 
     if row is None:
-        raise not_found()
+        raise NoteNotFound("note not found")
 
     return Note.model_validate(row)
 
@@ -265,6 +266,6 @@ def delete_note(conn: Conn, note_id: UUID) -> Response:
     )
 
     if result.one_or_none() is None:
-        raise not_found()
+        raise NoteNotFound("note not found")
 
     return Response(status_code=204)
