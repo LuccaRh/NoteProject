@@ -117,8 +117,7 @@ async def create_workspace(folder_id: UUID, description: str) -> list[Note]:
     folders = await create_workspace_folders(parent_id=folder.id)
     notes = NoteTools(root_id=folder.id)
 
-    # The prompt never changes, so the system prompt stays the same for
-    # the cache; the date goes with the text
+    # A fixed system prompt keeps the cache; the date goes in the request
     system = PROMPT_PATH.read_text(encoding="utf-8")
     request = f"Today is {date.today().isoformat()}.\n\n{description}"
     await claude.run_tools(system=system, request=request, tools=notes.tools())
