@@ -49,3 +49,12 @@ class NotePath(BaseModel):
     id: UUID
     path: str
     is_folder: bool
+
+
+class NoteMatch(BaseModel):
+    """
+    A note found by a search, only what is needed to pick and open it
+    """
+
+    id: UUID
+    title: str
