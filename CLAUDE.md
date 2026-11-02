@@ -26,7 +26,7 @@ Regra nova de resposta vai **lá**, com data; de página do Obsidian, em `Regras
    ruff/mypy/tsc ou hook do git; aqui só fica o que não virou lint.
 4. **Contexto curto e fixo.** Vocabulário fechado de áreas (`ai/kb/areas.yaml`). Antes de mexer
    numa área: `ai/np contexto <área>` e leia **só** o que ele lista, por trecho. Nada de varrer o repo.
-5. **Aprender fazendo.** Área com `aprender: true` (dados, sync, servidor, auth, infra): primeiro
+5. **Aprender fazendo.** Área com `aprender: true` (sync, auth, infra, cliente-api): primeiro
    o conceito (escadinha, `/aprender`), depois o usuário escreve o código ou o comando; a sessão
    revisa e confere. Só entregue pronto o que ele pedir pronto, ou o que não é do aprendizado
    (boilerplate, config de lint).
@@ -52,7 +52,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 `Regras de git`). Aqui fica o que não pode falhar.
 
 - **Tarefa = issue no GitHub**, na milestone da etapa (M0–M4, Editor, AI in the app, Desktop, Mobile); label = lado (`backend`, `frontend`,
-  `infrastructure`, `ai-workspace`); `backend`/`infrastructure` o usuário escreve; `frontend` (2026-10-29) a sessão escreve direto, menos o "front-back" (área `cliente-api`: chamadas à API, comunicação com o servidor, proxy do Vite), que é do usuário. Próxima tarefa: `gh issue list -m "<milestone>"`.
+  `infrastructure`, `ai-workspace`); `infrastructure` o usuário escreve; `backend` (2026-11-02) e `frontend` (2026-10-29) a sessão escreve direto, menos as áreas `aprender` (`sync`, `auth`) e o "front-back" (área `cliente-api`: chamadas à API, comunicação com o servidor, proxy do Vite), que é do usuário. Próxima tarefa: `gh issue list -m "<milestone>"`.
 - **Branch = uma issue**, em inglês, kebab-case, saindo da `master`
   atualizada. (2026-10-25) Nome `<serviço>/<kebab>` (`ichiro/search-notes-with-full-text-search`):
   serviço = pasta de `apps/`, `postgres` ou `caddy` (2026-10-30) (container do compose; config em pasta
