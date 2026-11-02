@@ -79,7 +79,8 @@ def test_list_root(client: TestClient) -> None:
 def test_create_in_missing_parent(client: TestClient) -> None:
 
     response = client.post(
-        "/notes", json={"title": "Orphan", "parent_id": MISSING_ID}
+        "/notes",
+        json={"title": "Orphan", "parent_id": MISSING_ID},
     )
 
     assert response.status_code == 422
@@ -91,7 +92,8 @@ def test_create_inside_a_note(client: TestClient) -> None:
 
     note = create(client=client, title="Plain note")
     response = client.post(
-        "/notes", json={"title": "Child", "parent_id": note["id"]}
+        "/notes",
+        json={"title": "Child", "parent_id": note["id"]},
     )
 
     assert response.status_code == 422
@@ -147,7 +149,8 @@ def test_move_folder_inside_itself(client: TestClient) -> None:
 
     folder = create(client=client, title="Folder", is_folder=True)
     response = client.patch(
-        f"/notes/{folder['id']}", json={"parent_id": folder["id"]}
+        f"/notes/{folder['id']}",
+        json={"parent_id": folder["id"]},
     )
 
     assert response.status_code == 422
@@ -172,7 +175,8 @@ def test_move_folder_inside_its_subfolder(client: TestClient) -> None:
     )
 
     response = client.patch(
-        f"/notes/{top['id']}", json={"parent_id": bottom["id"]}
+        f"/notes/{top['id']}",
+        json={"parent_id": bottom["id"]},
     )
 
     assert response.status_code == 422
