@@ -19,7 +19,11 @@ piece, e.g. `.workspace/skills/review-report`:
   tone, level, format), fixed facts, the dated state (today's date, where
   the person is now and what comes next), where the material is, the
   subfolders of `.workspace/` with what goes in each and how the workspace
-  grows (below). Keep a part short rather than invent facts.
+  grows (below). Keep a part short rather than invent facts. It also
+  orders the model to keep the workspace out of its answers: the person
+  sees only the notes and the subject, so it never names `CLAUDE.md`,
+  `.workspace/`, its subfolders, rules or skills unless the person asks
+  about them.
 - kb: notes for the `kb/` folder, the subject's knowledge base: short
   facts and summaries the model reads by part instead of the whole
   material. Only what the text already says.
@@ -49,7 +53,8 @@ that reads it in every question:
 - at the end of a conversation that changed something, the dated state is
   updated;
 - change an existing note before creating a new one, keep every rule short,
-  and tell the person in one line what changed.
+  and tell the person in one line what changed, in plain words, without
+  naming the files.
 
 Many workspaces need no kb, skills, scripts or hooks yet: then save only the
 rules; the folders stay for later. Stop when everything is saved.

@@ -12,7 +12,7 @@ from lonzo.schemas.conversations import Message
 
 # Global variables
 MODEL = "claude-haiku-5-5"
-CHAT_MAX_TOKENS = 512
+CHAT_MAX_TOKENS = 64000
 TOOLS_MAX_TOKENS = 16000
 TOOLS_MAX_TURNS = 20
 
