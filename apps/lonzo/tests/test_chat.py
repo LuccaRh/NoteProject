@@ -5,9 +5,11 @@ from types import SimpleNamespace, TracebackType
 from typing import Self
 
 import pytest
+from fakes import FakeIchiro
 from fastapi.testclient import TestClient
 
 from lonzo.clients.anthropic import get_client
+from lonzo.clients.ichiro import get_ichiro
 from lonzo.main import app
 
 
@@ -76,6 +78,7 @@ def parse(body: str) -> list[tuple[str, dict[str, object]]]:
 def test_chat_streams_named_events() -> None:
 
     app.dependency_overrides[get_client] = FakeClient
+    app.dependency_overrides[get_ichiro] = FakeIchiro().client
     response = client.post("/chat", json={"question": "Hi"})
     app.dependency_overrides.clear()
 
@@ -93,6 +96,7 @@ def test_chat_streams_named_events() -> None:
 def test_chat_needs_a_question() -> None:
 
     app.dependency_overrides[get_client] = FakeClient
+    app.dependency_overrides[get_ichiro] = FakeIchiro().client
     response = client.post("/chat", json={})
     app.dependency_overrides.clear()
 

@@ -1,7 +1,7 @@
 # Imports
 import os
 
-from anthropic import AsyncAnthropic
+from anthropic import AsyncAnthropic, omit
 from anthropic.lib.streaming import AsyncMessageStreamManager
 from fastapi import HTTPException
 
@@ -38,6 +38,6 @@ def stream_answer(
         model=MODEL,
         max_tokens=CHAT_MAX_TOKENS,
         thinking={"type": "disabled"},
-        system=system,
+        system=system or omit,
         messages=[{"role": "user", "content": question}],
     )

@@ -1,25 +1,27 @@
 # Imports
 import json
 from collections.abc import AsyncIterator
-from pathlib import Path
 from typing import Annotated
+from uuid import UUID
 
+import httpx2
 from anthropic import APIError, AsyncAnthropic
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from lonzo.clients.anthropic import get_client, stream_answer
+from lonzo.clients.ichiro import get_ichiro, workspace_rules
 
 
 # Global variables
 router = APIRouter(prefix="/chat")
-RULES_PATH = Path(__file__).parent.parent / "rules.md"
 
 
 # Code
 class ChatRequest(BaseModel):
     question: str
+    folder_id: UUID | None = None
 
 
 # One server-sent event: a name and a JSON payload
@@ -29,9 +31,12 @@ def event(name: str, data: dict[str, object]) -> str:
 
 
 # Events of one answer, sent to the client while the model writes
-async def answer(question: str, client: AsyncAnthropic) -> AsyncIterator[str]:
+async def answer(
+    question: str,
+    system: str,
+    client: AsyncAnthropic,
+) -> AsyncIterator[str]:
 
-    system = RULES_PATH.read_text(encoding="utf-8")
     yield event(name="message_start", data={})
 
     try:
@@ -66,9 +71,13 @@ async def answer(question: str, client: AsyncAnthropic) -> AsyncIterator[str]:
 async def chat(
     body: ChatRequest,
     client: Annotated[AsyncAnthropic, Depends(get_client)],
+    ichiro: Annotated[httpx2.AsyncClient, Depends(get_ichiro)],
 ) -> StreamingResponse:
 
+    # Read before the stream starts: an ichiro error is still a status code
+    system = await workspace_rules(ichiro=ichiro, folder_id=body.folder_id)
+
     return StreamingResponse(
-        answer(question=body.question, client=client),
+        answer(question=body.question, system=system, client=client),
         media_type="text/event-stream",
     )
