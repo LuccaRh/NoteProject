@@ -1,9 +1,11 @@
 # Imports
+import asyncio
 import json
 from collections.abc import AsyncIterator, Mapping
 from types import SimpleNamespace, TracebackType
 from typing import ClassVar, Self
 from unittest.mock import patch
+from uuid import UUID, uuid4
 
 import httpx2
 from anthropic import omit
@@ -13,6 +15,7 @@ from httpx2 import Response
 
 from lonzo import connections
 from lonzo.main import app
+from lonzo.services.conversations import get_conversation
 
 
 # Global variables
@@ -162,3 +165,52 @@ def test_chat_uses_root_and_folder_workspace_rules() -> None:
         "# How to answer\n\nBe short.\n\n# Fixed facts\n\nBats left."
     )
     assert "Exam soon." not in system
+
+
+def conversation_of(response: Response) -> str:
+
+    start = parse(body=response.text)[0]
+
+    assert start[0] == "message_start"
+
+    return str(start[1]["conversation_id"])
+
+
+def test_chat_keeps_the_question_and_answer() -> None:
+
+    response = post(body={"question": "Who bats left?"})
+    conversation_id = conversation_of(response=response)
+    found = asyncio.run(get_conversation(conversation_id=UUID(conversation_id)))
+
+    assert found.title == "Who bats left?"
+    assert [(m.role, m.content) for m in found.messages] == [
+        ("user", [{"type": "text", "text": "Who bats left?"}]),
+        ("assistant", [{"type": "text", "text": "Hello there"}]),
+    ]
+
+
+def test_chat_sends_the_history_of_the_conversation() -> None:
+
+    first = post(body={"question": "Who bats left?"})
+    conversation_id = conversation_of(response=first)
+
+    second = post(
+        body={"question": "And right?", "conversation_id": conversation_id},
+    )
+
+    assert conversation_of(response=second) == conversation_id
+    question = [{"type": "text", "text": "Who bats left?"}]
+    answer = [{"type": "text", "text": "Hello there"}]
+    assert FakeMessages.params["messages"] == [
+        {"role": "user", "content": question},
+        {"role": "assistant", "content": answer},
+        {"role": "user", "content": "And right?"},
+    ]
+
+
+def test_chat_in_a_missing_conversation() -> None:
+
+    body = {"question": "Hi", "conversation_id": str(uuid4())}
+    response = post(body=body)
+
+    assert response.status_code == 404
