@@ -17,11 +17,13 @@ router = APIRouter(prefix="/chat")
 # Code
 class ChatRequest(BaseModel):
     """
-    A question and, optionally, the workspace folder it is asked in
+    A question and, optionally, the workspace folder it is asked in or
+    the conversation it goes on
     """
 
     question: str
     folder_id: UUID | None = None
+    conversation_id: UUID | None = None
 
 
 async def server_sent(events: AsyncIterator[Event]) -> AsyncIterator[str]:
@@ -37,10 +39,15 @@ async def server_sent(events: AsyncIterator[Event]) -> AsyncIterator[str]:
 async def post_chat(body: ChatRequest) -> StreamingResponse:
     """
     Answers a question in server-sent events, with the rules of the
-    root and folder workspaces; without any, with no rules
+    root and folder workspaces (without any, with no rules), in a new
+    conversation or after the messages of conversation_id
     """
 
-    events = await answer(question=body.question, folder_id=body.folder_id)
+    events = await answer(
+        question=body.question,
+        folder_id=body.folder_id,
+        conversation_id=body.conversation_id,
+    )
 
     return StreamingResponse(
         server_sent(events=events),

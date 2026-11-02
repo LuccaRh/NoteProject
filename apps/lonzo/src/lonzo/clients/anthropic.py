@@ -1,11 +1,13 @@
 # Imports
-from typing import Any
+from typing import Any, cast
 
 from anthropic import AsyncAnthropic, omit
 from anthropic.lib.streaming import AsyncMessageStreamManager
 from anthropic.lib.tools import BetaAsyncFunctionTool
+from anthropic.types import MessageParam
 
 from lonzo.errors import MissingApiKey
+from lonzo.schemas.conversations import Message
 
 
 # Global variables
@@ -50,21 +52,29 @@ class AnthropicClient:
     def stream_answer(
         self,
         system: str,
+        history: list[Message],
         question: str,
     ) -> AsyncMessageStreamManager[None]:
         """
-        The answer to one question, streamed while the model writes; an
-        empty system goes as no system prompt
+        The answer to one question after the messages of the conversation,
+        streamed while the model writes; an empty system goes as no system
+        prompt
         """
 
         self.check_key()
+        # The blocks were saved in the shape the API takes them back
+        messages = [
+            cast(MessageParam, {"role": m.role, "content": m.content})
+            for m in history
+        ]
+        messages.append({"role": "user", "content": question})
 
         return self.sdk.messages.stream(
             model=MODEL,
             max_tokens=CHAT_MAX_TOKENS,
             thinking={"type": "disabled"},
             system=system or omit,
-            messages=[{"role": "user", "content": question}],
+            messages=messages,
         )
 
     async def run_tools(
