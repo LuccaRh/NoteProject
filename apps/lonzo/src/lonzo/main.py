@@ -1,8 +1,10 @@
 # Imports
 import httpx2
+from anthropic import APIError
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from lonzo.errors import FolderNotFound, MissingApiKey, NotAFolder
 from lonzo.routers import chat, health, workspaces
 
 
@@ -24,3 +26,42 @@ async def notes_unavailable(
     """
 
     return JSONResponse({"detail": "notes service unavailable"}, 502)
+
+
+@app.exception_handler(APIError)
+async def model_unavailable(request: Request, error: APIError) -> JSONResponse:
+    """
+    502 when the Anthropic API answers an error before any event went out
+    """
+
+    return JSONResponse({"detail": error.message}, 502)
+
+
+@app.exception_handler(MissingApiKey)
+async def missing_key(request: Request, error: MissingApiKey) -> JSONResponse:
+    """
+    503 while the service has no key for the Anthropic API
+    """
+
+    return JSONResponse({"detail": str(error)}, 503)
+
+
+@app.exception_handler(FolderNotFound)
+async def folder_not_found(
+    request: Request,
+    error: FolderNotFound,
+) -> JSONResponse:
+    """
+    404 when the folder asked for does not exist
+    """
+
+    return JSONResponse({"detail": str(error)}, 404)
+
+
+@app.exception_handler(NotAFolder)
+async def not_a_folder(request: Request, error: NotAFolder) -> JSONResponse:
+    """
+    422 when the id asked for is a note, not a folder
+    """
+
+    return JSONResponse({"detail": str(error)}, 422)
