@@ -1,6 +1,6 @@
 ---
 name: diagrama
-description: Desenha em draw.io, a partir de um YAML, diagramas de arquitetura, fluxo de dados, sequência em blocos e deploy do NoteProject (lib ai/tools/diagrama.py herdada do Disciplinas, sem colisão, conferido no PNG antes de mostrar) e embute o .drawio.svg na nota do Obsidian. Use quando o Lucca disser "/diagrama", "desenha", "faz um desenho de", "diagrama da arquitetura", "drawio".
+description: Desenha em draw.io, a partir de um YAML, diagramas de arquitetura, fluxo de dados, sequência em blocos e deploy do NoteProject (lib ai/tools/diagrama.py herdada do Disciplinas, sem colisão, conferido no PNG antes de mostrar) e embute o .drawio.svg na nota do Obsidian. Use quando o usuário disser "/diagrama", "desenha", "faz um desenho de", "diagrama da arquitetura", "drawio".
 argument-hint: "<nome> [o que desenhar]"
 ---
 # /diagrama <nome>
@@ -16,7 +16,7 @@ O **YAML é a fonte da verdade**; o `.drawio` é a vista (editar o .drawio não 
    novo. **Abra o PNG (Read, `build/diagramas/<nome>.png`) e olhe**: texto legível, setas certas.
 4. **Embuta**: `destino:` no YAML copia o `.drawio.svg` para `ai/obsidian/<destino>/`; na página,
    `![[<nome>.drawio.svg]]` + legenda de uma linha. `ai/np obsidian`.
-5. **Checkpoint:** caminho do `.drawio`, suposições, o que ficou *(geral)*. Espere o Lucca.
+5. **Checkpoint:** caminho do `.drawio`, suposições, o que ficou *(geral)*. Espere o usuário.
 
 ## Formato do YAML
 ```yaml

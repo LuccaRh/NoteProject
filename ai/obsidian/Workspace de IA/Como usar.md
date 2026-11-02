@@ -18,7 +18,7 @@ O repo `~/Documents/NoteProject` tem um workspace de IA: um
 | Regra vira lint | `ai/np lint` (W01–W17), `commit_msg.py`, ruff/mypy/tsc | regra que não gasta token em toda chamada |
 | Ler trecho | hook `leitura` barra Read > 400 linhas; agente `leitor` | arquivo grande não entra na sessão |
 | Escopo | `ai/kb/escopos/<branch>.md` (Pedido + áreas, criado pela `/tarefa`) | branch = uma funcionalidade |
-| Aprender fazendo | áreas `aprender: true` | o código de sync, auth e infra é escrito pelo Lucca |
+| Aprender fazendo | áreas `aprender: true` | o código de sync, auth e infra é escrito pelo usuário |
 
 ## Comandos (`ai/np`, ferramenta `np.py`)
 

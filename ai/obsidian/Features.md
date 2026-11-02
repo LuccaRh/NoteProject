@@ -28,6 +28,8 @@ Lidar com erros
 
 Versionamento de notas
 
+cancelar uma request de ia, igual esc no code
+
 https://www.figma.com/resource-library/web-design-trends/
 https://www.designrush.com/agency/website-design-development/trends/web-design-trends
 https://claude.ai/artifact/J1zxf5yrPvuFBS4ZunhBX1#play-b5870ad06ee7

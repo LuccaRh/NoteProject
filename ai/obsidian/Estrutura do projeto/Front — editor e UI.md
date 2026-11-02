@@ -36,7 +36,7 @@ O front é o que se vê: a lista de notas e o editor. A regra que manda nele: **
 |---|---|
 | lista de notas (sidebar) | abrir, criar e apagar notas (M1, #62) |
 | cliente da API (`api.ts`) | única porta do front para a rede; trocar HTTP por Tauri mexe só nele |
-| `/api` pelo Caddy | o [[Reverse proxy\|Caddy]] do compose repassa ao serviço `ichiro:8000`, na mesma origem do front, sem [[CORS]]; o Vite não tem mais proxy |
+| `/api` pelo Caddy | o [[Reverse proxy\|Caddy]] do compose repassa cada recurso ao serviço dele (`/api/notes` → `ichiro:8000`); o front só conhece o recurso e não muda quando o back troca de serviço, na mesma origem do front, sem [[CORS]]; o Vite não tem mais proxy |
 | Tauri | casca desktop leve (5–15 MB × 150–200 MB do Electron) |
 | [[Yjs]] + `y-codemirror.next` | o editor gera updates de [[CRDT]] para o sync |
 | KaTeX | fórmulas `$$…$$` |

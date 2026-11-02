@@ -70,6 +70,6 @@ O que mexe no repo continua no Claude Code. A ponte entre os dois é o [[MCP —
 
 ## Em aberto
 
-- Como a resposta chega aos pedaços ao cliente (SSE ou [[WebSocket]]).
+- Como a resposta chega aos pedaços ao cliente ([[Server-sent events|SSE]] ou [[WebSocket]]).
 - Sem login (M2), qualquer um que alcance o servidor gasta a chave: o chat não vai para a AWS antes do login.
 - Tabela das conversas e mensagens: colunas e [[Migration|migration]].

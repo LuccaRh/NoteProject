@@ -42,7 +42,7 @@ PKT_DATA = "#1f9d55"
 PKT_ERR = "#c43c3c"
 CODE_BG = "#ffffff"
 
-# Raias: nome, subtítulo, centro x, é código do Lucca?
+# Raias: nome, subtítulo, centro x, é código do usuário?
 RAIAS = [
     ("Navegador", "front", 160, False),
     ("StreamingResponse", "lib (Starlette)", 480, False),

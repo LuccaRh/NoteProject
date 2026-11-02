@@ -1,6 +1,6 @@
 ---
 name: escrita
-description: Tira a cara de texto de IA de texto público do NoteProject (README, descrição de PR, issue, apresentação do projeto) — lint ai/tools/estilo.py + checklist do blader/humanizer. Não usar em notas do Obsidian, ai/kb/ nem chat. Use quando o Lucca disser "/escrita", "tira a cara de IA", "deixa mais natural", ou ao escrever README/PR.
+description: Tira a cara de texto de IA de texto público do NoteProject (README, descrição de PR, issue, apresentação do projeto) — lint ai/tools/estilo.py + checklist do blader/humanizer. Não usar em notas do Obsidian, ai/kb/ nem chat. Use quando o usuário disser "/escrita", "tira a cara de IA", "deixa mais natural", ou ao escrever README/PR.
 argument-hint: <arquivo|pasta>
 ---
 # /escrita <arquivo|pasta>
@@ -16,7 +16,7 @@ commit `225a6f3`, inteiro em `blader.md`. **Não leia o `blader.md`**; para o ex
 1. `python3 ai/tools/estilo.py <arquivo|pasta>`: E01 "não é X, é Y", E02 expressão de IA, E03
    travessão demais, E04 resíduo de chat, E05 abertura encenada. Corrija, ou deixe se é de propósito.
 2. Uma leitura com o checklist. Edite só o trecho; mantenha todo fato, número e código.
-3. Lint de novo. Ao Lucca, ≤ 5 linhas: o que mudou e por quê.
+3. Lint de novo. Ao usuário, ≤ 5 linhas: o que mudou e por quê.
 
 ## Checklist (§ do blader)
 - §2 Fecho que repete o parágrafo → corte. §3 Ditado ("no fundo") → a afirmação concreta.

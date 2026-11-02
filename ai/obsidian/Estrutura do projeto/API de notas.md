@@ -11,7 +11,7 @@ O serviço `ichiro` do [[Back — daemon e servidor|servidor]]: a API que o [[Na
 |---|---|---|
 | `GET /health` | responde 200 se o processo está de pé; o healthcheck do [[Docker Compose\|compose]] usa ([[Observabilidade]]) | ⏳ M0 (#10) |
 | `/notes` | CRUD das notas e pastas no [[Postgres]] | ⏳ M1 (#46) |
-| `/search` | busca full-text no Postgres | ⏳ M1 (#56) |
+| `GET /notes/search?q=` | busca full-text no Postgres; declarada antes de `/notes/{note_id}`, que pegaria o `search` | ⏳ M1 (#56) |
 
 O build do editor não passa pela api: o [[Reverse proxy|Caddy]] serve os [[Arquivo estático|arquivos estáticos]] na mesma origem ([[Navegador]], #47).
 
@@ -29,7 +29,7 @@ O build do editor não passa pela api: o [[Reverse proxy|Caddy]] serve os [[Arqu
 | conexão por pedido (`Depends`) e as consultas das rotas | `apps/ichiro/src/ichiro/` | ⏳ #46 |
 
 - O Alembic roda dentro do container `ichiro` ([[Comandos do Docker no dev|`dc exec ichiro uv run alembic upgrade head`]]): fora da rede do compose, o host `postgres` não resolve ([[Rede de containers]]).
-- Quem manda `/api` para o `ichiro:8000`, tirando o prefixo, é o [[Reverse proxy|Caddy]], no compose de dev e no ar.
+- Quem manda `/api/notes` para o `ichiro:8000`, tirando o `/api`, é o [[Reverse proxy|Caddy]], no compose de dev e no ar. Toda rota do `ichiro` fica dentro de `/notes`, o recurso: rota nova não pede linha no Caddy ([[Reverse proxy#Prefixo nomeia o recurso|prefixo por recurso]]).
 
 ## Estrutura dentro de `apps/ichiro`: `src/`
 

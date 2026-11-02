@@ -30,7 +30,7 @@ O que roda dentro do `ichiro` ([[API de notas]], [[Issue 10 — Scaffold the ser
 > [!note]- Resposta
 > Esperam: `async def` roda no event loop, e a chamada bloqueante trava o processo inteiro. Com `def`, a rota vai para uma thread do pool. Na dúvida, `def` ([[FastAPI]]).
 
-## 6. Um arquivo novo `routers/search.py` tem `@router.get("/search")`, mas `GET /search` dá 404. O que faltou, e por quê?
+## 6. Um arquivo novo `routers/search.py` tem `@router.get("/notes/search")`, mas `GET /notes/search` dá 404. O que faltou, e por quê?
 
 > [!note]- Resposta
 > O `include_router` no `main.py`. O `@` só registra a rota quando o arquivo é importado; sem o import pelo `main.py`, o arquivo nunca roda ([[Módulo Python]], [[Decorator]]).

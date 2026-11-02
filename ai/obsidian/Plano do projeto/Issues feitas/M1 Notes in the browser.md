@@ -9,5 +9,8 @@ Etapa do [[Roadmap]] que leva as notas do [[Postgres]] ao navegador: rotas `/not
 |---|---|---|---|
 | [[Issue 57 — Apply the import and typing rules to the old notes files\|#57]] | Apply the import and typing rules to the old notes files | ✅ PR #58 mergeado | Python, regras de forma |
 | [[Issue 46 — Expose the notes API on the server\|#46]] | Expose the notes API on the server | ✅ PR #59 mergeado | [[FastAPI]], Postgres, testes |
-| #62 | List, create and edit notes in the editor through the API | ⏳ aberta | front, [[API de notas]] |
+| #62 | List, create and edit notes in the editor through the API | ✅ mergeado | front, [[API de notas]] |
+| #64 | Proxy API requests from the Vite dev server to the notes service | ✅ fechada | [[Proxy de desenvolvimento]] |
+| #65 · #69 | Indent the web code and the dev compose file with 4 spaces | ✅ fechadas | regras de forma |
+| #16 | Put Caddy with local TLS in front of the server | ✅ fechada | [[Reverse proxy]], [[TLS]] |
 | #56 | Search notes with Postgres full-text search | ⏳ aberta | Postgres |

@@ -42,7 +42,7 @@ Para 2026-11-06, a [[Entrega de 2026-11-06|entrega]] puxa notas e IA em localhos
 #10 `apps/ichiro` com `/health` → #11 [[Docker Compose|compose]] → #12 [[Postgres]] + [[Migration|migrations]] (`users`, `notes` com `parent_id`, `fields`, `version`) → #13 `.env` fora do git.
 
 ### M1 — notas no navegador
-1. #46 rotas `/notes` no [[Postgres]], e #56 `/search` com a busca full-text; no front, #62 o cliente da API e a lista de notas, com o proxy do Vite apontando para o servidor (`:8000`).
+1. #46 rotas `/notes` no [[Postgres]], e #56 `/notes/search` com a busca full-text; no front, #62 o cliente da API e a lista de notas, com o proxy do Vite apontando para o servidor (`:8000`).
 2. #16 [[Reverse proxy|Caddy]] com [[TLS]] local no compose de dev: `/api/notes` → `ichiro`, o resto → Vite; sai o proxy do Vite.
 3. #6 pastas, #7 campos (JSONB), #8 [[Pastas, campos e views|views]]: modelo de dados, à mão.
 4. #9 sidebar com pastas e views: delegada.

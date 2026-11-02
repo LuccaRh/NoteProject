@@ -1,6 +1,6 @@
 ---
 name: destrinchar
-description: Acha a raiz de uma confusão do Lucca sobre um conceito do projeto (sync, CRDT, auth, proxy, deploy...) com perguntas curtas, um elo do raciocínio por vez, e grava a lógica no Obsidian no fim. Use quando ele disser "/destrinchar", "não entendo como isso se conecta", "ainda está confuso", "me pergunta até achar onde eu me perco".
+description: Acha a raiz de uma confusão do usuário sobre um conceito do projeto (sync, CRDT, auth, proxy, deploy...) com perguntas curtas, um elo do raciocínio por vez, e grava a lógica no Obsidian no fim. Use quando ele disser "/destrinchar", "não entendo como isso se conecta", "ainda está confuso", "me pergunta até achar onde eu me perco".
 argument-hint: "<conceito ou trecho>"
 ---
 # /destrinchar <conceito>

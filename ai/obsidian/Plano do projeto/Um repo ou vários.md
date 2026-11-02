@@ -29,7 +29,7 @@ O NoteProject vai ter vários serviços: o editor, o servidor (M0–M1), o sync 
 
 ```
 apps/chimchar  editor (Vite + CodeMirror)
-apps/ichiro    API de notas: /notes, /search, build do front (M0–M1)
+apps/ichiro    API de notas: /notes, /notes/search, build do front (M0–M1)
 apps/auth      API de login e sessões (M2)
 apps/worker    worker de IA: pega pedidos da fila e chama o modelo (depois da v1)
 apps/sync      sync ao vivo (M4)
@@ -38,7 +38,7 @@ infra/         compose, Caddyfile, Terraform: o papel do repo de entrega
 ```
 
 - A pasta `infra/` faz o papel do repo de entrega: o [[Docker Compose|compose]] de produção aponta para as imagens no [[CD|GHCR]] com tag.
-- Cada API tem a própria pasta, imagem e [[Container|container]]; nada de uma API geral para tudo. O [[Reverse proxy|Caddy]] manda cada caminho (`/api/notes`, `/api/auth`) para a API dela.
+- Cada API tem a própria pasta, imagem e [[Container|container]]; nada de uma API geral para tudo. O [[Reverse proxy|Caddy]] manda cada caminho (`/api/notes`, `/api/auth`) para a API dela; o caminho nomeia o recurso, não o serviço, e o front não muda quando uma rota troca de serviço ([[Reverse proxy#Prefixo nomeia o recurso|prefixo por recurso]]).
 - Cada serviço Python (`ichiro`, `auth`, `worker`, `sync`) é um projeto uv próprio com a mesma forma: `pyproject.toml`, `src/<serviço>/` e `tests/`, criado com `uv init --python 3.14` na pasta do serviço; o porquê da estrutura `src/` está em [[API de notas]].
 - Em aberto: como `ichiro` confere o login feito em `auth` (tabela de sessões no mesmo [[Postgres]], pedido ao `auth` ou token assinado) e onde fica o código Python que as APIs compartilham.
 

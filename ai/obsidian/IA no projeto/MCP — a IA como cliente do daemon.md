@@ -13,18 +13,18 @@ Aqui o cliente [[MCP]] é o Claude Code, e o servidor é um módulo do daemon. �
 
 ```mermaid
 sequenceDiagram
-  participant L as Lucca
+  participant U as Usuário
   participant C as Claude Code
   participant M as notesd-mcp
   participant D as notesd
-  L->>C: /duvida es728
+  U->>C: /duvida es728
   C->>M: listar_pedidos(materia="es728")
   M->>D: GET /pedidos?materia=es728
   D-->>M: 2 dúvidas, cada uma com a seção em volta
   M-->>C: texto curto
   C->>M: propor(pedido, operação)
   M->>D: POST /pedidos/{id}/resposta
-  D-->>L: a sugestão aparece no editor
+  D-->>U: a sugestão aparece no editor
 ```
 
 - `notesd-mcp` seria um módulo do próprio `apps/notesd` (`python -m notesd.mcp`), feito com o SDK `mcp` de Python.
@@ -36,7 +36,7 @@ sequenceDiagram
   "mcpServers": {
     "notas": {
       "command": "uv",
-      "args": ["run", "--directory", "/home/lucca/Documents/NoteProject/apps/notesd",
+      "args": ["run", "--directory", "/caminho/do/NoteProject/apps/notesd",
                "python", "-m", "notesd.mcp"]
     }
   }

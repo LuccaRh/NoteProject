@@ -17,7 +17,7 @@ Exemplo das duas figuras: "atualiza a nota do Caddy com o que vimos, cria uma de
 3. Antes de chamar o modelo, o `lonzo` pede à [[API de notas]] o `.workspace/` daquele workspace: as regras inteiras e só o cabeçalho (nome + descrição) de cada skill. Do banco dele, lê o histórico da conversa.
 4. Monta o pacote 1 ([[Chamada a um modelo]]): `system` com regras e índice de skills, `tools` com as ferramentas de nota, `messages` com o histórico e a pergunta. Request 1 à Anthropic.
 5. O modelo entende a pergunta e vê que não tem a nota do Caddy. Responde com um pedido, em JSON com campos fixos: `tool_use search_notes("caddy")`. As palavras da busca ele tira da própria pergunta.
-6. O `lonzo` lê o nome do pedido, chama a função `search_notes` (código nosso, sem IA), que chama o `/search` do `ichiro`, e recebe `[{id: 42, title: "Caddy"}]`.
+6. O `lonzo` lê o nome do pedido, chama a função `search_notes` (código nosso, sem IA), que chama o `/notes/search` do `ichiro`, e recebe `[{id: 42, title: "Caddy"}]`.
 7. Request 2: o pacote 1 inteiro + o pedido + o resultado. A Anthropic não guardou nada da request 1; quem reenvia é o `lonzo` ([[Laço de ferramentas]]).
 8. Com o id, o modelo pede `read_note(42)`. O `lonzo` busca o texto na API e manda a request 3 com ele.
 9. Com a nota em mãos, o modelo decide as mudanças e pede três ferramentas de uma vez:
@@ -34,7 +34,7 @@ Exemplo das duas figuras: "atualiza a nota do Caddy com o que vimos, cria uma de
 ### Os pedaços, dentro do `answer` ✅
 
 ![[stream-do-answer.gif]]
-*Hoje (#74): uma request à Anthropic, a resposta chega aos pedaços e cada pedaço vira um evento SSE para o navegador. Fonte: `ai/kb/diagramas/stream-do-answer.py`.*
+*Hoje (#74): uma request à Anthropic, a resposta chega aos pedaços e cada pedaço vira um evento [[Server-sent events|SSE]] para o navegador. Fonte: `ai/kb/diagramas/stream-do-answer.py`.*
 
 - `answer` (`apps/lonzo/src/lonzo/routers/chat.py:42`) é um [[Gerador|gerador]]: chamar não roda nada; o `StreamingResponse` pede um item por vez e manda ao navegador.
 - O `answer` fica parado em dois lugares: no `yield` (até a lib pedir o próximo) e no `async for` ([[Gerador|async for]]) da linha 53 (até a Anthropic mandar o próximo pedaço).

@@ -11,9 +11,9 @@ areas: [infra]
 
 ## Contexto (pode tocar só o mínimo para o Pedido funcionar)
 - `.dockerignore` em `apps/notes` (`.venv`, caches); README (como subir pelo compose).
-- Renomear `docker-compose.yml` → `docker-compose-dev.yml` (produção terá arquivo próprio; pedido do Lucca, 2026-10-21).
+- Renomear `docker-compose.yml` → `docker-compose-dev.yml` (produção terá arquivo próprio; pedido do usuário, 2026-10-21).
 - Notas `Conceitos/Container e Docker Compose` e `Estrutura do projeto/API de notas`.
-- Desenho das redes (loopback, wi-fi, Docker, operadora até o YouTube) na página de rede, como base geral (pedido do Lucca, 2026-10-20).
+- Desenho das redes (loopback, wi-fi, Docker, operadora até o YouTube) na página de rede, como base geral (pedido do usuário, 2026-10-20).
 
 ## Fora (vira outra branch)
 - Postgres, volume do banco e migrations (#12); `.env` (#13).

@@ -16,4 +16,4 @@ areas: [infra]
 ## Fora (vira outra branch)
 - Tirar o proxy `/api` do `vite.config.ts`: PR 2, branch `web/route-api-requests-through-caddy`.
 - `/api/auth` (#48) e servir o `dist/` em produção (#47).
-- Confiar na CA local no navegador: passo manual do Lucca.
+- Confiar na CA local no navegador: passo manual do usuário.

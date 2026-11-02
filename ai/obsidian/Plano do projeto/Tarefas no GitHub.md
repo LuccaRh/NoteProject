@@ -3,7 +3,7 @@ tags: [noteproject, plano, workspace]
 ---
 # Tarefas no GitHub
 
-As tarefas do [[Roadmap]] ficam no GitHub do repo (`LuccaRh/NoteProject`). Assim a tarefa, a branch e o PR ficam ligados e o histórico mostra o que fechou o quê. O vault continua com o *porquê* (decisões, conceitos).
+As tarefas do [[Roadmap]] ficam no GitHub do repo (`NoteProject`). Assim a tarefa, a branch e o PR ficam ligados e o histórico mostra o que fechou o quê. O vault continua com o *porquê* (decisões, conceitos).
 
 ## As peças
 
@@ -22,8 +22,8 @@ As tarefas do [[Roadmap]] ficam no GitHub do repo (`LuccaRh/NoteProject`). Assim
 1. Pegar a próxima issue aberta da milestone atual: `gh issue list -m "M1 Minimal server"`.
 2. Branch com o nome da issue em kebab-case, saindo da `master` atualizada (`/tarefa`). O escopo (`ai/kb/escopos/<branch>.md`) cita o número da issue.
 3. Commits seguindo as [[Regras de git]].
-4. PR com só `Issue #N` no corpo (2026-10-26). A issue não fecha sozinha: quem fecha é o Lucca.
-5. Issue sem PR (feita por outro caminho) quem fecha é o Lucca, à mão; a sessão só avisa que está pronta (2026-10-19).
+4. PR com só `Issue #N` no corpo (2026-10-26). A issue não fecha sozinha: quem fecha é o usuário.
+5. Issue sem PR (feita por outro caminho) quem fecha é o usuário, à mão; a sessão só avisa que está pronta (2026-10-19).
 
 ## Labels
 

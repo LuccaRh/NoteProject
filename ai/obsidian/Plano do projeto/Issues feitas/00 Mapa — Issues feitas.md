@@ -14,4 +14,5 @@ Diário das issues do [[Tarefas no GitHub|GitHub]]: uma página por milestone do
 | Página | Ideia |
 |---|---|
 | [[M0 Server skeleton]] | tabela das issues da M0, com uma página por issue em `M0 Server skeleton/`: #4 workspace no git, #10 API com `/health`, #11 API no compose, #12 · #13 Postgres e `.env` |
+| [[AI in the app]] | tabela das issues da etapa de IA, com uma página por issue em `AI in the app/`: #82 uv alinhado, #74 chat pelo `lonzo` |
 | [[M1 Notes in the browser]] | tabela das issues da M1, com uma página por issue em `M1 Notes in the browser/`: #57 regras de forma nos arquivos antigos, #46 rotas `/notes` |
