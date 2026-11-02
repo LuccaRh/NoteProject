@@ -26,7 +26,7 @@ Regra nova de resposta vai **lá**, com data; de página do Obsidian, em `Regras
    ruff/mypy/tsc ou hook do git; aqui só fica o que não virou lint.
 4. **Contexto curto e fixo.** Vocabulário fechado de áreas (`ai/kb/areas.yaml`). Antes de mexer
    numa área: `ai/np contexto <área>` e leia **só** o que ele lista, por trecho. Nada de varrer o repo.
-5. **Aprender fazendo.** Área com `aprender: true` (dados, sync, servidor, auth, infra): primeiro
+5. **Aprender fazendo.** Área com `aprender: true` (sync, auth, infra, cliente-api): primeiro
    o conceito (escadinha, `/aprender`), depois o usuário escreve o código ou o comando; a sessão
    revisa e confere. Só entregue pronto o que ele pedir pronto, ou o que não é do aprendizado
    (boilerplate, config de lint).
@@ -52,7 +52,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 `Regras de git`). Aqui fica o que não pode falhar.
 
 - **Tarefa = issue no GitHub**, na milestone da etapa (M0–M4, Editor, AI in the app, Desktop, Mobile); label = lado (`backend`, `frontend`,
-  `infrastructure`, `ai-workspace`); `backend`/`infrastructure` o usuário escreve; `frontend` (2026-10-29) a sessão escreve direto, menos o "front-back" (área `cliente-api`: chamadas à API, comunicação com o servidor, proxy do Vite), que é do usuário. Próxima tarefa: `gh issue list -m "<milestone>"`.
+  `infrastructure`, `ai-workspace`); `infrastructure` o usuário escreve; `backend` (2026-11-02) e `frontend` (2026-10-29) a sessão escreve direto, menos as áreas `aprender` (`sync`, `auth`) e o "front-back" (área `cliente-api`: chamadas à API, comunicação com o servidor, proxy do Vite), que é do usuário. Próxima tarefa: `gh issue list -m "<milestone>"`.
 - **Branch = uma issue**, em inglês, kebab-case, saindo da `master`
   atualizada. (2026-10-25) Nome `<serviço>/<kebab>` (`ichiro/search-notes-with-full-text-search`):
   serviço = pasta de `apps/`, `postgres` ou `caddy` (2026-10-30) (container do compose; config em pasta
@@ -140,6 +140,13 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   `class`): `"""` sozinho na linha, o texto (sem ponto no fim), `"""` sozinho, e uma linha em
   branco só entre ela e o código (W14 confere). Nada de comentário em cima do `def`; comentário
   dentro do corpo é para o porquê de um trecho. Lint W21 (`ai/np lint`).
+- **Comentário de uma linha** (2026-11-02): comentário no código do app tem uma linha só; o
+  que precisa de mais vai para a docstring ou sai. Lint W23 (`ai/np lint`).
+- **Nada de código repetido** (2026-11-02): preferência por escrever cada coisa uma vez; dois
+  caminhos que acabam na mesma chamada viram `if`s que preparam os valores, e a chamada
+  aparece uma vez só.
+- **Variável perto do uso** (2026-11-02): cada variável nasce o mais perto possível da linha
+  que a usa, e `if`s que tratam do mesmo valor ficam juntos.
 - **Função e classe tipadas** (2026-10-26): todo parâmetro e retorno com tipo, e atributo de
   classe com `nome: tipo`. Python: mypy `strict = true` no `pyproject.toml` do serviço e lint
   W15 (atributo de classe sem tipo).
@@ -167,7 +174,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 | `ai/np contexto <área>` / `areas` | o que ler para uma área / o vocabulário |
 | `ai/np obsidian [-q]` / `duvidas [pág]` | sincronia vault ↔ `ai/obsidian/` / marcas `[!duvida]` `[fix]` `[coment]` |
 | `ai/np diagrama <spec> [--png]` | YAML → draw.io (`ai/tools/diagrama.py`, nó `banco` para BD) |
-| `ai/np lint` / `test` | regras do workspace (W01–W22) / testes das ferramentas |
+| `ai/np lint` / `test` | regras do workspace (W01–W23) / testes das ferramentas |
 
 Ambiente: Arch Linux, Python 3.14 + uv, Node 22, Docker, `drawio` CLI, poppler (`pdftotext`).
 Hooks do Claude Code em `.claude/settings.json`; do git em `ai/tools/githooks/` (`ai/tools/instalar.sh`).
@@ -207,8 +214,9 @@ ai/                todo o resto do workspace de IA:
 
 ## Estado (2026-11-02)
 
-- M0, #46, #62, #64, #65, #69, #16, #80, #82, #74 e #73 mergeados (PRs #66–#68, #70–#72, #81,
-  #83–#85, #88, #93–#96, #99); `master` local = remoto; branches `backup/*` locais guardadas.
+- M0, #46, #62, #64, #65, #69, #16, #80, #82, #74, #73, #98 e #100 mergeados (PRs #66–#68,
+  #70–#72, #81, #83–#85, #88, #93–#96, #99, #101, #102); `master` local = remoto; branches
+  `backup/*` locais guardadas. Issues #73, #89–#92, #98 e #100 com PR mergeado: o Lucca fecha.
 - #74 pronta: `apps/lonzo` responde `POST /api/chat` em SSE (Haiku 5.5, `thinking` desligado,
   `max_tokens` 512); o Caddy roteia `/api/notes/*` → ichiro, `/api/chat/*` →
   lonzo, outro `/api` → 404. Evento `status` saiu da #74 e nasce com as ferramentas (#77).
@@ -224,15 +232,18 @@ ai/                todo o resto do workspace de IA:
   `note_tools`) → `clients/` (`IchiroClient`, `AnthropicClient`, instâncias em `connections.py`,
   fechadas no `lifespan`); erros do domínio viram status no `handlers.py` (branch abaixo); modelos em `schemas/`;
   o `message_start` saiu sem `model`, que foi para o `message_end` (a constante fica no cliente).
-- #98 na branch `ichiro/split-ichiro-into-routers-and-services`, sobre a `master` (sem push,
-  revisão do Lucca pendente): ichiro em `routers/` → `services/` (`notes`, `health`, as regras)
-  → `repositories/` (`notes`, `health`: só o SQL, devolvem `Note` ou `None`; o `IntegrityError`
-  já sai como `TitleTaken`/`ParentNotFound`); `errors.py` com exceções do domínio, status no `handlers.py`;
-  docstring em todo o `src/`; versão 0.12.0. Falta no ichiro: comentário em cima das fixtures
-  do `conftest.py`, W20 em `tests/test_notes.py`.
-- Branch `lonzo/move-the-error-handlers-into-their-own-module`, empilhada sobre a da #98 (sem
-  push, #100): handlers do lonzo saem do `main.py` para `handlers.py` (tabela erro →
-  status + `notes_unavailable`); versão 0.3.0.
+- #98 (ichiro em `routers/` → `services/` → `repositories/`, PR #101) e #100 (handlers do lonzo
+  em `handlers.py`, PR #102) mergeados. Falta no ichiro: comentário em cima das fixtures do
+  `conftest.py`, W20 em `tests/test_notes.py`.
+- #75 em duas branches sobre a `master` (sem push, revisão do Lucca pendente):
+  - `postgres/create-the-lonzo-database`: `postgres/init/create-lonzo-database.sh` cria o
+    usuário e o banco `lonzo` na primeira subida (volume vazio); no volume do dev, já rodado à
+    mão. `.env` com `LONZO_DB_PASSWORD` e `LONZO_DATABASE_URL`.
+  - `lonzo/keep-chat-conversations-on-the-server`: tabelas `conversations` e `messages`
+    (Alembic no lonzo; `content` jsonb em blocos da Messages API), SQLAlchemy Core async
+    (`lonzo/db.py`, `repositories/conversations.py`, card `ai/kb/libs/sqlalchemy.md`);
+    `POST /api/chat {conversation_id?}` manda o histórico e grava pergunta + resposta;
+    `GET /api/chat/conversations[?folder_id]` e `/{id}`; versão 0.4.0. Conferido pelo Caddy.
 - IA (2026-10-31): chat com o workspace no servidor; vault `IA no projeto/Chat com o workspace` e
   `Caminho de uma pergunta`. Workspace = pasta com `.workspace/`, vários por pessoa.
 - #31 (Ctrl+D) e #5 (chips) sem milestone, para depois; `decorations/replace.ts` (#5) fora do git.
@@ -246,7 +257,7 @@ ai/                todo o resto do workspace de IA:
 Plano: vault `Plano do projeto/Roadmap` (navegador → app desktop → celular) + issues/milestones no GitHub.
 
 1. Entrega de 2026-11-06 (vault `Plano do projeto/Entrega de 2026-11-06`): #74 ✅ → #73 ✅ workspace criado pela IA a partir de um texto breve
-   (esqueleto; vault `Workspace no app#Como nasce`) → #98 ichiro em camadas (branch pronta, falta PR) → #75 conversas, #76 tela do chat → #56 busca, #77 ler/buscar
+   (esqueleto; vault `Workspace no app#Como nasce`) → #98 ✅ ichiro em camadas → #75 conversas (2 branches prontas, falta PR), #76 tela do chat → #56 busca, #77 ler/buscar
    → #78 criar/editar/apagar, #51 → #6 pastas, #79 importar o vault → #17 se sobrar.
 2. M2 login (#48, #17) → M3 AWS (#18–#25, #47) → M4 edição ao vivo (#26, #27, #30).
 - v1 = ler notas no navegador com o servidor na AWS (vault `Plano do projeto/Objetivo do app`);

@@ -11,7 +11,7 @@ O chat leva as duas coisas para o servidor: o [[Workspace no app|workspace]] e a
 
 Cada assunto tem o seu workspace, como cada pasta de projeto no PC tem o próprio `CLAUDE.md` e `.claude/`: **workspace = qualquer pasta com um `.workspace/` dentro** (`Faculdade/`, `Baseball/`, `NoteProject/`). Um `.workspace/` na raiz faz o papel do `~/.claude/`: regras que valem em todos.
 
-- Cada conversa pertence a um workspace; o pacote leva as regras da raiz e as da pasta.
+- Cada conversa pertence a um workspace; o pacote leva as regras do `.workspace` da pasta. A raiz nunca tem `.workspace` (combinado de 2026-11-02).
 - Um workspace novo nasce de um texto breve ou de perguntas iniciais: a IA preenche um esqueleto fixo (objetivo, como responder, fatos fixos, estado, fontes), e skills prontas são opcionais ([[Workspace no app#Como nasce]]).
 
 ## Onde cada peça fica ⏳
@@ -27,12 +27,28 @@ Cada assunto tem o seu workspace, como cada pasta de projeto no PC tem o própri
 ![[chat-workspace.drawio.svg]]
 *Uma pergunta: o serviço de IA monta o pacote, chama a Anthropic e, a cada pedido de ferramenta, lê a nota pelo `ichiro` e chama de novo.*
 
+## Conversas no banco
+
+Banco `lonzo`, com usuário próprio, criado na primeira subida do [[Postgres]] (`postgres/init/`); as tabelas vêm da [[Migration|migration]] do lonzo (#75).
+
+![[bancos-e-tabelas.drawio.svg]]
+*Um Postgres, dois bancos: cada serviço só faz SQL no seu; `folder_id` aponta para `notes.id` sem FK, e o lonzo chega às notas por HTTP.*
+
+| Tabela | Uma linha por | Colunas |
+|---|---|---|
+| `conversations` | conversa | `id` (uuidv7), `folder_id` (o workspace; nulo = raiz; sem chave estrangeira, a pasta mora no banco do `ichiro`), `title` (começo da 1ª pergunta), `created_at`, `updated_at` |
+| `messages` | mensagem | `id` (uuidv7: ordena a conversa), `conversation_id` (apagar a conversa apaga as mensagens), `role` (`user`/`assistant`), `content` (jsonb: os blocos da Messages API, devolvidos ao modelo como estão), `created_at` |
+
+- `POST /api/chat` sem `conversation_id` cria a conversa e devolve o id no primeiro evento; com ele, manda o histórico antes da pergunta.
+- Pergunta e resposta são gravadas juntas, no fim da resposta; erro no meio não grava nada.
+- `content` em jsonb e não texto: com as ferramentas (#77), a resposta traz blocos `tool_use`/`tool_result`, e a tabela não muda.
+
 ## Uma pergunta
 
 O passo a passo completo, com edição, criação e remoção de notas e a comparação com o Claude Code, está em [[Caminho de uma pergunta]].
 
 1. O cliente manda `POST /api/chat {workspace, conversa, pergunta}`; o [[Reverse proxy|Caddy]] encaminha ao serviço de IA.
-2. O serviço lê as regras e o índice de skills do `.workspace/` daquele workspace (mais o da raiz, se houver) e o histórico da conversa, e monta a [[Chamada a um modelo|chamada ao modelo]].
+2. O serviço lê as regras e o índice de skills do `.workspace/` daquele workspace e o histórico da conversa, e monta a [[Chamada a um modelo|chamada ao modelo]].
 3. Se o modelo pede ferramenta, o serviço executa e chama de novo ([[Laço de ferramentas]]), até vir só texto.
 4. O texto volta ao cliente aos pedaços, enquanto é gerado, e a conversa é gravada no banco do `lonzo`.
 
@@ -72,4 +88,3 @@ O que mexe no repo continua no Claude Code. A ponte entre os dois é o [[MCP —
 
 - Como a resposta chega aos pedaços ao cliente ([[Server-sent events|SSE]] ou [[WebSocket]]).
 - Sem login (M2), qualquer um que alcance o servidor gasta a chave: o chat não vai para a AWS antes do login.
-- Tabela das conversas e mensagens: colunas e [[Migration|migration]].

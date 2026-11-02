@@ -7,7 +7,7 @@
     ai/np obsidian [-q] [--simular] sincronia vault Note Project/ ↔ obsidian/
     ai/np duvidas [trecho da pág]   marcas [!duvida] [duvidas] [fix] [coment] nas notas
     ai/np diagrama <spec.yaml> [--png]   YAML → draw.io; `destino:` no spec copia o .drawio.svg para obsidian/
-    ai/np lint                      regras do workspace que viraram código (W01–W22)
+    ai/np lint                      regras do workspace que viraram código (W01–W23)
     ai/np test                      testes das ferramentas (tools/test_*.py)
     ai/np check                     o check do app (make check: ruff, mypy, pytest, tsc, build)
 
@@ -484,8 +484,27 @@ def checar_camadas(texto: str, pacote: str) -> list[int]:
     )
 
 
+_PARTES = {"# Imports", "# Global variables", "# Code"}
+
+
+def checar_comentarios(texto: str) -> list[int]:
+    """Linhas de comentário logo abaixo de outra linha de comentário: comentário tem uma
+    linha só; o que precisa de mais vai para a docstring ou some (2026-11-02)."""
+    import io
+    import tokenize
+
+    linhas = texto.splitlines()
+    sozinhos = sorted(
+        t.start[0]
+        for t in tokenize.generate_tokens(io.StringIO(texto).readline)
+        if t.type == tokenize.COMMENT and not linhas[t.start[0] - 1][: t.start[1]].strip()
+        and t.string not in _PARTES
+    )
+    return [n for n in sozinhos if n - 1 in sozinhos]
+
+
 def _chamadas() -> list[str]:
-    """W18–W22 no Python do app criado ou mexido na branch."""
+    """W18–W23 no Python do app criado ou mexido na branch."""
     base = git("merge-base", "master", "HEAD")
     mexidos = git("diff", "--name-only", "--diff-filter=AM", base, "--", "apps").splitlines()
     mexidos += git("ls-files", "--others", "--exclude-standard", "apps").splitlines()
@@ -508,6 +527,9 @@ def _chamadas() -> list[str]:
         for i in checar_parametros(texto):
             out.append(f"W20 {n}:{i}: parâmetros quebrados sem ser um por linha;"
                        " cabe em uma, fica em uma; senão, um por linha")
+        for i in checar_comentarios(texto):
+            out.append(f"W23 {n}:{i}: comentário com mais de uma linha;"
+                       " diga em uma ou leve para a docstring")
         if "/src/" in n:
             for i in checar_docstrings(texto):
                 out.append(f"W21 {n}:{i}: função ou classe sem docstring; explique dentro"

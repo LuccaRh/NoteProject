@@ -5,6 +5,7 @@ from np import (
     checar_blocos,
     checar_docstrings,
     checar_camadas,
+    checar_comentarios,
     checar_constantes,
     checar_layout,
     checar_parametros,
@@ -137,3 +138,11 @@ class TestCamadas(unittest.TestCase):
     def test_router_com_repository(self) -> None:
         texto = "from ichiro.repositories.notes import select_note\n"
         self.assertEqual(checar_camadas(texto, "ichiro"), [1])
+
+    def test_comentario_de_uma_linha(self) -> None:
+        texto = "# Code\n# Fake stream\nx = 1  # a\n# b\ny = 2\n"
+        self.assertEqual(checar_comentarios(texto), [])
+
+    def test_comentario_de_duas_linhas(self) -> None:
+        texto = "def f():\n    # first\n    # second\n    return 1\n"
+        self.assertEqual(checar_comentarios(texto), [3])

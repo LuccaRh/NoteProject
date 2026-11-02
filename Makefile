@@ -16,6 +16,8 @@ check-chimchar:
 
 # Tests run on the host: reach the compose Postgres through localhost
 TEST_DATABASE_URL = $(subst @postgres:,@localhost:,$(DATABASE_URL))
+TEST_LONZO_DATABASE_URL = \
+	$(subst @postgres:,@localhost:,$(LONZO_DATABASE_URL))
 
 check-ichiro:
 	cd apps/ichiro && uv run ruff check && uv run mypy src tests \
@@ -23,7 +25,7 @@ check-ichiro:
 
 check-lonzo:
 	cd apps/lonzo && uv run ruff check && uv run mypy src tests \
-		&& uv run pytest
+		&& LONZO_DATABASE_URL='$(TEST_LONZO_DATABASE_URL)' uv run pytest
 
 # Development workspace tools (ai/tools, ai/kb): tests + lint.
 check-tools:

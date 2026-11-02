@@ -20,10 +20,10 @@ PROMPT_PATH = Path(__file__).parent.parent / "create_workspace.md"
 
 
 # Code
-async def find_workspace(parent_id: UUID | None) -> UUID | None:
+async def find_workspace(parent_id: UUID) -> UUID | None:
     """
-    The .workspace folder right inside a folder (None = the root), if it
-    has one; titles are unique inside a folder
+    The .workspace folder right inside a folder, if it has one; titles are
+    unique inside a folder
     """
 
     notes = await ichiro.list_notes(parent_id=parent_id, title=WORKSPACE)
@@ -36,22 +36,23 @@ async def find_workspace(parent_id: UUID | None) -> UUID | None:
 
 async def workspace_rules(folder_id: UUID | None) -> str:
     """
-    Rules for a question: notes of the root .workspace, then the
-    folder's; empty when neither has one
+    Rules for a question: notes of the folder's .workspace; empty with no
+    folder or no .workspace (the root never has one)
     """
 
-    parts = []
-    folders = [None] if folder_id is None else [None, folder_id]
+    if folder_id is None:
+        return ""
 
-    for folder in folders:
-        workspace = await find_workspace(parent_id=folder)
+    workspace = await find_workspace(parent_id=folder_id)
 
-        if workspace is None:
-            continue
+    if workspace is None:
+        return ""
 
-        for note in await ichiro.list_notes(parent_id=workspace):
-            if not note.is_folder:
-                parts.append(f"# {note.title}\n\n{note.body}")
+    parts = [
+        f"# {note.title}\n\n{note.body}"
+        for note in await ichiro.list_notes(parent_id=workspace)
+        if not note.is_folder
+    ]
 
     if not parts:
         return ""
@@ -116,8 +117,7 @@ async def create_workspace(folder_id: UUID, description: str) -> list[Note]:
     folders = await create_workspace_folders(parent_id=folder.id)
     notes = NoteTools(root_id=folder.id)
 
-    # The prompt never changes, so the system prompt stays the same for
-    # the cache; the date goes with the text
+    # A fixed system prompt keeps the cache; the date goes in the request
     system = PROMPT_PATH.read_text(encoding="utf-8")
     request = f"Today is {date.today().isoformat()}.\n\n{description}"
     await claude.run_tools(system=system, request=request, tools=notes.tools())
