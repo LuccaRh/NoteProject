@@ -30,7 +30,9 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | Página | Ideia |
 |---|---|
 | [[SQLite]] | banco SQL inteiro num arquivo, sem servidor |
+| [[Índice]] | estrutura à parte que acha linhas sem ler a tabela; o invertido guarda palavra → linhas |
 | [[FTS5]] | índice invertido do SQLite: palavra → linhas onde ela aparece |
+| [[Busca full-text no Postgres]] | `to_tsvector` quebra o texto em palavras; o índice GIN sobre a expressão acha as linhas |
 | [[Postgres]] | banco que roda como serviço; muitos clientes escrevem ao mesmo tempo |
 | [[Migration]] | cada mudança do schema é um arquivo versionado: `upgrade` aplica, `downgrade` reverte |
 | [[SQLAlchemy]] | a API guarda conexões abertas e empresta uma por pedido |

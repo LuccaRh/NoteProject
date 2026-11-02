@@ -28,6 +28,7 @@ O [[Chat com o workspace|chat]] é o oposto da fila: a IA busca o próprio conte
 
 - O pacote cresce a cada volta: uma pergunta que lê 5 notas faz 6 chamadas, e a última leva as 5 notas.
 - O que segura o gasto: `system` e `tools` fixos no começo do pacote, para o [[Cache de prompt|cache]] pegar; ferramentas que devolvem a seção, não a nota inteira; um limite de voltas por pergunta.
+- A [[Busca full-text no Postgres|busca de notas]] devolve só `id` e `title` de cada nota achada: o gasto vem do que volta para a IA, não de como o banco acha; a IA abre só a nota que escolher.
 - O ganho é a pergunta livre, sem pedido montado antes; o preço é gastar mais por pergunta que a fila.
 
 ## Ordem do pacote, para o cache
