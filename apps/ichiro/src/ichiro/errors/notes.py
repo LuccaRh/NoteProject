@@ -44,3 +44,11 @@ def title_taken() -> HTTPException:
     """
 
     return HTTPException(status_code=409, detail="title already in folder")
+
+
+def path_empty() -> HTTPException:
+    """
+    422 for a path with no names, only slashes or nothing at all
+    """
+
+    return HTTPException(status_code=422, detail="path is empty")

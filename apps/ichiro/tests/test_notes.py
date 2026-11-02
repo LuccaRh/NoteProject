@@ -274,3 +274,63 @@ def test_move_to_title_taken(client: TestClient) -> None:
     response = client.patch(f"/notes/{note['id']}", json=body)
 
     assert response.status_code == 409
+
+
+# A path of titles from a folder finds the note at its end
+def test_get_by_path(client: TestClient) -> None:
+
+    top = create(client=client, title="Work", is_folder=True)
+    middle = create(
+        client=client,
+        title="Plans",
+        parent_id=top["id"],
+        is_folder=True,
+    )
+    note = create(client=client, title="Week", parent_id=middle["id"])
+
+    params = {"parent_id": top["id"], "path": "Plans/Week"}
+    response = client.get("/notes/by-path", params=params)
+
+    assert response.status_code == 200
+    assert response.json() == note
+
+
+# Without parent_id the path starts at the root; extra slashes are fine
+def test_get_by_path_from_root(client: TestClient) -> None:
+
+    folder = create(client=client, title="Work", is_folder=True)
+    note = create(client=client, title="Plan", parent_id=folder["id"])
+
+    params = {"path": "/Work//Plan/"}
+    response = client.get("/notes/by-path", params=params)
+
+    assert response.json() == note
+
+
+# A path that ends at a folder gives the folder
+def test_get_folder_by_path(client: TestClient) -> None:
+
+    folder = create(client=client, title="Work", is_folder=True)
+
+    response = client.get("/notes/by-path", params={"path": "Work"})
+
+    assert response.json() == folder
+
+
+# A missing name anywhere on the way is 404
+def test_get_by_missing_path(client: TestClient) -> None:
+
+    create(client=client, title="Work", is_folder=True)
+
+    params = {"path": "Work/Nothing here"}
+    response = client.get("/notes/by-path", params=params)
+
+    assert response.status_code == 404
+
+
+# A path with no names is 422
+def test_get_by_empty_path(client: TestClient) -> None:
+
+    response = client.get("/notes/by-path", params={"path": "//"})
+
+    assert response.status_code == 422

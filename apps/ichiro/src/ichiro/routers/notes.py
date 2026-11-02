@@ -13,6 +13,7 @@ from ichiro.errors.notes import (
     parent_inside_note,
     parent_not_folder,
     parent_not_found,
+    path_empty,
     title_taken,
 )
 from ichiro.schemas.notes import Note, NoteCreate, NoteUpdate
@@ -105,6 +106,46 @@ def list_notes(
     ).mappings()
 
     return [Note.model_validate(row) for row in rows]
+
+
+@router.get("/by-path")
+def get_note_by_path(
+    conn: Conn,
+    path: str,
+    parent_id: UUID | None = None,
+) -> Note:
+    """
+    The note at a path of titles (a/b/c) from parent_id (the root when
+    none), walked down one name per level in one query; 404 when a name
+    on the way is missing
+    """
+
+    names = [name for name in path.split("/") if name]
+
+    if not names:
+        raise path_empty()
+
+    row = conn.execute(
+        text(
+            "WITH RECURSIVE walk AS ("
+            " SELECT id, 1 AS depth FROM notes"
+            " WHERE parent_id IS NOT DISTINCT FROM CAST(:parent_id AS uuid)"
+            " AND title = (CAST(:names AS text[]))[1]"
+            " UNION ALL"
+            " SELECT n.id, w.depth + 1 FROM notes n"
+            " JOIN walk w ON n.parent_id = w.id"
+            " WHERE n.title = (CAST(:names AS text[]))[w.depth + 1]"
+            f") SELECT {COLUMNS} FROM notes WHERE id = ("
+            " SELECT id FROM walk"
+            " WHERE depth = cardinality(CAST(:names AS text[])))"
+        ),
+        {"parent_id": parent_id, "names": names},
+    ).mappings().one_or_none()
+
+    if row is None:
+        raise not_found()
+
+    return Note.model_validate(row)
 
 
 @router.get("/{note_id}")
