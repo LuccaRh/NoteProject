@@ -188,11 +188,91 @@ button {
     color: var(--muted);
 }
 
+/* Tabs */
+
+.work {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.tabs {
+    flex: none;
+    display: flex;
+    gap: 2px;
+    padding: 6px 8px 0;
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+}
+
+.tab {
+    flex: 0 1 200px;
+    min-width: 90px;
+    display: flex;
+    align-items: center;
+    border-radius: 6px 6px 0 0;
+    color: var(--muted);
+}
+
+.tab:hover {
+    background: var(--hover);
+}
+
+.tab[aria-selected='true'] {
+    background: var(--panel);
+    color: var(--text);
+}
+
+.tab-open {
+    flex: 1;
+    min-width: 0;
+    height: 32px;
+    padding: 0 4px 0 12px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* The chat tabs carry a dot, to tell them from notes */
+.tab.chat .tab-open::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin: 0 8px 1px 0;
+    border-radius: 50%;
+    background: var(--muted);
+}
+
+.tab-close {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--faint);
+}
+
+.tab-close:hover {
+    background: var(--active);
+    color: var(--text);
+}
+
 /* Note */
 
 .page {
     flex: 1;
     min-width: 0;
+    min-height: 0;
     box-sizing: border-box;
     padding: 28px 40px 56px;
     overflow-y: auto;
