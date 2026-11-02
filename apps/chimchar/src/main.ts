@@ -1,5 +1,6 @@
 // Imports
 import './style.css'
+import { Chat } from './chat/chat.ts'
 import { createNote, deleteNote, updateNote } from './notes/api.ts'
 import { Page } from './notes/page.ts'
 import { Tree } from './notes/tree.ts'
@@ -11,6 +12,7 @@ import type { Note } from './notes/api.ts'
 // Global variables
 const serverStatus = byId<HTMLElement>('server-status')
 const notePanel = byId('note-panel')
+const work = byId('work')
 
 const page = new Page(
     {
@@ -57,6 +59,26 @@ function openNote(note: Note): Promise<void> {
         title: note.title,
         panel: notePanel,
         show: () => page.open(note.id, tree.path(note)),
+    })
+}
+
+/** Open a new chat tab in a workspace folder (null = no workspace). */
+function openChat(folderId: string | null): void {
+
+    const id = crypto.randomUUID()
+    const chat = new Chat({
+        parent: work,
+        folderId,
+        folders: () => tree.folders(),
+        onTitle: title => tabs.rename(id, title),
+    })
+    void tabs.open({
+        id,
+        kind: 'chat',
+        title: chat.workspaceName(),
+        panel: chat.panel,
+        show: () => chat.question.focus(),
+        close: () => chat.panel.remove(),
     })
 }
 
@@ -133,6 +155,7 @@ document.addEventListener('visibilitychange', () => {
 
 byId('new-note').addEventListener('click', () => void create(false))
 byId('new-folder').addEventListener('click', () => void create(true))
+byId('new-chat').addEventListener('click', () => openChat(tree.target()))
 
 void tree.load(null).then(() => {
     serverStatus.textContent = ''
