@@ -70,6 +70,7 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[Proxy de desenvolvimento]] | o servidor do front repassa `/api` à api, e tudo fica na mesma origem |
 | [[Servidor de desenvolvimento]] | quem responde `/` com o `index.html` e converte o `.ts` na hora; o `Content-Type` diz o que o navegador faz |
 | [[Arquivo estático]] | resposta lida do disco como está, um pedido por arquivo; a dinâmica sai de código |
+| [[Server-sent events]] | uma resposta HTTP que fica aberta e manda eventos nomeados aos pedaços |
 
 ## TypeScript
 

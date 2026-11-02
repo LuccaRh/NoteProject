@@ -3,7 +3,7 @@ tags: [noteproject, workspace, regras]
 ---
 # Regras de página
 
-Valem para toda página que o workspace escreve ou corrige no Obsidian (`/nota`, `/aprender`, `/duvida`, `/destrinchar`). O estilo de texto vem das [[Regras de resposta]]; aqui fica o que é **de página**. Correção do Lucca que vale para outras páginas entra aqui, com data.
+Valem para toda página que o workspace escreve ou corrige no Obsidian (`/nota`, `/aprender`, `/duvida`, `/destrinchar`). O estilo de texto vem das [[Regras de resposta]]; aqui fica o que é **de página**. Correção do usuário que vale para outras páginas entra aqui, com data.
 
 > [!info] Onde este arquivo mora
 > As skills leem `.claude/skills/nota/regras.md`, que é um link para esta página (cópia em `obsidian/Workspace de IA/` do repo).

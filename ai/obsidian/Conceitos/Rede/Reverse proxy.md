@@ -120,12 +120,20 @@ No Caddy, um site com três rotas:
 
 ```
 notas.exemplo.com {
-    handle_path /api/* {
-        reverse_proxy api:8000
+    @notas path /api/notas /api/notas/*
+    handle @notas {
+        uri strip_prefix /api
+        reverse_proxy notas:8000
     }
 
-    handle_path /ia/* {
-        reverse_proxy ia:9000
+    @chat path /api/chat /api/chat/*
+    handle @chat {
+        uri strip_prefix /api
+        reverse_proxy chat:9000
+    }
+
+    handle /api/* {
+        respond 404
     }
 
     handle {
@@ -134,13 +142,54 @@ notas.exemplo.com {
 }
 ```
 
-- `handle_path` tira o prefixo antes de repassar (`/api/notas` → `/notas`); `handle /api/*` repassaria o caminho inteiro.
-- O `handle` sem caminho é o "senão": pega o que nenhum outro pegou. Só um `handle` roda por pedido, e os que têm caminho são testados antes do que não tem, seja qual for a ordem no arquivo *(geral)*.
-- Serviço novo = prefixo novo; o "senão" continua pegando só o resto.
-- `api:8000`: o nome acha a máquina (o [[Container|container]]), a porta acha o programa nela. Sem porta, o Caddy tenta a 80 *(geral)*.
+- `@notas path ...` é um matcher nomeado: dá nome a uma condição, que o `handle @notas` usa. Os dois caminhos pegam `/api/notas` sem barra e tudo abaixo dele.
+- `uri strip_prefix /api` tira o prefixo antes de repassar (`/api/notas/7` → `notas:8000/notas/7`). `handle_path /api/*` faz o mesmo num bloco só, mas tira o caminho inteiro do matcher.
+- `handle /api/*` com `respond 404`: caminho de API que nenhum serviço atende para ali, em vez de cair no front.
+- O `handle` sem caminho é o "senão": pega o que nenhum outro pegou. Só um `handle` roda por pedido.
+- `notas:8000`: o nome acha a máquina (o [[Container|container]]), a porta acha o programa nela. Sem porta, o Caddy tenta a 80 *(geral)*.
+
+### Ordem dos blocos
+
+| `handle` com | Ordem em que o Caddy testa |
+|---|---|
+| caminho escrito direto (`handle /api/*`) | o caminho mais longo primeiro, seja qual for a ordem no arquivo |
+| matcher nomeado (`handle @notas`) | a ordem do arquivo |
+| nada (`handle {`) | por último |
+
+Conferido com `caddy adapt` no Caddy 2.11, que mostra a configuração na ordem em que roda. Na prática: o bloco mais específico vem primeiro no arquivo, e a regra vale nos dois casos.
+
+### Prefixo nomeia o recurso
+
+O caminho público diz **o que** se pede (`/api/notas`, `/api/chat`), não **qual serviço** responde (`/api/servico-a`). O proxy guarda o mapa recurso → serviço; o cliente só conhece o recurso.
+
+| | Prefixo por recurso (`/api/notas`) | Prefixo por serviço (`/api/servico-a`) |
+|---|---|---|
+| Rota nova dentro do recurso (`/api/notas/busca`) | não mexe no proxy | não mexe no proxy |
+| Recurso novo no topo (`/api/pastas`) | uma linha no proxy | não mexe no proxy |
+| Mover uma rota para outro serviço | muda só o proxy; a URL fica | muda a URL em todo cliente |
+| Cliente instalado (app desktop, celular) | continua funcionando | quebra até atualizar |
+
+Mover a busca de notas para um serviço próprio, com prefixo por recurso, é um bloco a mais no proxy, antes do bloco do recurso:
+
+```
+@busca path /api/notas/busca /api/notas/busca/*
+handle @busca {
+    uri strip_prefix /api
+    reverse_proxy busca:8000
+}
+
+@notas path /api/notas /api/notas/*
+handle @notas { ... }
+```
+
+O cliente continua chamando `/api/notas/busca`. Rota nova entra dentro do recurso a que pertence (`/notas/busca`, não `/busca`): não pede linha no proxy e deixa o caminho livre para mudar de serviço depois.
+
+> [!example] Uso
+> As rotas do servidor ficam em [[Infra — deploy e operação#O Caddyfile de desenvolvimento|Infra — deploy e operação]].
 
 > [!warning] Erros comuns nas rotas
-> - Prefixos que se cruzam (`/api/*` e `/api/ia/*`): o Caddy fica com o caminho mais longo *(geral)*, mas a regra fica escondida; prefixos separados evitam a dúvida.
+> - Bloco geral com matcher nomeado antes do específico (`@notas` antes de `@busca`): o geral pega tudo, e o específico nunca roda.
+> - Nome do serviço no caminho público: mudar o serviço passa a quebrar os clientes.
 > - Página do front com o mesmo prefixo de um serviço (`/api/...`) vai parar no serviço.
 > - Serviço que o navegador nunca chama (um worker que só fala com o banco) não precisa de rota.
 

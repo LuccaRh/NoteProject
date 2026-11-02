@@ -42,7 +42,7 @@ Para o servidor de [[AWS ou infra própria]] sair de graça no primeiro ano, jun
 > [!warning] O que gera fatura sem aviso
 > NAT Gateway, ALB, RDS e IPv4 sobrando cobram **por hora**, mesmo parados. Uma [[EC2]] parada também continua pagando o [[EC2|EBS]] e o IPv4. O alarme do Budget avisa, mas **não desliga** nada.
 
-## GitHub (aluno da UNICAMP)
+## GitHub (conta de aluno)
 
 | Benefício | Serve? | Fonte |
 |---|---|---|

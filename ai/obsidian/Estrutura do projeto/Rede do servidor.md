@@ -12,7 +12,7 @@ Os dispositivos falam com o servidor por duas URLs, a api e o sync. As duas cheg
 
 | O dispositivo chama | Chega em | Vai para |
 |---|---|---|
-| `https://notes.exemplo.com/api/...` | [[Reverse proxy\|Caddy]], 443 | `api:8000` |
+| `https://notes.exemplo.com/api/notes/...` | [[Reverse proxy\|Caddy]], 443 | `ichiro:8000` |
 | `wss://notes.exemplo.com/sync` | [[Reverse proxy\|Caddy]], 443 | `sync:<porta>` |
 
 ## O caminho, passo a passo
@@ -21,7 +21,7 @@ Os dispositivos falam com o servidor por duas URLs, a api e o sync. As duas cheg
 2. O dispositivo abre TCP em `IP:443`. O [[Security Group]] só deixa a 443 passar.
 3. Na [[EC2]], a 443 está publicada no container `caddy`. O [[Reverse proxy|Caddy]] faz o [[TLS]] e lê o pedido.
 4. Pelo caminho (`/sync`), ele abre outra conexão, HTTP simples, para `sync:<porta>`, pela [[Rede de containers|rede do compose]]. O nome `sync` vira o IP do container pelo DNS do Docker.
-5. Do `api` para o [[Postgres]] é igual: `postgres:5432`, sem sair da rede.
+5. Do `ichiro` para o [[Postgres]] é igual: `postgres:5432`, sem sair da rede.
 
 ## Portas
 
@@ -29,7 +29,7 @@ Os dispositivos falam com o servidor por duas URLs, a api e o sync. As duas cheg
 |---|---|---|---|
 | 443 | `caddy` | sim | sim |
 | 80 | ninguém | não | não: o app sempre chama `https`/`wss`; o Let's Encrypt valida pela 443 (desafio TLS-ALPN) |
-| 8000 | `api` | não | não |
+| 8000 | `ichiro` | não | não |
 | `<porta>` | `sync` | não | não |
 | 5432 | [[Postgres]] | não | não |
 
@@ -44,8 +44,8 @@ services:
     volumes:
       - ./infra/Caddyfile:/etc/caddy/Caddyfile
       - caddy-data:/data        # certificados, sobrevivem ao restart
-  api:
-    image: ghcr.io/.../api      # sem ports: só a rede do compose
+  ichiro:
+    image: ghcr.io/.../ichiro   # sem ports: só a rede do compose
   sync:
     image: ghcr.io/.../sync
 ```
@@ -53,7 +53,12 @@ services:
 ```
 # infra/Caddyfile
 notes.exemplo.com {
-    reverse_proxy /api/* api:8000
+    @ichiro path /api/notes /api/notes/*
+    handle @ichiro {
+        uri strip_prefix /api
+        reverse_proxy ichiro:8000
+    }
+
     reverse_proxy /sync* sync:<porta>
 }
 ```

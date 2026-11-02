@@ -11,7 +11,7 @@ O caminho de um pedido do navegador até o [[Postgres]], no compose de dev (#16)
 > 1. `*.localhost` vira `127.0.0.1` sem `/etc/hosts`.
 > 2. O navegador abre [[TCP]] em `127.0.0.1:443`, publicada no container `caddy`.
 > 3. O [[Reverse proxy|Caddy]] faz o [[TLS]] com o certificado da CA local dele (`tls internal`).
-> 4. `handle_path /api/*` tira o `/api` e repassa a `ichiro:8000/notes/7` pela [[Rede de containers|rede do compose]].
+> 4. O caminho bate com `@ichiro` (`/api/notes/*`); `uri strip_prefix /api` tira o `/api` e repassa a `ichiro:8000/notes/7` pela [[Rede de containers|rede do compose]].
 > 5. O uvicorn entrega o pedido ao [[FastAPI]], que acha a rota `GET /notes/{id}`.
 >
 > Fonte: `caddy/Caddyfile`, `docker-compose-dev.yml`.

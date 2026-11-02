@@ -7,7 +7,7 @@ O navegador abre as notas de qualquer computador, sem instalar nada. Quem serve 
 
 ## Como funciona
 
-1. O [[Reverse proxy|Caddy]] entrega o [[Build do front|build do front]] e repassa `/api` à api, com as rotas `/notes` e `/search`.
+1. O [[Reverse proxy|Caddy]] entrega o [[Build do front|build do front]] e repassa `/api/notes` ao `ichiro`, com as rotas de notas e a busca (`/api/notes/search`).
 2. A tela usa [[UI otimista]]: a edição aparece na hora e vai ao servidor em seguida.
 3. O servidor confirma → nada muda na tela. Recusa ou a rede cai → a tela desfaz ou avisa e tenta de novo.
 
@@ -30,7 +30,7 @@ A [[UI otimista]] cobre a escrita; a leitura pede ao servidor só o necessário,
 | Peça | O que muda | Estado |
 |---|---|---|
 | [[Reverse proxy\|Caddy]] | serve o build do front (`apps/chimchar/dist`), #47 | ⏳ |
-| servidor | expõe as rotas `/notes` (#46) e `/search` (#56) que o front vai chamar | ⏳ |
+| servidor | expõe as rotas `/notes` (#46) e `/notes/search` (#56) que o front vai chamar | ⏳ |
 | `apps/chimchar/src/notes/api.ts` | cliente da API: chama `/api` na própria origem, o [[Reverse proxy\|Caddy]] repassa | ✅ |
 | front | [[UI otimista]]: estado pendente na tela, desfaz ou tenta de novo se o servidor recusar | ⏳ |
 | login | cookie de sessão (httpOnly, mesma origem), #48 | ⏳ |

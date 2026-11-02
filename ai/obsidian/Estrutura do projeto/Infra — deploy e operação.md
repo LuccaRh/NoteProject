@@ -9,19 +9,20 @@ Enquanto tudo roda no notebook, infra é só o [[Docker Compose|`docker compose`
 
 | Arquivo | Faz |
 |---|---|
-| `docker-compose-dev.yml` | `caddy` na frente (`https://notes.localhost`), `chimchar` (Vite) e `ichiro` (FastAPI) com reload, [[Postgres]]; sobe com `-f` |
-| `caddy/Caddyfile` | `/api/*` → `ichiro:8000` sem o `/api`; o resto → `chimchar:5173`; certificado da CA local (`tls internal`) |
+| `docker-compose-dev.yml` | `caddy` na frente (`https://notes.localhost`), `chimchar` (Vite), `ichiro` e `lonzo` (FastAPI) com reload, [[Postgres]]; sobe com `-f` |
+| `caddy/Caddyfile` | `/api/notes/*` → `ichiro:8000` e `/api/chat/*` → `lonzo:8000`, sem o `/api`; outro `/api` → 404; o resto → `chimchar:5173`; certificado da CA local (`tls internal`) |
 | `apps/chimchar/Dockerfile.dev`, `apps/ichiro/Dockerfile.dev` | imagens de desenvolvimento, com reload |
 | `Makefile` | `make dev` sem [[Container\|Docker]]; `make check` |
 | `.github/workflows/ci.yml` | tsc + build do web; testes de `ai/tools/`; ruff, mypy e pytest entram com o servidor (#17) |
 
-Os serviços do compose de desenvolvimento são programas separados, cada um na sua [[Porta|porta]]. O front é só o `chimchar`; a "api" é o `ichiro`, o back. Só o `caddy` publica porta no notebook; `chimchar` e `ichiro` ficam só na [[Rede de containers|rede do compose]].
+Os serviços do compose de desenvolvimento são programas separados, cada um na sua [[Porta|porta]]. O front é só o `chimchar`; o back são o `ichiro` (notas) e o `lonzo` (chat com IA). Só o `caddy` publica porta no notebook; os outros ficam só na [[Rede de containers|rede do compose]].
 
 | Serviço | Pasta | Porta | Faz |
 |---|---|---|---|
-| `caddy` | `caddy/` | 80, 443 | [[Reverse proxy\|reverse proxy]] com [[TLS]] local: divide `/api` e o resto entre `ichiro` e `chimchar` |
+| `caddy` | `caddy/` | 80, 443 | [[Reverse proxy\|reverse proxy]] com [[TLS]] local: manda cada prefixo de `/api` ao serviço dele e o resto ao `chimchar` |
 | `chimchar` | `apps/chimchar/` | 5173 | entrega o HTML e o JS do editor ao navegador |
-| `ichiro` | `apps/ichiro/` | 8000 | a api: rotas `/notes` em [[FastAPI]], lê e grava no [[Postgres]] |
+| `ichiro` | `apps/ichiro/` | 8000 | API de notas: rotas `/notes` em [[FastAPI]], lê e grava no [[Postgres]] |
+| `lonzo` | `apps/lonzo/` | 8000 | chat com o workspace: `POST /chat` em [[Server-sent events\|SSE]] |
 | `postgres` | — | 5432 | o banco |
 
 A ideia de partida: um [[Docker Compose|compose]] com FastAPI, sync, [[Postgres]], armazenamento de objetos e reverse proxy numa máquina só, que para uso pessoal custa pouco. O plano usa uma [[EC2]] e o [[S3]] ([[AWS ou infra própria]]); [[TLS]], domínio, [[Backup|backup]] e [[Observabilidade|monitoramento]] entram abaixo.
@@ -32,8 +33,20 @@ A ideia de partida: um [[Docker Compose|compose]] com FastAPI, sync, [[Postgres]
 notes.localhost {
     tls internal
 
-    handle_path /api/* {
+    @ichiro path /api/notes /api/notes/*
+    handle @ichiro {
+        uri strip_prefix /api
         reverse_proxy ichiro:8000
+    }
+
+    @lonzo path /api/chat /api/chat/*
+    handle @lonzo {
+        uri strip_prefix /api
+        reverse_proxy lonzo:8000
+    }
+
+    handle /api/* {
+        respond 404
     }
 
     handle {
@@ -46,8 +59,13 @@ notes.localhost {
 |---|---|
 | `notes.localhost {` | bloco do site: vale para pedidos com esse nome no SNI e no `Host` ([[Reverse proxy#Vários sites e várias rotas\|vários sites]]); `*.localhost` dá a loopback do notebook sem `/etc/hosts` ([[DNS]]). Com um nome, o Caddy liga o HTTPS na 443 e redireciona a 80 para ela |
 | `tls internal` | certificado assinado pela CA local que o Caddy cria ([[TLS]]); o navegador avisa até confiar nela (passo no README) |
-| `handle_path /api/* { reverse_proxy ichiro:8000 }` | `/api/notes` → `ichiro:8000/notes`, sem o `/api`: as rotas do [[FastAPI]] não têm o prefixo |
+| `@ichiro path /api/notes /api/notes/*` | [[Reverse proxy#Vários sites e várias rotas\|matcher nomeado]]: o recurso `notes`, sem barra e tudo abaixo dele |
+| `uri strip_prefix /api` + `reverse_proxy ichiro:8000` | `/api/notes/7` → `ichiro:8000/notes/7`: as rotas do [[FastAPI]] não têm o prefixo |
+| `@lonzo ...` | o mesmo para `/api/chat` → `lonzo:8000/chat` |
+| `handle /api/* { respond 404 }` | caminho de API sem dono: 404, nunca o front |
 | `handle { reverse_proxy chimchar:5173 }` | o resto (HTML, JS, CSS) vai ao Vite |
+
+O prefixo nomeia o recurso, não o serviço ([[Reverse proxy#Prefixo nomeia o recurso|prefixo por recurso]]): o front chama `/api/notes` sem saber que quem responde é o `ichiro`. Rota nova entra dentro do recurso (a busca é `/api/notes/search`), e mudar uma rota de serviço muda só o Caddyfile, nunca o front. Bloco mais específico vem antes do geral.
 
 O serviço `caddy` no `docker-compose-dev.yml`:
 
@@ -89,6 +107,7 @@ O serviço `caddy` no `docker-compose-dev.yml`:
 | | Compose de desenvolvimento | Compose de produção |
 |---|---|---|
 | `/api/notes/*` | Caddy → `ichiro:8000` | Caddy → `ichiro:8000` |
+| `/api/chat/*` | Caddy → `lonzo:8000` | depois do login (M2) |
 | `/*` (o front) | Caddy → `chimchar:5173`, o [[Servidor de desenvolvimento\|Vite]], que recompila e recarrega | Caddy serve o `dist/` do próprio disco ([[Arquivo estático\|arquivos estáticos]]) |
 | container do front | `chimchar` (Vite) | nenhum: o `dist/` vai na imagem do Caddy por [[Build multi-stage\|build multi-stage]] |
 | proxy `/api` do Vite | sai: o Caddy já roteia | não existe |
