@@ -334,3 +334,59 @@ def test_get_by_empty_path(client: TestClient) -> None:
     response = client.get("/notes/by-path", params={"path": "//"})
 
     assert response.status_code == 422
+
+
+# The tree of a folder: every level, with paths, in file tree order
+def test_tree_of_a_folder(client: TestClient) -> None:
+
+    top = create(client=client, title="Work", is_folder=True)
+    plans = create(
+        client=client,
+        title="Plans",
+        parent_id=top["id"],
+        is_folder=True,
+    )
+    week = create(client=client, title="Week", parent_id=plans["id"])
+    zebra = create(client=client, title="Zebra", parent_id=top["id"])
+
+    params = {"parent_id": top["id"]}
+    response = client.get("/notes/tree", params=params)
+
+    assert response.status_code == 200
+    assert response.json() == [
+        {"id": plans["id"], "path": "Plans", "is_folder": True},
+        {"id": week["id"], "path": "Plans/Week", "is_folder": False},
+        {"id": zebra["id"], "path": "Zebra", "is_folder": False},
+    ]
+
+
+# Without parent_id the tree starts at the root
+def test_tree_of_the_root(client: TestClient) -> None:
+
+    folder = create(client=client, title="Work", is_folder=True)
+    create(client=client, title="Plan", parent_id=folder["id"])
+
+    paths = [item["path"] for item in client.get("/notes/tree").json()]
+
+    assert "Work" in paths
+    assert "Work/Plan" in paths
+
+
+# An empty folder has an empty tree
+def test_tree_of_an_empty_folder(client: TestClient) -> None:
+
+    folder = create(client=client, title="Work", is_folder=True)
+
+    params = {"parent_id": folder["id"]}
+    response = client.get("/notes/tree", params=params)
+
+    assert response.json() == []
+
+
+# The tree of an unknown folder is 404
+def test_tree_of_a_missing_folder(client: TestClient) -> None:
+
+    params = {"parent_id": MISSING_ID}
+    response = client.get("/notes/tree", params=params)
+
+    assert response.status_code == 404
