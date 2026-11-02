@@ -60,6 +60,8 @@ services:
         env_file: .env
         volumes:
             - db:/var/lib/postgresql
+            # Scripts run on the first start only (empty volume)
+            - ./postgres/init:/docker-entrypoint-initdb.d
 
 
 volumes:
