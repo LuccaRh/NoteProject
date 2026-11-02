@@ -70,19 +70,24 @@ def check_parent(
 
 
 @router.get("")
-def list_notes(conn: Conn, parent_id: UUID | None = None) -> list[Note]:
+def list_notes(
+    conn: Conn,
+    parent_id: UUID | None = None,
+    title: str | None = None,
+) -> list[Note]:
     """
     Notes right inside parent_id (the root when none), folders first,
-    then by title
+    then by title; only the ones with this title when one is given
     """
 
     rows = conn.execute(
         text(
             f"SELECT {COLUMNS} FROM notes"
             " WHERE parent_id IS NOT DISTINCT FROM CAST(:parent_id AS uuid)"
+            " AND (CAST(:title AS text) IS NULL OR title = :title)"
             " ORDER BY is_folder DESC, title"
         ),
-        {"parent_id": parent_id},
+        {"parent_id": parent_id, "title": title},
     ).mappings()
 
     return [Note.model_validate(row) for row in rows]
