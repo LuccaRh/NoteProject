@@ -211,12 +211,14 @@ ai/                todo o resto do workspace de IA:
   `POST /api/chat/workspaces {folder_id, description}` → o lonzo cria `.workspace/` + `kb/ skills/
   scripts/ hooks/` (reaproveita as que existem) e o `tool_runner` da SDK roda o laço com o prompt
   (`create_workspace.md`, sem `CLAUDE.md` base) e as ferramentas `create_note`/`create_folder`
-  (`lonzo/tools.py`, caminho relativo à pasta), que gravam `CLAUDE.md` e as notas no ichiro
+  (`lonzo/services/note_tools.py`, caminho relativo à pasta), que gravam `CLAUDE.md` e as notas no ichiro
   (`httpx2`, `http://ichiro:8000`); o chat aceita `folder_id` e usa as regras do `.workspace` da
   raiz + pasta, e sem nenhum vai sem `system` (o `rules.md` da #74 saiu). Docstring em toda
   função do lonzo (W21); o ichiro ainda tem comentário em cima do `def` (o `check_parent` tem
   docstring, mas separada da assinatura): arrumar numa branch do `ichiro`.
-  Chamadas a APIs em `lonzo/clients/` (`anthropic.py`, `ichiro.py`), modelos em `lonzo/schemas/`;
+  Lonzo em camadas (2026-11-02): `routers/` → `services/` (`chat`, `workspaces`,
+  `note_tools`) → `clients/` (`IchiroClient`, `AnthropicClient`, instâncias em `connections.py`,
+  fechadas no `lifespan`); erros do domínio viram status no `main.py`; modelos em `schemas/`;
   o `message_start` saiu sem `model`, que foi para o `message_end` (a constante fica no cliente).
 - IA (2026-10-31): chat com o workspace no servidor; vault `IA no projeto/Chat com o workspace` e
   `Caminho de uma pergunta`. Workspace = pasta com `.workspace/`, vários por pessoa.
