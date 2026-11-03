@@ -11,6 +11,7 @@ from lonzo.services.conversations import (
     save_exchange,
     start_conversation,
 )
+from lonzo.services.note_tools import NoteTools
 from lonzo.services.workspaces import workspace_rules
 
 
@@ -27,24 +28,37 @@ async def events(
 ) -> AsyncIterator[Event]:
     """
     The events of one answer, as (name, data), while the model writes; the
-    question and the whole answer are kept at the end, and an error of the
-    API mid-answer becomes an error event, with nothing kept
+    text of every turn goes out, between the reads of notes by the tools.
+    The question and the whole answer are kept at the end, and an error of
+    the API mid-answer becomes an error event, with nothing kept
     """
 
     yield ("message_start", {"conversation_id": str(conversation.id)})
     chunks: list[str] = []
+    usage = {"input_tokens": 0, "output_tokens": 0}
+    end: dict[str, object] = {"usage": usage}
+    runner = claude.stream_answer(
+        system=system,
+        history=history,
+        question=question,
+        tools=NoteTools().tools(),
+    )
 
     try:
-        async with claude.stream_answer(
-            system=system,
-            history=history,
-            question=question,
-        ) as stream:
+        async for stream in runner:
+            # The text of a new turn starts a paragraph of its own
+            gap = "\n\n" if chunks else ""
+
             async for text in stream.text_stream:
-                chunks.append(text)
-                yield ("text_delta", {"text": text})
+                chunks.append(gap + text)
+                yield ("text_delta", {"text": gap + text})
+                gap = ""
 
             final = await stream.get_final_message()
+            usage["input_tokens"] += final.usage.input_tokens
+            usage["output_tokens"] += final.usage.output_tokens
+            end["model"] = final.model
+            end["stop_reason"] = final.stop_reason
 
     except APIError as error:
         yield ("error", {"message": error.message})
@@ -56,15 +70,6 @@ async def events(
         question=question,
         answer="".join(chunks),
     )
-    usage = {
-        "input_tokens": final.usage.input_tokens,
-        "output_tokens": final.usage.output_tokens,
-    }
-    end: dict[str, object] = {
-        "model": final.model,
-        "stop_reason": final.stop_reason,
-        "usage": usage,
-    }
     yield ("message_end", end)
 
 

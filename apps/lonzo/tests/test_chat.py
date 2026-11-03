@@ -2,8 +2,8 @@
 import asyncio
 import json
 from collections.abc import AsyncIterator, Mapping
-from types import SimpleNamespace, TracebackType
-from typing import ClassVar, Self
+from types import SimpleNamespace
+from typing import ClassVar
 from unittest.mock import patch
 from uuid import UUID, uuid4
 
@@ -26,19 +26,6 @@ client = TestClient(app)
 # Stands in for the stream of the anthropic client: two chunks of text
 class FakeStream:
 
-    async def __aenter__(self) -> Self:
-
-        return self
-
-    async def __aexit__(
-        self,
-        kind: type[BaseException] | None,
-        error: BaseException | None,
-        trace: TracebackType | None,
-    ) -> None:
-
-        return None
-
     @property
     async def text_stream(self) -> AsyncIterator[str]:
 
@@ -56,20 +43,30 @@ class FakeStream:
         )
 
 
+# Stands in for the tool runner: one stream per turn of the model
+class FakeRunner:
+    turns: ClassVar[int] = 1
+
+    async def __aiter__(self) -> AsyncIterator[FakeStream]:
+
+        for _ in range(FakeRunner.turns):
+            yield FakeStream()
+
+
 # Keeps the parameters of the last call, to check the system prompt
 class FakeMessages:
     params: ClassVar[dict[str, object]] = {}
 
-    def stream(self, **params: object) -> FakeStream:
+    def tool_runner(self, **params: object) -> FakeRunner:
 
         FakeMessages.params = params
 
-        return FakeStream()
+        return FakeRunner()
 
 
 class FakeClient:
     api_key: str = "test-key"
-    messages: FakeMessages = FakeMessages()
+    beta: SimpleNamespace = SimpleNamespace(messages=FakeMessages())
 
 
 # Parses a server-sent events body into (name, data) pairs
