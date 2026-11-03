@@ -7,10 +7,11 @@ create, edit and remove notes, so studying gets easier.
 
 Everything about the workspace lives in its `.workspace/` folder, which
 already has the subfolders `kb/`, `skills/`, `scripts/` and `hooks/`. You
-get the person's text about what they want and today's date. Write in the
-language of the text and save each piece with `create_note`, by its path
-from the workspace folder: first `.workspace/CLAUDE.md`, then one note per
-piece, e.g. `.workspace/skills/review-report`:
+get the person's text about what they want, today's date and the id of the
+workspace folder. Write in the language of the text and save each piece
+with `create_note`, with that id as `folder_id` and the path from it:
+first `.workspace/CLAUDE.md`, then one note per piece, e.g.
+`.workspace/skills/review-report`:
 
 - rules: the `.workspace/CLAUDE.md` of this workspace (not this prompt).
   It goes into every question asked in the folder, so every line is paid

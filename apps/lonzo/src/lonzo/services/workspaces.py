@@ -115,11 +115,14 @@ async def create_workspace(folder_id: UUID, description: str) -> list[Note]:
         raise NotAFolder("folder_id is not a folder")
 
     folders = await create_workspace_folders(parent_id=folder.id)
-    notes = NoteTools(root_id=folder.id)
+    notes = NoteTools()
 
-    # A fixed system prompt keeps the cache; the date goes in the request
+    # A fixed system prompt keeps the cache; date and folder go in the request
     system = PROMPT_PATH.read_text(encoding="utf-8")
-    request = f"Today is {date.today().isoformat()}.\n\n{description}"
+    request = (
+        f"Today is {date.today().isoformat()}. The workspace folder is"
+        f" {folder.id}.\n\n{description}"
+    )
     await claude.run_tools(system=system, request=request, tools=notes.tools())
 
     return [*folders, *notes.created]
