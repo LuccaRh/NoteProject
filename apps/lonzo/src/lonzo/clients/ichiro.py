@@ -73,13 +73,21 @@ class IchiroClient:
 
         return Note.model_validate(response.json())
 
-    async def get_note_by_path(self, parent_id: UUID, path: str) -> Note | None:
+    async def get_note_by_path(
+        self,
+        parent_id: UUID | None,
+        path: str,
+    ) -> Note | None:
         """
         GET /notes/by-path: the note or folder at a path of titles (a/b/c)
-        inside parent_id; None when a name is missing
+        inside parent_id (None = the root); None when a name is missing
         """
 
-        params = {"parent_id": str(parent_id), "path": path}
+        params = {"path": path}
+
+        if parent_id is not None:
+            params["parent_id"] = str(parent_id)
+
         response = await self.http.get("/notes/by-path", params=params)
 
         if response.status_code == 404:
@@ -132,19 +140,20 @@ class IchiroClient:
     async def create_note(
         self,
         title: str,
-        parent_id: UUID,
+        parent_id: UUID | None,
         body: str = "",
         is_folder: bool = False,
     ) -> Note:
         """
-        POST /notes: a new note or folder inside parent_id, as ichiro saved
-        it; TitleTaken when the folder already has that title
+        POST /notes: a new note or folder inside parent_id (None = the
+        root), as ichiro saved it; TitleTaken when the folder already has
+        that title
         """
 
         note = {
             "title": title,
             "body": body,
-            "parent_id": str(parent_id),
+            "parent_id": None if parent_id is None else str(parent_id),
             "is_folder": is_folder,
         }
         response = await self.http.post("/notes", json=note)
