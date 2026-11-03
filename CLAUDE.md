@@ -223,80 +223,35 @@ ai/                todo o resto do workspace de IA:
 
 ## Estado (2026-11-03)
 
-- M0, #46, #62, #64, #65, #69, #16, #80, #82, #74, #73, #98 e #100 mergeados (PRs #66–#68,
-  #70–#72, #81, #83–#85, #88, #93–#96, #99, #101, #102); `master` local = remoto; branches
-  `backup/*` apagadas (2026-11-02). Issues #73, #89–#92, #98 e #100 com PR mergeado: o Lucca fecha.
-- #74 pronta: `apps/lonzo` responde `POST /api/chat` em SSE (Haiku 5.5, `thinking` desligado,
-  `max_tokens` 512, 64000 na branch `lonzo/longer-answers-without-workspace-talk`, sem push,
-  PR do lonzo da #76, que também tira o workspace das respostas); o Caddy roteia `/api/notes/*` → ichiro, `/api/chat/*` →
-  lonzo, outro `/api` → 404. Evento `status` saiu da #74 e nasce com as ferramentas (#77).
-- #73 pronta (PR #99):
-  `POST /api/chat/workspaces {folder_id, description}` → o lonzo cria `.workspace/` + `kb/ skills/
-  scripts/ hooks/` (reaproveita as que existem) e o `tool_runner` da SDK roda o laço com o prompt
-  (`create_workspace.md`, sem `CLAUDE.md` base) e as ferramentas `create_note`/`create_folder`
-  (`lonzo/services/note_tools.py`, caminho relativo à pasta), que gravam `CLAUDE.md` e as notas no ichiro
-  (`httpx2`, `http://ichiro:8000`); o chat aceita `folder_id` e usa as regras do `.workspace` da
-  raiz + pasta, e sem nenhum vai sem `system` (o `rules.md` da #74 saiu). Docstring em toda
-  função do lonzo (W21).
-  Lonzo em camadas (2026-11-02): `routers/` → `services/` (`chat`, `workspaces`,
-  `note_tools`) → `clients/` (`IchiroClient`, `AnthropicClient`, instâncias em `connections.py`,
-  fechadas no `lifespan`); erros do domínio viram status no `handlers.py` (branch abaixo); modelos em `schemas/`;
-  o `message_start` saiu sem `model`, que foi para o `message_end` (a constante fica no cliente).
-- #98 (ichiro em `routers/` → `services/` → `repositories/`, PR #101) e #100 (handlers do lonzo
-  em `handlers.py`, PR #102) mergeados. Falta no ichiro: comentário em cima das fixtures do
-  `conftest.py` (o W20 de `tests/test_notes.py` sai na #56).
-- #75 em duas branches sobre a `master` (sem push, revisão do Lucca pendente):
-  - `postgres/create-the-lonzo-database`: `postgres/init/create-lonzo-database.sh` cria o
-    usuário e o banco `lonzo` na primeira subida (volume vazio); no volume do dev, já rodado à
-    mão. `.env` com `LONZO_DB_PASSWORD` e `LONZO_DATABASE_URL`.
-  - `lonzo/keep-chat-conversations-on-the-server`: tabelas `conversations` e `messages`
-    (Alembic no lonzo; `content` jsonb em blocos da Messages API), SQLAlchemy Core async
-    (`lonzo/db.py`, `repositories/conversations.py`, card `ai/kb/libs/sqlalchemy.md`);
-    `POST /api/chat {conversation_id?}` manda o histórico e grava pergunta + resposta;
-    `GET /api/chat/conversations[?folder_id]` e `/{id}`; versão 0.4.0. Conferido pelo Caddy.
-- #76 na branch `chimchar/chat-with-the-ai-from-the-web-app` (sem push), **em cima da
-  `lonzo/keep-...`** (usa as rotas de conversa): rebase na `master` depois do merge da #75
-  (o W13 avisa `apps/lonzo` até lá). Front com abas (`tabs.ts`: nota ou chat; as notas dividem
-  o mesmo editor), aba de chat (`chat/chat.ts`, SSE lido no `fetch` em `chat/api.ts`) e
-  pop-up "Create workspace" (`chat/workspace-dialog.ts`, texto já preenchido); chimchar
-  0.7.0. Conferido no navegador pelo Caddy (Playwright). Escrita pela sessão, cliente-api
-  incluso (o Lucca pediu pronto).
-- #56 mergeada (PR #110, `ichiro/search-notes-with-postgres-full-text-search`):
-  `GET /notes/search?q=&parent_id=` → `[{id, title}]` por título, notas (não pastas) com as
-  palavras no título ou corpo, só dentro de `parent_id` (qualquer profundidade) quando vem;
-  índice GIN sobre `to_tsvector('simple', title || ' ' || body)`, sem coluna (migration
-  `4f274e14b79c`); sem ranking, trecho nem limite; ichiro 0.13.0. Vault: `Conceitos/Banco
-  de dados/Índice` e `Busca full-text no Postgres`.
-- #107 mergeada (PR #111, `ichiro/search-notes-by-title`): `GET /notes/search-titles?q=&parent_id=` → `[{id, title,
-  is_folder}]`, `ILIKE` no título (pedaço de palavra, notas e pastas, `%`/`_` escapados),
-  sem índice; cada busca escreve a CTE do filtro por pasta na própria consulta
-  (`repositories/notes.py`); ichiro 0.14.0.
-- #108 mergeada (PR #112, `ichiro/open-the-transaction-in-the-service`): `db.transaction()`
-  no lugar do `get_conn`; cada service abre a transação e os routers não recebem conexão;
-  testes trocam o `transaction` dos services por savepoint; W22 barra router importando
-  `db`; ichiro 0.15.0.
-- #109 (busca no front) no PR #113 (`chimchar/search-notes-from-the-web-app`): pop-up
-  `notes/search.ts` (botão, `Ctrl+O`, lupa da pasta), nomes na hora + corpos/títulos do
-  servidor, palavras marcadas na nota (`decorations/found.ts`); chimchar 0.8.0. Escrita
-  pelo Lucca, commits da sessão; falta conferir no navegador.
-- #77 no PR #114 (`lonzo/let-the-chat-read-and-search-notes`, rebase na `master` com a #56), feita no worktree
-  `../NoteProject-lonzo-search`: o chat responde pelo `tool_runner(stream=True)` com
-  `search_notes`, `search_titles`, `list_folder`, `read_note`, `create_note`, `create_folder`,
-  todas no `NoteTools` (`services/note_tools.py`, um conjunto só, o mesmo da #73), sem trava de
-  pasta (2026-11-03: a IA lê e cria em qualquer pasta; `folder_id` opcional, sem ele a raiz); o
-  ponto de partida é o id da pasta, que o `create_workspace.md` manda gravar no `CLAUDE.md`
-  do workspace (o `FOLDER_HINT` saiu do código, e o `RULES_HEADER` também: o `CLAUDE.md` abre com ele). Usa `/notes/search` e `/notes/search-titles` da #56.
-  Conferido ao vivo (container temporário na rede do compose). lonzo 0.6.0.
-- #78 no PR #115 (`lonzo/let-the-chat-create-edit-and-delete-notes`), **em cima da
-  #77**: `edit_note` (trecho velho → novo) e `delete_note` no `NoteTools`; lonzo 0.7.0.
-  Conferido ao vivo contra o ichiro (sem o Claude). Achado: no ichiro o commit do `get_conn`
-  sai depois da resposta (`Depends` sem `scope="function"`), e ler logo depois de apagar às
-  vezes ainda acha a nota.
-- IA (2026-10-31): chat com o workspace no servidor; vault `IA no projeto/Chat com o workspace` e
-  `Caminho de uma pergunta`. Workspace = pasta com `.workspace/`, vários por pessoa.
-- #31 (Ctrl+D) e #5 (chips) sem milestone, para depois; `decorations/replace.ts` (#5) fora do git.
-- Falta: confiar na CA local do Caddy no navegador (README); `/docs` do FastAPI quebra atrás do
-  `/api` (precisa de `root_path`, branch do `ichiro`).
+- Mergeados até o PR #116: M0, #46, #62, #64, #65, #69, #16, #80, #82, #74, #73, #98, #100,
+  #75 (PRs #103, #104), #76 (#105, #106), #56 (#110), #107 (#111), #108 (#112), #109 (#113),
+  #77 (#114), #78 (#115), #51 (#116). `master` local = remoto. Com PR mergeado e ainda
+  abertas, o Lucca fecha: #51, #56, #75–#78, #107–#109. #79 (importar o vault) fechada como
+  "not planned" (2026-11-03: não faz sentido).
+- lonzo (IA): `POST /api/chat` em SSE (Haiku 5.5, `max_tokens` 64000) pelo
+  `tool_runner(stream=True)`, com histórico no banco `lonzo` (`conversations`/`messages`,
+  Alembic, SQLAlchemy Core async; `GET /api/chat/conversations[?folder_id]` e `/{id}`);
+  `POST /api/chat/workspaces {folder_id, description}` cria o `.workspace/` pelo
+  `create_workspace.md`. Ferramentas no `NoteTools` (`services/note_tools.py`):
+  `search_notes`, `search_titles`, `list_folder`, `read_note`, `create_note`,
+  `create_folder`, `edit_note`, `delete_note`, sem trava de pasta. Camadas `routers/` →
+  `services/` → `clients/` (`IchiroClient`, `AnthropicClient` em `connections.py`) e
+  `repositories/`; erros no `handlers.py`. Caddy: `/api/notes/*` → ichiro, `/api/chat/*` →
+  lonzo, outro `/api` → 404.
+- ichiro: camadas `routers/` → `services/` → `repositories/`, `db.transaction()` aberto no
+  service (testes por savepoint); `GET /notes/search` (full-text, índice GIN `simple`) e
+  `/notes/search-titles` (`ILIKE`). Falta: comentário em cima das fixtures do `conftest.py`;
+  `/docs` do FastAPI quebra atrás do `/api` (precisa de `root_path`).
+- chimchar: abas (nota/chat, `tabs.ts`), chat com SSE (`chat/`), pop-up "Create workspace",
+  busca (`notes/search.ts`, `Ctrl+O`, `decorations/found.ts`), `.dockerignore` (#51).
+- #117 (milestone Editor) no PR da branch `chimchar/render-markdown-in-the-editor`: live
+  preview no editor (`decorations/preview.ts`: títulos, tabela GFM, bloco de código com cor,
+  marcas escondidas fora do cursor); chimchar 0.10.0. Callout `[!tipo]` fica para a #5.
+- IA (2026-10-31): vault `IA no projeto/Chat com o workspace` e `Caminho de uma pergunta`.
+  Workspace = pasta com `.workspace/`, vários por pessoa.
+- Para depois: #6 (mover notas entre pastas, 2026-11-03), #31 (Ctrl+D), #5 (chips;
+  `decorations/replace.ts` fora do git).
+- Falta: confiar na CA local do Caddy no navegador (README).
 - Serviços (2026-11-01): `chimchar` (front), `ichiro` (notas), `lonzo` (IA). Tabela, rotas `/notes`
   e `notes.localhost` ficam (são o domínio, não o serviço).
 
@@ -304,12 +259,9 @@ ai/                todo o resto do workspace de IA:
 
 Plano: vault `Plano do projeto/Roadmap` (navegador → app desktop → celular) + issues/milestones no GitHub.
 
-1. Entrega de 2026-11-06 (vault `Plano do projeto/Entrega de 2026-11-06`): #74 ✅ → #73 ✅ workspace criado pela IA a partir de um texto breve
-   (esqueleto; vault `Workspace no app#Como nasce`) → #98 ✅ ichiro em camadas → #75 conversas (2 branches prontas, falta PR), #76 tela do chat (branch pronta, falta PR) → #56 busca e #107 busca por título (branches prontas, falta PR), #77 ler/buscar
-   → #78 criar/editar/apagar, #51 → #6 pastas, #79 importar o vault → #17 se sobrar.
-   (esqueleto; vault `Workspace no app#Como nasce`) → #98 ✅ ichiro em camadas → #75 conversas (2 branches prontas, falta PR), #76 tela do chat (branch pronta, falta PR) → #56 busca, #77 ler/buscar
-   → #78 criar/editar/apagar (branch pronta, falta PR), #51 → #6 pastas, #79 importar o vault → #17 se sobrar.
-2. M2 login (#48, #17) → M3 AWS (#18–#25, #47) → M4 edição ao vivo (#26, #27, #30).
+1. Entrega de 2026-11-06 (vault `Plano do projeto/Entrega de 2026-11-06`): feita, menos a #6
+   (adiada) e a #79 (fechada). Live preview (#117) no PR, falta o merge.
+2. M2 login (#48) → M3 AWS (#18–#25, #47) → M4 edição ao vivo (#26, #27, #30).
 - v1 = ler notas no navegador com o servidor na AWS (vault `Plano do projeto/Objetivo do app`);
   o chat não vai para a AWS antes do login.
 - Depois da entrega (IA): #32 âncora, scripts em sandbox, #34 MCP, #35 worker, resto da #42, #36.
