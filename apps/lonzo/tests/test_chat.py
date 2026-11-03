@@ -161,6 +161,34 @@ def test_chat_uses_the_folder_workspace_rules() -> None:
     assert "Exam soon." not in system
 
 
+def test_chat_gives_the_model_the_note_tools() -> None:
+
+    post(body={"question": "Hi"})
+
+    tools = FakeMessages.params["tools"]
+    assert isinstance(tools, list)
+    assert {tool.name for tool in tools} == {
+        "search_notes",
+        "search_titles",
+        "list_folder",
+        "read_note",
+        "create_note",
+        "create_folder",
+    }
+
+
+def test_chat_streams_the_text_of_every_turn() -> None:
+
+    with patch.object(FakeRunner, "turns", 2):
+        response = post(body={"question": "Hi"})
+
+    events = parse(body=response.text)
+    text = "".join(str(data["text"]) for name, data in events
+                   if name == "text_delta")
+    assert text == "Hello there\n\nHello there"
+    assert events[-1][1]["usage"] == {"input_tokens": 20, "output_tokens": 4}
+
+
 def conversation_of(response: Response) -> str:
 
     start = parse(body=response.text)[0]
