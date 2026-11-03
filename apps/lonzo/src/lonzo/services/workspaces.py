@@ -12,10 +12,6 @@ from lonzo.services.note_tools import NoteTools
 # Global variables
 WORKSPACE = ".workspace"
 WORKSPACE_FOLDERS = ["kb", "skills", "scripts", "hooks"]
-RULES_HEADER = (
-    "These notes are the person's workspace. Follow them in every answer;"
-    " they win over your own defaults (language, length, format)."
-)
 PROMPT_PATH = Path(__file__).parent.parent / "create_workspace.md"
 
 
@@ -36,8 +32,9 @@ async def find_workspace(parent_id: UUID) -> UUID | None:
 
 async def workspace_rules(folder_id: UUID | None) -> str:
     """
-    Rules for a question: notes of the folder's .workspace; empty with no
-    folder or no .workspace (the root never has one)
+    Rules for a question: notes of the folder's .workspace, as written
+    (the CLAUDE.md opens saying they win); empty with no folder or no
+    .workspace (the root never has one)
     """
 
     if folder_id is None:
@@ -54,10 +51,7 @@ async def workspace_rules(folder_id: UUID | None) -> str:
         if not note.is_folder
     ]
 
-    if not parts:
-        return ""
-
-    return "\n\n".join([RULES_HEADER, *parts])
+    return "\n\n".join(parts)
 
 
 async def create_workspace_folders(parent_id: UUID) -> list[Note]:
@@ -115,11 +109,14 @@ async def create_workspace(folder_id: UUID, description: str) -> list[Note]:
         raise NotAFolder("folder_id is not a folder")
 
     folders = await create_workspace_folders(parent_id=folder.id)
-    notes = NoteTools(root_id=folder.id)
+    notes = NoteTools()
 
-    # A fixed system prompt keeps the cache; the date goes in the request
+    # A fixed system prompt keeps the cache; date and folder go in the request
     system = PROMPT_PATH.read_text(encoding="utf-8")
-    request = f"Today is {date.today().isoformat()}.\n\n{description}"
+    request = (
+        f"Today is {date.today().isoformat()}. The workspace folder is"
+        f" {folder.id}.\n\n{description}"
+    )
     await claude.run_tools(system=system, request=request, tools=notes.tools())
 
     return [*folders, *notes.created]

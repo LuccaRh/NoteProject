@@ -6,7 +6,7 @@ import httpx2
 from pydantic import TypeAdapter
 
 from lonzo.errors import TitleTaken
-from lonzo.schemas.notes import Note
+from lonzo.schemas.notes import Note, NoteMatch, TitleMatch
 
 
 # Global variables
@@ -73,13 +73,21 @@ class IchiroClient:
 
         return Note.model_validate(response.json())
 
-    async def get_note_by_path(self, parent_id: UUID, path: str) -> Note | None:
+    async def get_note_by_path(
+        self,
+        parent_id: UUID | None,
+        path: str,
+    ) -> Note | None:
         """
         GET /notes/by-path: the note or folder at a path of titles (a/b/c)
-        inside parent_id; None when a name is missing
+        inside parent_id (None = the root); None when a name is missing
         """
 
-        params = {"parent_id": str(parent_id), "path": path}
+        params = {"path": path}
+
+        if parent_id is not None:
+            params["parent_id"] = str(parent_id)
+
         response = await self.http.get("/notes/by-path", params=params)
 
         if response.status_code == 404:
@@ -89,22 +97,63 @@ class IchiroClient:
 
         return Note.model_validate(response.json())
 
+    async def search_notes(
+        self,
+        query: str,
+        parent_id: UUID | None,
+    ) -> list[NoteMatch]:
+        """
+        GET /notes/search: the notes whose title or body has the words of
+        query, inside parent_id at any depth (None = all of them)
+        """
+
+        params = {"q": query}
+
+        if parent_id is not None:
+            params["parent_id"] = str(parent_id)
+
+        response = await self.http.get("/notes/search", params=params)
+        response.raise_for_status()
+
+        return TypeAdapter(list[NoteMatch]).validate_python(response.json())
+
+    async def search_titles(
+        self,
+        text: str,
+        parent_id: UUID | None,
+    ) -> list[TitleMatch]:
+        """
+        GET /notes/search-titles: the notes and folders with text anywhere
+        in the title, inside parent_id at any depth (None = all of them)
+        """
+
+        params = {"q": text}
+
+        if parent_id is not None:
+            params["parent_id"] = str(parent_id)
+
+        response = await self.http.get("/notes/search-titles", params=params)
+        response.raise_for_status()
+
+        return TypeAdapter(list[TitleMatch]).validate_python(response.json())
+
     async def create_note(
         self,
         title: str,
-        parent_id: UUID,
+        parent_id: UUID | None,
         body: str = "",
         is_folder: bool = False,
     ) -> Note:
         """
-        POST /notes: a new note or folder inside parent_id, as ichiro saved
-        it; TitleTaken when the folder already has that title
+        POST /notes: a new note or folder inside parent_id (None = the
+        root), as ichiro saved it; TitleTaken when the folder already has
+        that title
         """
 
         note = {
             "title": title,
             "body": body,
-            "parent_id": str(parent_id),
+            "parent_id": None if parent_id is None else str(parent_id),
             "is_folder": is_folder,
         }
         response = await self.http.post("/notes", json=note)

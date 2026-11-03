@@ -29,9 +29,7 @@ def call(name: str, **arguments: object) -> SimpleNamespace:
     )
 
 
-# Stands in for the tool runner: runs each turn of tool calls with the
-# real tools, keeping what each answered; an error of a tool goes back
-# to the model, as the SDK does with any exception
+# The tool runner: real tools per turn, errors back to the model as text
 class FakeRunner:
     turns: ClassVar[list[list[SimpleNamespace]]] = []
     params: ClassVar[dict[str, Any]] = {}
@@ -86,11 +84,13 @@ def test_workspace_saves_rules_and_skills_in_the_folder() -> None:
     body = {"folder_id": str(folder), "description": "I play baseball"}
     rules = call(
         name="create_note",
+        folder_id=str(folder),
         path=".workspace/CLAUDE.md",
         body="# Workspace\n\nHit better.",
     )
     skill = call(
         name="create_note",
+        folder_id=str(folder),
         path=".workspace/skills/review-swing",
         body="Look at the video.",
     )
@@ -121,8 +121,18 @@ def test_note_creates_the_folders_on_its_path() -> None:
     ichiro = FakeIchiro()
     folder = ichiro.add(title="Baseball", is_folder=True)
     body = {"folder_id": str(folder), "description": "I play baseball"}
-    rules = call(name="create_note", path=".workspace/CLAUDE.md", body="")
-    note = call(name="create_note", path="Games/2026/first", body="Won.")
+    rules = call(
+        name="create_note",
+        folder_id=str(folder),
+        path=".workspace/CLAUDE.md",
+        body="",
+    )
+    note = call(
+        name="create_note",
+        folder_id=str(folder),
+        path="Games/2026/first",
+        body="Won.",
+    )
     response = post(ichiro=ichiro, body=body, turns=[[rules, note]])
 
     assert response.status_code == 201
@@ -135,13 +145,23 @@ def test_note_creates_the_folders_on_its_path() -> None:
     assert first["parent_id"] == year["id"]
 
 
-def test_path_outside_the_folder_goes_back_as_an_error() -> None:
+def test_path_with_dots_goes_back_as_an_error() -> None:
 
     ichiro = FakeIchiro()
     folder = ichiro.add(title="Baseball", is_folder=True)
     body = {"folder_id": str(folder), "description": "I play baseball"}
-    wrong = call(name="create_note", path="../Other/x", body="")
-    rules = call(name="create_note", path=".workspace/CLAUDE.md", body="")
+    wrong = call(
+        name="create_note",
+        folder_id=str(folder),
+        path="../Other/x",
+        body="",
+    )
+    rules = call(
+        name="create_note",
+        folder_id=str(folder),
+        path=".workspace/CLAUDE.md",
+        body="",
+    )
     response = post(ichiro=ichiro, body=body, turns=[[wrong], [rules]])
 
     assert response.status_code == 201
@@ -154,8 +174,17 @@ def test_taken_title_goes_back_as_an_error() -> None:
     ichiro = FakeIchiro()
     folder = ichiro.add(title="Baseball", is_folder=True)
     body = {"folder_id": str(folder), "description": "I play baseball"}
-    again = call(name="create_folder", path=".workspace/kb")
-    rules = call(name="create_note", path=".workspace/CLAUDE.md", body="")
+    again = call(
+        name="create_folder",
+        folder_id=str(folder),
+        path=".workspace/kb",
+    )
+    rules = call(
+        name="create_note",
+        folder_id=str(folder),
+        path=".workspace/CLAUDE.md",
+        body="",
+    )
     response = post(ichiro=ichiro, body=body, turns=[[again, rules]])
 
     assert response.status_code == 201
@@ -168,8 +197,18 @@ def test_note_on_the_path_goes_back_as_an_error() -> None:
     folder = ichiro.add(title="Baseball", is_folder=True)
     ichiro.add(title="Games", parent_id=folder)
     body = {"folder_id": str(folder), "description": "I play baseball"}
-    note = call(name="create_note", path="Games/2026/first", body="Won.")
-    rules = call(name="create_note", path=".workspace/CLAUDE.md", body="")
+    note = call(
+        name="create_note",
+        folder_id=str(folder),
+        path="Games/2026/first",
+        body="Won.",
+    )
+    rules = call(
+        name="create_note",
+        folder_id=str(folder),
+        path=".workspace/CLAUDE.md",
+        body="",
+    )
     response = post(ichiro=ichiro, body=body, turns=[[note, rules]])
 
     assert response.status_code == 201
@@ -209,7 +248,12 @@ def test_workspace_reuses_the_folders_already_there() -> None:
     workspace = ichiro.add(title=".workspace", parent_id=folder, is_folder=True)
     ichiro.add(title="kb", parent_id=workspace, is_folder=True)
     body = {"folder_id": str(folder), "description": "I play baseball"}
-    rules = call(name="create_note", path=".workspace/CLAUDE.md", body="")
+    rules = call(
+        name="create_note",
+        folder_id=str(folder),
+        path=".workspace/CLAUDE.md",
+        body="",
+    )
     response = post(ichiro=ichiro, body=body, turns=[[rules]])
 
     assert response.status_code == 201

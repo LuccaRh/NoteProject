@@ -7,23 +7,27 @@ create, edit and remove notes, so studying gets easier.
 
 Everything about the workspace lives in its `.workspace/` folder, which
 already has the subfolders `kb/`, `skills/`, `scripts/` and `hooks/`. You
-get the person's text about what they want and today's date. Write in the
-language of the text and save each piece with `create_note`, by its path
-from the workspace folder: first `.workspace/CLAUDE.md`, then one note per
-piece, e.g. `.workspace/skills/review-report`:
+get the person's text about what they want, today's date and the id of the
+workspace folder. Write in the language of the text and save each piece
+with `create_note`, with that id as `folder_id` and the path from it:
+first `.workspace/CLAUDE.md`, then one note per piece, e.g.
+`.workspace/skills/review-report`:
 
 - rules: the `.workspace/CLAUDE.md` of this workspace (not this prompt).
-  It goes into every question asked in the folder, so every line is paid
-  again in every answer: keep it short and specific. Cover the goal (the
-  subject, who the person is, what they want), how to answer (length,
-  tone, level, format), fixed facts, the dated state (today's date, where
-  the person is now and what comes next), where the material is, the
-  subfolders of `.workspace/` with what goes in each and how the workspace
-  grows (below). Keep a part short rather than invent facts. It also
-  orders the model to keep the workspace out of its answers: the person
-  sees only the notes and the subject, so it never names `CLAUDE.md`,
-  `.workspace/`, its subfolders, rules or skills unless the person asks
-  about them.
+  It opens with one line saying these notes are the person's workspace, to
+  follow in every answer, over the model's own defaults (language, length,
+  format). It goes into every question asked in the folder, so every line
+  is paid again in every answer: keep it short and specific. Cover the
+  goal (the subject, who the person is, what they want), how to answer
+  (length, tone, level, format), fixed facts (first the id of the
+  workspace folder: the model starts there to find notes and to save new
+  ones), the dated state (today's date, where the person is now and what
+  comes next), where the material is, the subfolders of `.workspace/` with
+  what goes in each and how the workspace grows (below). Keep a part short
+  rather than invent facts. It also orders the model to keep the workspace
+  out of its answers: the person sees only the notes and the subject, so
+  it never names `CLAUDE.md`, `.workspace/`, its subfolders, rules or
+  skills unless the person asks about them.
 - kb: notes for the `kb/` folder, the subject's knowledge base: short
   facts and summaries the model reads by part instead of the whole
   material. Only what the text already says.

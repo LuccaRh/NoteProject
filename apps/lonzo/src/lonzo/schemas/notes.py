@@ -15,3 +15,22 @@ class Note(BaseModel):
     is_folder: bool
     title: str
     body: str
+
+
+class NoteMatch(BaseModel):
+    """
+    A note found by the words in its title or body
+    """
+
+    id: UUID
+    title: str
+
+
+class TitleMatch(BaseModel):
+    """
+    A note or folder found by a piece of its title
+    """
+
+    id: UUID
+    title: str
+    is_folder: bool

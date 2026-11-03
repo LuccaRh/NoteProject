@@ -60,13 +60,13 @@ Todas rodam no serviço de IA, `apps/lonzo`, em [[Container|container]] próprio
 
 | Ferramenta | O que faz | Toca em |
 |---|---|---|
-| `search_notes`, `list_folder` | acha notas e devolve títulos | API do `ichiro` |
+| `search_notes`, `search_titles`, `list_folder` | acha notas e pastas e devolve id + título | API do `ichiro` |
 | `read_note` | devolve o texto de uma nota ou skill | API do `ichiro` |
-| `create_note`, `edit_note` | grava nota, regra ou skill; a edição manda só o trecho velho → novo (é assim que a IA monta o workspace) | API do `ichiro` |
-| `delete_note` | apaga uma nota pelo id | API do `ichiro` |
+| `create_note`, `create_folder`, `edit_note` | grava nota, pasta, regra ou skill; a edição manda só o trecho velho → novo (é assim que a IA monta o workspace) | API do `ichiro` |
+| `delete_note` | apaga uma nota pelo id, ou uma pasta com tudo dentro | API do `ichiro` |
 | scripts do `.workspace/` | o que a pessoa ou a IA escreveu | [[Sandbox]] ([[Workspace no app#Scripts]]) |
 
-- As ferramentas só alcançam as notas da pasta do workspace da conversa: o chat de um assunto não lê nem muda as notas de outro.
+- (2026-11-03) As ferramentas não têm trava de pasta: a IA lê, cria, edita e apaga em qualquer pasta, quantas notas e pastas quiser. O ponto de partida é o id da pasta do workspace, gravado no `CLAUDE.md` dele quando a IA o cria: o código não monta prompt, só junta as regras.
 - O serviço chega às notas pela API do `ichiro` ([[API de notas]]), pela [[Rede de containers|rede interna do compose]], e não direto no banco: o `ichiro` continua dono da tabela, e as regras de pasta e validação valem para a IA também.
 - Mudança feita pela IA passa a ser [[Edição por âncora|proposta por âncora]] quando ela existir; antes disso, grava direto.
 

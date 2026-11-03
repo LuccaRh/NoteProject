@@ -2,9 +2,11 @@
 from typing import Any, cast
 
 from anthropic import AsyncAnthropic, omit
-from anthropic.lib.streaming import AsyncMessageStreamManager
-from anthropic.lib.tools import BetaAsyncFunctionTool
-from anthropic.types import MessageParam
+from anthropic.lib.tools import (
+    BetaAsyncFunctionTool,
+    BetaAsyncStreamingToolRunner,
+)
+from anthropic.types.beta import BetaMessageParam
 
 from lonzo.errors import MissingApiKey
 from lonzo.schemas.conversations import Message
@@ -54,27 +56,32 @@ class AnthropicClient:
         system: str,
         history: list[Message],
         question: str,
-    ) -> AsyncMessageStreamManager[None]:
+        tools: list[BetaAsyncFunctionTool[Any]],
+    ) -> BetaAsyncStreamingToolRunner[None]:
         """
         The answer to one question after the messages of the conversation,
-        streamed while the model writes; an empty system goes as no system
-        prompt
+        by the tool runner of the SDK: one stream per turn of the model,
+        until it stops calling tools or reaches TOOLS_MAX_TURNS; an empty
+        system goes as no system prompt
         """
 
         self.check_key()
         # The blocks were saved in the shape the API takes them back
         messages = [
-            cast(MessageParam, {"role": m.role, "content": m.content})
+            cast(BetaMessageParam, {"role": m.role, "content": m.content})
             for m in history
         ]
         messages.append({"role": "user", "content": question})
 
-        return self.sdk.messages.stream(
+        return self.sdk.beta.messages.tool_runner(
             model=MODEL,
             max_tokens=CHAT_MAX_TOKENS,
             thinking={"type": "disabled"},
             system=system or omit,
             messages=messages,
+            tools=tools,
+            max_iterations=TOOLS_MAX_TURNS,
+            stream=True,
         )
 
     async def run_tools(
