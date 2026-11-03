@@ -113,3 +113,36 @@ def test_read_note_of_a_folder(ichiro: FakeIchiro) -> None:
 
     with pytest.raises(ValueError, match="is a folder"):
         call(name="read_note", note_id=stats)
+
+
+def test_create_note_at_the_root(ichiro: FakeIchiro) -> None:
+
+    assert call(name="create_note", path="Ideas", body="Fly.") == (
+        "created Ideas"
+    )
+
+    row = ichiro.rows[id_of(fake=ichiro, title="Ideas")]
+    assert row["parent_id"] is None
+    assert row["body"] == "Fly."
+
+
+def test_create_note_in_any_workspace(ichiro: FakeIchiro) -> None:
+
+    calculus = id_of(fake=ichiro, title="Calculus")
+    call(
+        name="create_note",
+        folder_id=calculus,
+        path="Series/Taylor",
+        body="Sums.",
+    )
+
+    series = id_of(fake=ichiro, title="Series")
+    assert ichiro.rows[series]["parent_id"] == str(calculus)
+    taylor = ichiro.rows[id_of(fake=ichiro, title="Taylor")]
+    assert taylor["parent_id"] == str(series)
+
+
+def test_create_folder_at_the_root(ichiro: FakeIchiro) -> None:
+
+    assert call(name="create_folder", path="Physics") == "created Physics/"
+    assert ichiro.rows[id_of(fake=ichiro, title="Physics")]["is_folder"]
