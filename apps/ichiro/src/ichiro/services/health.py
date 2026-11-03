@@ -1,13 +1,13 @@
 # Imports
-from sqlalchemy import Connection
-
+from ichiro.db import transaction
 from ichiro.repositories.health import select_one
 
 
 # Code
-def check_database(conn: Connection) -> None:
+def check_database() -> None:
     """
     Raises when the database is down
     """
 
-    select_one(conn=conn)
+    with transaction() as conn:
+        select_one(conn=conn)

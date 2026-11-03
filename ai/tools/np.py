@@ -466,12 +466,13 @@ def checar_docstrings(texto: str) -> list[int]:
     return out
 
 
-_CAMADA_BAIXA = ("clients", "connections", "repositories")
+_CAMADA_BAIXA = ("clients", "connections", "db", "repositories")
 
 
 def checar_camadas(texto: str, pacote: str) -> list[int]:
-    """Linhas de um router que importam de clients/, connections ou repositories: o router só
-    usa services, que fazem as checagens e chamam os clients e os repositories (2026-11-02)."""
+    """Linhas de um router que importam de clients/, connections, db ou repositories: o router
+    só usa services, que fazem as checagens, abrem a transação (db.transaction) e chamam os
+    clients e os repositories (2026-11-02)."""
     return sorted(
         no.lineno
         for no in ast.walk(ast.parse(texto))
@@ -536,8 +537,8 @@ def _chamadas() -> list[str]:
                            " dela, não em comentário em cima")
         if "/routers/" in n:
             for i in checar_camadas(texto, pacote):
-                out.append(f"W22 {n}:{i}: router importa de clients/, connections"
-                           " ou repositories/;"
+                out.append(f"W22 {n}:{i}: router importa de clients/, connections,"
+                           " db ou repositories/;"
                            " chame uma função de services/")
     return out
 

@@ -3,6 +3,7 @@ from uuid import UUID
 
 from sqlalchemy import Connection
 
+from ichiro.db import transaction
 from ichiro.errors import (
     FieldNull,
     NoteNotFound,
@@ -66,91 +67,10 @@ def check_parent(
         raise ParentInsideNote("cannot move a folder inside itself")
 
 
-def list_notes(
-    conn: Connection,
-    parent_id: UUID | None,
-    title: str | None,
-) -> list[Note]:
+def load_note(conn: Connection, note_id: UUID) -> Note:
     """
-    Notes right inside parent_id (the root when none), folders first,
-    then by title; only the ones with this title when one is given
-    """
-
-    return select_children(conn=conn, parent_id=parent_id, title=title)
-
-
-def list_tree(conn: Connection, parent_id: UUID | None) -> list[NotePath]:
-    """
-    Everything inside parent_id (the root when none), at any depth, each
-    with its path of titles from there, in the order of a file tree;
-    NoteNotFound when parent_id doesn't exist
-    """
-
-    if parent_id is not None:
-        find_note(conn=conn, note_id=parent_id)
-
-    return select_tree(conn=conn, parent_id=parent_id)
-
-
-def search_notes(
-    conn: Connection,
-    query: str,
-    parent_id: UUID | None,
-) -> list[NoteMatch]:
-    """
-    Notes (not folders) whose title or body has the words of query, by
-    title, inside parent_id when one is given; NoteNotFound when
-    parent_id doesn't exist
-    """
-
-    if parent_id is not None:
-        find_note(conn=conn, note_id=parent_id)
-
-    return select_matches(conn=conn, query=query, parent_id=parent_id)
-
-
-def search_titles(
-    conn: Connection,
-    text_in_title: str,
-    parent_id: UUID | None,
-) -> list[TitleMatch]:
-    """
-    Notes and folders whose title contains the text, by title, inside
-    parent_id when one is given; NoteNotFound when parent_id doesn't exist
-    """
-
-    if parent_id is not None:
-        find_note(conn=conn, note_id=parent_id)
-
-    return select_title_matches(
-        conn=conn,
-        text_in_title=text_in_title,
-        parent_id=parent_id,
-    )
-
-
-def find_by_path(conn: Connection, path: str, parent_id: UUID | None) -> Note:
-    """
-    The note at a path of titles (a/b/c) from parent_id (the root when
-    none); NoteNotFound when a name on the way is missing
-    """
-
-    names = [name for name in path.split("/") if name]
-
-    if not names:
-        raise PathEmpty("path is empty")
-
-    note = select_by_path(conn=conn, names=names, parent_id=parent_id)
-
-    if note is None:
-        raise NoteNotFound("note not found")
-
-    return note
-
-
-def find_note(conn: Connection, note_id: UUID) -> Note:
-    """
-    One note by id; NoteNotFound when it doesn't exist
+    One note by id, inside the transaction of conn; NoteNotFound when it
+    doesn't exist
     """
 
     note = select_note(conn=conn, note_id=note_id)
@@ -161,17 +81,108 @@ def find_note(conn: Connection, note_id: UUID) -> Note:
     return note
 
 
-def create_note(conn: Connection, note: NoteCreate) -> Note:
+def list_notes(parent_id: UUID | None, title: str | None) -> list[Note]:
+    """
+    Notes right inside parent_id (the root when none), folders first,
+    then by title; only the ones with this title when one is given
+    """
+
+    with transaction() as conn:
+        return select_children(conn=conn, parent_id=parent_id, title=title)
+
+
+def list_tree(parent_id: UUID | None) -> list[NotePath]:
+    """
+    Everything inside parent_id (the root when none), at any depth, each
+    with its path of titles from there, in the order of a file tree;
+    NoteNotFound when parent_id doesn't exist
+    """
+
+    with transaction() as conn:
+
+        if parent_id is not None:
+            load_note(conn=conn, note_id=parent_id)
+
+        return select_tree(conn=conn, parent_id=parent_id)
+
+
+def search_notes(query: str, parent_id: UUID | None) -> list[NoteMatch]:
+    """
+    Notes (not folders) whose title or body has the words of query, by
+    title, inside parent_id when one is given; NoteNotFound when
+    parent_id doesn't exist
+    """
+
+    with transaction() as conn:
+
+        if parent_id is not None:
+            load_note(conn=conn, note_id=parent_id)
+
+        return select_matches(conn=conn, query=query, parent_id=parent_id)
+
+
+def search_titles(
+    text_in_title: str,
+    parent_id: UUID | None,
+) -> list[TitleMatch]:
+    """
+    Notes and folders whose title contains the text, by title, inside
+    parent_id when one is given; NoteNotFound when parent_id doesn't exist
+    """
+
+    with transaction() as conn:
+
+        if parent_id is not None:
+            load_note(conn=conn, note_id=parent_id)
+
+        return select_title_matches(
+            conn=conn,
+            text_in_title=text_in_title,
+            parent_id=parent_id,
+        )
+
+
+def find_by_path(path: str, parent_id: UUID | None) -> Note:
+    """
+    The note at a path of titles (a/b/c) from parent_id (the root when
+    none); NoteNotFound when a name on the way is missing
+    """
+
+    names = [name for name in path.split("/") if name]
+
+    if not names:
+        raise PathEmpty("path is empty")
+
+    with transaction() as conn:
+        note = select_by_path(conn=conn, names=names, parent_id=parent_id)
+
+    if note is None:
+        raise NoteNotFound("note not found")
+
+    return note
+
+
+def find_note(note_id: UUID) -> Note:
+    """
+    One note by id; NoteNotFound when it doesn't exist
+    """
+
+    with transaction() as conn:
+        return load_note(conn=conn, note_id=note_id)
+
+
+def create_note(note: NoteCreate) -> Note:
     """
     Saves a new note or folder and returns it as the table keeps it
     """
 
-    check_parent(conn=conn, parent_id=note.parent_id)
+    with transaction() as conn:
+        check_parent(conn=conn, parent_id=note.parent_id)
 
-    return insert_note(conn=conn, note=note)
+        return insert_note(conn=conn, note=note)
 
 
-def update_note(conn: Connection, note_id: UUID, patch: NoteUpdate) -> Note:
+def update_note(note_id: UUID, patch: NoteUpdate) -> Note:
     """
     Changes only the fields sent: title, body or parent (a move)
     """
@@ -183,11 +194,17 @@ def update_note(conn: Connection, note_id: UUID, patch: NoteUpdate) -> Note:
     if fields.get("title", "") is None or fields.get("body", "") is None:
         raise FieldNull("title and body not null")
 
-    # check if the new parent_id exists
-    if "parent_id" in fields:
-        check_parent(conn=conn, parent_id=fields["parent_id"], note_id=note_id)
+    with transaction() as conn:
 
-    note = update_fields(conn=conn, note_id=note_id, fields=fields)
+        # check if the new parent_id exists
+        if "parent_id" in fields:
+            check_parent(
+                conn=conn,
+                parent_id=fields["parent_id"],
+                note_id=note_id,
+            )
+
+        note = update_fields(conn=conn, note_id=note_id, fields=fields)
 
     if note is None:
         raise NoteNotFound("note not found")
@@ -195,10 +212,13 @@ def update_note(conn: Connection, note_id: UUID, patch: NoteUpdate) -> Note:
     return note
 
 
-def remove_note(conn: Connection, note_id: UUID) -> None:
+def remove_note(note_id: UUID) -> None:
     """
     Deletes a note, or a folder with everything inside it
     """
 
-    if not delete_note(conn=conn, note_id=note_id):
+    with transaction() as conn:
+        deleted = delete_note(conn=conn, note_id=note_id)
+
+    if not deleted:
         raise NoteNotFound("note not found")

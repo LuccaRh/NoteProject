@@ -1,5 +1,6 @@
 # Imports
 from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
 import pytest
@@ -8,8 +9,9 @@ from alembic.config import Config
 from fastapi.testclient import TestClient
 from sqlalchemy import Connection
 
-from ichiro.db import engine, get_conn
+from ichiro.db import engine
 from ichiro.main import app
+from ichiro.services import health, notes
 
 
 # Global variables
@@ -27,23 +29,22 @@ def migrate() -> None:
 
 # Client whose requests share one connection, undone after the test
 @pytest.fixture
-def client() -> Iterator[TestClient]:
+def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
 
-    # One transaction per test, rolled back at the end: the database
-    # (the dev one, on the host) keeps no test rows
+    # One transaction per test, rolled back so the dev database keeps none
     with engine.connect() as conn:
         outer = conn.begin()
 
-        # Replaces get_conn: each request in a savepoint of the shared
-        # connection, so a failed one doesn't break the next
-        def test_conn() -> Iterator[Connection]:
+        # Each transaction a savepoint, so a failed request spares the next
+        @contextmanager
+        def test_transaction() -> Iterator[Connection]:
 
             with conn.begin_nested():
                 yield conn
 
-        app.dependency_overrides[get_conn] = test_conn
+        monkeypatch.setattr(health, "transaction", test_transaction)
+        monkeypatch.setattr(notes, "transaction", test_transaction)
 
         yield TestClient(app)
 
-        app.dependency_overrides.clear()
         outer.rollback()

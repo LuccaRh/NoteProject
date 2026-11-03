@@ -2,10 +2,8 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Response
-from sqlalchemy import Connection
+from fastapi import APIRouter, Query, Response
 
-from ichiro.db import get_conn
 from ichiro.schemas.notes import (
     Note,
     NoteCreate,
@@ -29,13 +27,11 @@ from ichiro.services.notes import (
 
 # Global variables
 router = APIRouter(prefix="/notes")
-Conn = Annotated[Connection, Depends(get_conn)]
 
 
 # Code
 @router.get("")
 def get_notes(
-    conn: Conn,
     parent_id: UUID | None = None,
     title: str | None = None,
 ) -> list[Note]:
@@ -44,36 +40,31 @@ def get_notes(
     then by title; only the ones with this title when one is given
     """
 
-    return list_notes(conn=conn, parent_id=parent_id, title=title)
+    return list_notes(parent_id=parent_id, title=title)
 
 
 @router.get("/tree")
-def get_tree(conn: Conn, parent_id: UUID | None = None) -> list[NotePath]:
+def get_tree(parent_id: UUID | None = None) -> list[NotePath]:
     """
     Everything inside parent_id, at any depth, each with its path of
     titles from there; 404 when parent_id doesn't exist
     """
 
-    return list_tree(conn=conn, parent_id=parent_id)
+    return list_tree(parent_id=parent_id)
 
 
 @router.get("/by-path")
-def get_by_path(
-    conn: Conn,
-    path: str,
-    parent_id: UUID | None = None,
-) -> Note:
+def get_by_path(path: str, parent_id: UUID | None = None) -> Note:
     """
     The note at a path of titles (a/b/c) from parent_id (the root when
     none); 404 when a name on the way is missing
     """
 
-    return find_by_path(conn=conn, path=path, parent_id=parent_id)
+    return find_by_path(path=path, parent_id=parent_id)
 
 
 @router.get("/search")
 def get_search(
-    conn: Conn,
     q: Annotated[str, Query(min_length=1)],
     parent_id: UUID | None = None,
 ) -> list[NoteMatch]:
@@ -83,12 +74,11 @@ def get_search(
     given; 404 when parent_id doesn't exist
     """
 
-    return search_notes(conn=conn, query=q, parent_id=parent_id)
+    return search_notes(query=q, parent_id=parent_id)
 
 
 @router.get("/search-titles")
 def get_search_titles(
-    conn: Conn,
     q: Annotated[str, Query(min_length=1)],
     parent_id: UUID | None = None,
 ) -> list[TitleMatch]:
@@ -98,42 +88,42 @@ def get_search_titles(
     404 when parent_id doesn't exist
     """
 
-    return search_titles(conn=conn, text_in_title=q, parent_id=parent_id)
+    return search_titles(text_in_title=q, parent_id=parent_id)
 
 
 @router.get("/{note_id}")
-def get_note(conn: Conn, note_id: UUID) -> Note:
+def get_note(note_id: UUID) -> Note:
     """
     One note by id; 404 when it doesn't exist
     """
 
-    return find_note(conn=conn, note_id=note_id)
+    return find_note(note_id=note_id)
 
 
 @router.post("", status_code=201)
-def post_note(conn: Conn, note: NoteCreate) -> Note:
+def post_note(note: NoteCreate) -> Note:
     """
     Saves a new note or folder and returns it as the table keeps it
     """
 
-    return create_note(conn=conn, note=note)
+    return create_note(note=note)
 
 
 @router.patch("/{note_id}")
-def patch_note(conn: Conn, note_id: UUID, patch: NoteUpdate) -> Note:
+def patch_note(note_id: UUID, patch: NoteUpdate) -> Note:
     """
     Changes only the fields sent: title, body or parent (a move)
     """
 
-    return update_note(conn=conn, note_id=note_id, patch=patch)
+    return update_note(note_id=note_id, patch=patch)
 
 
 @router.delete("/{note_id}", status_code=204)
-def delete_note(conn: Conn, note_id: UUID) -> Response:
+def delete_note(note_id: UUID) -> Response:
     """
     Deletes a note, or a folder with everything inside it
     """
 
-    remove_note(conn=conn, note_id=note_id)
+    remove_note(note_id=note_id)
 
     return Response(status_code=204)
