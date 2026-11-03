@@ -132,7 +132,12 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   (`services/<assunto>.py`): as funções do serviço em cima dos clients e repositories,
   com as checagens e os erros do domínio (`FolderNotFound`). **Router**: recebe o pedido,
   chama **um** service e devolve; nunca um client nem um repository, mesmo para uma chamada
-  direta. Erro do
+  direta. **Banco** (2026-11-02): o `engine` (com o pool) é global em `<pacote>/db.py`, que
+  dá um `transaction()` (context manager de `engine.begin()`); cada service público abre
+  `with transaction() as conn:` e passa `conn` aos repositories; o router não recebe
+  conexão (nada de `Depends(get_conn)`), e service não chama service público dentro da
+  transação (helper que recebe `conn`, como `load_note`). Conexão global, nunca: os
+  pedidos dividiriam a transação. Teste troca o `transaction` do service por savepoint. Erro do
   domínio vira status num `exception_handler` do `<pacote>/handlers.py` (tabela erro →
   status, ligada no `main.py` por `add_handlers`). Lint W22 (`ai/np lint`).
 - **Explicação dentro da função** (2026-11-02): todo `def` e `class` do app (`src/`) explica o que
@@ -263,6 +268,11 @@ ai/                todo o resto do workspace de IA:
   is_folder}]`, `ILIKE` no título (pedaço de palavra, notas e pastas, `%`/`_` escapados),
   sem índice; cada busca escreve a CTE do filtro por pasta na própria consulta
   (`repositories/notes.py`); ichiro 0.14.0.
+- #108 na branch `ichiro/open-the-transaction-in-the-service` (sem push, worktree
+  `../NoteProject-ichiro-transaction`), **em cima da #107**: `db.transaction()` no lugar do
+  `get_conn`; cada service abre a transação e os routers não recebem conexão; testes trocam
+  o `transaction` dos services por savepoint; W22 barra router importando `db`; ichiro
+  0.15.0. Rebase na `master` depois do merge da #56 e da #107.
 - IA (2026-10-31): chat com o workspace no servidor; vault `IA no projeto/Chat com o workspace` e
   `Caminho de uma pergunta`. Workspace = pasta com `.workspace/`, vários por pessoa.
 - #31 (Ctrl+D) e #5 (chips) sem milestone, para depois; `decorations/replace.ts` (#5) fora do git.
