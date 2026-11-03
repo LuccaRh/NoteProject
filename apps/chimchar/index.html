@@ -15,6 +15,18 @@
 
                 <!-- Buttons to create a note or a folder -->
                 <div class="toolbar">
+                    <button id="search" class="icon" aria-label="Search"
+                        title="Search (Ctrl+O)">
+                        <svg aria-hidden="true" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="6" />
+                            <path d="M20 20l-4.5-4.5" />
+                        </svg>
+                    </button>
+
                     <button id="new-note" class="icon" aria-label="New note"
                         title="New note">
                         <svg aria-hidden="true" width="16" height="16"
@@ -134,6 +146,41 @@
                     </button>
                 </div>
             </form>
+        </dialog>
+
+        <!-- Search notes and folders, driven by notes/search.ts -->
+        <dialog id="search-dialog" class="search" aria-label="Search">
+            <div class="search-bar">
+                <!-- Folder the search stays inside, when there is one -->
+                <span id="search-scope" class="search-scope" hidden>
+                    <span id="search-scope-path"></span>
+                    <button id="search-scope-clear" type="button"
+                        aria-label="Search everywhere"
+                        title="Search everywhere">&times;</button>
+                </span>
+                <input id="search-input" class="search-input"
+                    aria-label="Search" autocomplete="off"
+                    aria-controls="search-results" />
+
+                <!-- Everything (names and bodies) or titles only -->
+                <div class="search-modes" role="group" aria-label="Search in">
+                    <button id="search-mode-all" type="button"
+                        aria-pressed="true">Everything</button>
+                    <button id="search-mode-titles" type="button"
+                        aria-pressed="false">Titles</button>
+                </div>
+            </div>
+
+            <ul id="search-results" class="search-results"
+                role="listbox"></ul>
+
+            <p class="search-hints">
+                <span><kbd>&uarr;&darr;</kbd> to navigate</span>
+                <span><kbd>&crarr;</kbd> to open</span>
+                <span><kbd>&crarr;</kbd> on a folder to search in it</span>
+                <span><kbd>&#9003;</kbd> to go up a folder</span>
+                <span><kbd>alt t</kbd> titles only</span>
+            </p>
         </dialog>
 
         <script type="module" src="/src/main.ts"></script>

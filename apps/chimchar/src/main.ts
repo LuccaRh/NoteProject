@@ -4,10 +4,12 @@ import { Chat } from './chat/chat.ts'
 import { WorkspaceDialog } from './chat/workspace-dialog.ts'
 import { createNote, deleteNote, updateNote } from './notes/api.ts'
 import { Page } from './notes/page.ts'
+import { Search } from './notes/search.ts'
 import { Tree } from './notes/tree.ts'
 import { Tabs } from './tabs.ts'
 
 import type { Note } from './notes/api.ts'
+import type { Found } from './notes/search.ts'
 
 
 // Global variables
@@ -30,10 +32,25 @@ const page = new Page(
 const tree = new Tree(
         byId('tree'), 
         {
-                open: note => void openNote(note),
+                open: note => void openNote(note, () => tree.path(note)),
                 rename: (note, title) => void rename(note, title),
                 remove: note => void remove(note),
+                search: folder => void search.open(folder.id),
         }
+)
+
+const search = new Search(
+    {
+        dialog: byId('search-dialog'),
+        scope: byId('search-scope'),
+        scopePath: byId('search-scope-path'),
+        scopeClear: byId('search-scope-clear'),
+        input: byId('search-input'),
+        results: byId('search-results'),
+        modeAll: byId('search-mode-all'),
+        modeTitles: byId('search-mode-titles'),
+    },
+    found => void openFound(found),
 )
 
 const workspaceDialog = new WorkspaceDialog(
@@ -65,16 +82,29 @@ function byId<T extends HTMLElement>(id: string): T {
     return el as T
 }
 
-/** Open a note in its tab, or bring its tab back to the front. */
-function openNote(note: Note): Promise<void> {
+/**
+ * Open a note in its tab, or bring its tab back to the front.
+ * folders: titles above the note, read each time the tab shows.
+ */
+function openNote(
+    note: { id: string, title: string },
+    folders: () => string[],
+): Promise<void> {
 
     return tabs.open({
         id: note.id,
         kind: 'note',
         title: note.title,
         panel: notePanel,
-        show: () => page.open(note.id, tree.path(note)),
+        show: () => page.open(note.id, folders()),
     })
+}
+
+/** Open a note picked in the search, with its words marked. */
+async function openFound(found: Found): Promise<void> {
+
+    await openNote(found, () => found.folders)
+    page.mark(found.words)
 }
 
 /** Open a new chat tab in a workspace folder (null = no workspace). */
@@ -159,7 +189,7 @@ async function create(isFolder: boolean): Promise<void> {
         return
     }
 
-    await openNote(note)
+    await openNote(note, () => tree.path(note))
     byId<HTMLInputElement>('title').select()
 }
 
@@ -175,6 +205,16 @@ document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') void page.flush()
 })
 
+// Ctrl+O, as in Obsidian: search everywhere
+document.addEventListener('keydown', event => {
+
+    if (!(event.ctrlKey || event.metaKey) || event.key !== 'o') return
+
+    event.preventDefault()
+    void search.open(null)
+})
+
+byId('search').addEventListener('click', () => void search.open(null))
 byId('new-note').addEventListener('click', () => void create(false))
 byId('new-folder').addEventListener('click', () => void create(true))
 byId('new-chat').addEventListener('click', () => openChat(tree.target()))
