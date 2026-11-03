@@ -1,4 +1,5 @@
 # Imports
+import re
 from typing import Any
 from uuid import UUID
 
@@ -7,7 +8,13 @@ from sqlalchemy import Connection, text
 from sqlalchemy.exc import IntegrityError
 
 from ichiro.errors import ParentNotFound, TitleTaken
-from ichiro.schemas.notes import Note, NoteCreate, NoteMatch, NotePath
+from ichiro.schemas.notes import (
+    Note,
+    NoteCreate,
+    NoteMatch,
+    NotePath,
+    TitleMatch,
+)
 
 
 # Global variables
@@ -168,6 +175,37 @@ def select_matches(
     ).mappings()
 
     return [NoteMatch.model_validate(row) for row in rows]
+
+
+def select_title_matches(
+    conn: Connection,
+    text_in_title: str,
+    parent_id: UUID | None,
+) -> list[TitleMatch]:
+    """
+    Notes and folders whose title contains the text, even mid-word, by
+    title; only the ones inside parent_id, at any depth, when one is given
+    """
+
+    # % and _ are wildcards in ILIKE: escaped, they match themselves
+    escaped = re.sub(r"([\\%_])", r"\\\1", text_in_title)
+
+    rows = conn.execute(
+        text(
+            "WITH RECURSIVE tree AS ("
+            " SELECT id FROM notes WHERE parent_id = :parent_id"
+            " UNION ALL"
+            " SELECT n.id FROM notes n JOIN tree t ON n.parent_id = t.id"
+            ") SELECT id, title, is_folder FROM notes"
+            " WHERE title ILIKE '%' || :escaped || '%'"
+            " AND (CAST(:parent_id AS uuid) IS NULL"
+            " OR id IN (SELECT id FROM tree))"
+            " ORDER BY title"
+        ),
+        {"escaped": escaped, "parent_id": parent_id},
+    ).mappings()
+
+    return [TitleMatch.model_validate(row) for row in rows]
 
 
 def select_note(conn: Connection, note_id: UUID) -> Note | None:

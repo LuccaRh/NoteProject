@@ -258,6 +258,11 @@ ai/                todo o resto do workspace de IA:
   índice GIN sobre `to_tsvector('simple', title || ' ' || body)`, sem coluna (migration
   `4f274e14b79c`); sem ranking, trecho nem limite; ichiro 0.13.0. Vault: `Conceitos/Banco
   de dados/Índice` e `Busca full-text no Postgres`.
+- #107 na branch `ichiro/search-notes-by-title` (sem push), **em cima da #56**: rebase na
+  `master` depois do merge dela. `GET /notes/search-titles?q=&parent_id=` → `[{id, title,
+  is_folder}]`, `ILIKE` no título (pedaço de palavra, notas e pastas, `%`/`_` escapados),
+  sem índice; cada busca escreve a CTE do filtro por pasta na própria consulta
+  (`repositories/notes.py`); ichiro 0.14.0.
 - IA (2026-10-31): chat com o workspace no servidor; vault `IA no projeto/Chat com o workspace` e
   `Caminho de uma pergunta`. Workspace = pasta com `.workspace/`, vários por pessoa.
 - #31 (Ctrl+D) e #5 (chips) sem milestone, para depois; `decorations/replace.ts` (#5) fora do git.
@@ -271,7 +276,7 @@ ai/                todo o resto do workspace de IA:
 Plano: vault `Plano do projeto/Roadmap` (navegador → app desktop → celular) + issues/milestones no GitHub.
 
 1. Entrega de 2026-11-06 (vault `Plano do projeto/Entrega de 2026-11-06`): #74 ✅ → #73 ✅ workspace criado pela IA a partir de um texto breve
-   (esqueleto; vault `Workspace no app#Como nasce`) → #98 ✅ ichiro em camadas → #75 conversas (2 branches prontas, falta PR), #76 tela do chat (branch pronta, falta PR) → #56 busca (branch pronta, falta PR), #77 ler/buscar
+   (esqueleto; vault `Workspace no app#Como nasce`) → #98 ✅ ichiro em camadas → #75 conversas (2 branches prontas, falta PR), #76 tela do chat (branch pronta, falta PR) → #56 busca e #107 busca por título (branches prontas, falta PR), #77 ler/buscar
    → #78 criar/editar/apagar, #51 → #6 pastas, #79 importar o vault → #17 se sobrar.
 2. M2 login (#48, #17) → M3 AWS (#18–#25, #47) → M4 edição ao vivo (#26, #27, #30).
 - v1 = ler notas no navegador com o servidor na AWS (vault `Plano do projeto/Objetivo do app`);

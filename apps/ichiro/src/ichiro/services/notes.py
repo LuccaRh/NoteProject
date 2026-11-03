@@ -20,6 +20,7 @@ from ichiro.repositories.notes import (
     select_is_inside,
     select_matches,
     select_note,
+    select_title_matches,
     select_tree,
     update_fields,
 )
@@ -29,6 +30,7 @@ from ichiro.schemas.notes import (
     NoteMatch,
     NotePath,
     NoteUpdate,
+    TitleMatch,
 )
 
 
@@ -105,6 +107,26 @@ def search_notes(
         find_note(conn=conn, note_id=parent_id)
 
     return select_matches(conn=conn, query=query, parent_id=parent_id)
+
+
+def search_titles(
+    conn: Connection,
+    text_in_title: str,
+    parent_id: UUID | None,
+) -> list[TitleMatch]:
+    """
+    Notes and folders whose title contains the text, by title, inside
+    parent_id when one is given; NoteNotFound when parent_id doesn't exist
+    """
+
+    if parent_id is not None:
+        find_note(conn=conn, note_id=parent_id)
+
+    return select_title_matches(
+        conn=conn,
+        text_in_title=text_in_title,
+        parent_id=parent_id,
+    )
 
 
 def find_by_path(conn: Connection, path: str, parent_id: UUID | None) -> Note:
