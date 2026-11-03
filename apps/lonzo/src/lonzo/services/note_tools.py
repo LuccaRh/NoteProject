@@ -12,9 +12,9 @@ from lonzo.schemas.notes import Note, TitleMatch
 # Code
 class NoteTools:
     """
-    The tools the model uses to find, read and write notes, in any
-    folder; writes go by paths of titles from a folder (or the root), as
-    a coding agent does with files
+    The tools the model uses to find, read, write, edit and delete notes,
+    in any folder; new ones go by paths of titles from a folder (or the
+    root), as a coding agent does with files
     """
 
     created: list[Note]
@@ -88,13 +88,7 @@ class NoteTools:
             Reads one note by its id: the title and the whole body
             """
 
-            note = await ichiro.get_note(note_id=note_id)
-
-            if note is None:
-                raise ValueError(f"there is no note {note_id}")
-
-            if note.is_folder:
-                raise ValueError(f"{note.title} is a folder: use list_folder")
+            note = await self.note(note_id=note_id)
 
             return f"# {note.title}\n\n{note.body}"
 
@@ -132,6 +126,48 @@ class NoteTools:
 
             return f"created {path}/"
 
+        @beta_async_tool(strict=True)
+        async def edit_note(
+            note_id: UUID,
+            old_text: str,
+            new_text: str,
+        ) -> str:
+            """
+            Changes one piece of a note's body: old_text, copied exactly
+            and found only once in the body, becomes new_text (empty to
+            remove it). Send only the piece, never the whole note.
+            """
+
+            note = await self.note(note_id=note_id)
+            count = note.body.count(old_text) if old_text else 0
+
+            if count == 0:
+                raise ValueError(f"old_text is not in {note.title}")
+
+            if count > 1:
+                raise ValueError(
+                    f"old_text is {count} times in {note.title}: send more"
+                    " of the text around it"
+                )
+
+            body = note.body.replace(old_text, new_text)
+
+            if await ichiro.update_note(note_id=note_id, body=body) is None:
+                raise ValueError(f"there is no note {note_id}")
+
+            return f"edited {note.title}"
+
+        @beta_async_tool(strict=True)
+        async def delete_note(note_id: UUID) -> str:
+            """
+            Deletes a note by its id, or a folder with everything inside it
+            """
+
+            if not await ichiro.delete_note(note_id=note_id):
+                raise ValueError(f"there is no note {note_id}")
+
+            return f"deleted {note_id}"
+
         return [
             search_notes,
             search_titles,
@@ -139,7 +175,25 @@ class NoteTools:
             read_note,
             create_note,
             create_folder,
+            edit_note,
+            delete_note,
         ]
+
+    async def note(self, note_id: UUID) -> Note:
+        """
+        The note with note_id; ValueError when it doesn't exist or is a
+        folder, whose body the tools don't read nor edit
+        """
+
+        note = await ichiro.get_note(note_id=note_id)
+
+        if note is None:
+            raise ValueError(f"there is no note {note_id}")
+
+        if note.is_folder:
+            raise ValueError(f"{note.title} is a folder: use list_folder")
+
+        return note
 
     def split(self, path: str) -> list[str]:
         """

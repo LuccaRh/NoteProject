@@ -174,6 +174,8 @@ def test_chat_gives_the_model_the_note_tools() -> None:
         "read_note",
         "create_note",
         "create_folder",
+        "edit_note",
+        "delete_note",
     }
 
 
