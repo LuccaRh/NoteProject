@@ -58,3 +58,13 @@ class NoteMatch(BaseModel):
 
     id: UUID
     title: str
+
+
+class TitleMatch(BaseModel):
+    """
+    A note or folder found by its title, with what tells them apart
+    """
+
+    id: UUID
+    title: str
+    is_folder: bool
