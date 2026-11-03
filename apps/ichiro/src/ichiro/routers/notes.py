@@ -12,6 +12,7 @@ from ichiro.schemas.notes import (
     NoteMatch,
     NotePath,
     NoteUpdate,
+    TitleMatch,
 )
 from ichiro.services.notes import (
     create_note,
@@ -21,6 +22,7 @@ from ichiro.services.notes import (
     list_tree,
     remove_note,
     search_notes,
+    search_titles,
     update_note,
 )
 
@@ -82,6 +84,21 @@ def get_search(
     """
 
     return search_notes(conn=conn, query=q, parent_id=parent_id)
+
+
+@router.get("/search-titles")
+def get_search_titles(
+    conn: Conn,
+    q: Annotated[str, Query(min_length=1)],
+    parent_id: UUID | None = None,
+) -> list[TitleMatch]:
+    """
+    Notes and folders whose title contains q, even mid-word, by title;
+    only the ones inside parent_id, at any depth, when one is given;
+    404 when parent_id doesn't exist
+    """
+
+    return search_titles(conn=conn, text_in_title=q, parent_id=parent_id)
 
 
 @router.get("/{note_id}")
