@@ -4,7 +4,7 @@ import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
 import { languages } from '@codemirror/language-data'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { tags } from '@lezer/highlight'
-import { headings } from './decorations/headings.ts'
+import { preview } from './decorations/preview.ts'
 import { found, showFound } from './decorations/found.ts'
 
 
@@ -112,7 +112,7 @@ export function createEditor(
         syntaxHighlighting(highlight),
         theme,
         EditorView.lineWrapping,
-        headings,
+        preview,
         found,
         EditorView.updateListener.of(update => {
             if (update.docChanged) onChange?.(update.state.doc.toString())
