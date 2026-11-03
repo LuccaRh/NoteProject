@@ -268,11 +268,14 @@ ai/                todo o resto do workspace de IA:
   is_folder}]`, `ILIKE` no título (pedaço de palavra, notas e pastas, `%`/`_` escapados),
   sem índice; cada busca escreve a CTE do filtro por pasta na própria consulta
   (`repositories/notes.py`); ichiro 0.14.0.
-- #108 na branch `ichiro/open-the-transaction-in-the-service` (sem push, worktree
-  `../NoteProject-ichiro-transaction`), **em cima da #107**: `db.transaction()` no lugar do
-  `get_conn`; cada service abre a transação e os routers não recebem conexão; testes trocam
-  o `transaction` dos services por savepoint; W22 barra router importando `db`; ichiro
-  0.15.0. Rebase na `master` depois do merge da #56 e da #107.
+- #108 mergeada (PR #112, `ichiro/open-the-transaction-in-the-service`): `db.transaction()`
+  no lugar do `get_conn`; cada service abre a transação e os routers não recebem conexão;
+  testes trocam o `transaction` dos services por savepoint; W22 barra router importando
+  `db`; ichiro 0.15.0.
+- #109 (busca no front) no PR #113 (`chimchar/search-notes-from-the-web-app`): pop-up
+  `notes/search.ts` (botão, `Ctrl+O`, lupa da pasta), nomes na hora + corpos/títulos do
+  servidor, palavras marcadas na nota (`decorations/found.ts`); chimchar 0.8.0. Escrita
+  pelo Lucca, commits da sessão; falta conferir no navegador.
 - IA (2026-10-31): chat com o workspace no servidor; vault `IA no projeto/Chat com o workspace` e
   `Caminho de uma pergunta`. Workspace = pasta com `.workspace/`, vários por pessoa.
 - #31 (Ctrl+D) e #5 (chips) sem milestone, para depois; `decorations/replace.ts` (#5) fora do git.
