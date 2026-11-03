@@ -7,7 +7,7 @@
     ai/np obsidian [-q] [--simular] sincronia vault Note Project/ ↔ obsidian/
     ai/np duvidas [trecho da pág]   marcas [!duvida] [duvidas] [fix] [coment] nas notas
     ai/np diagrama <spec.yaml> [--png]   YAML → draw.io; `destino:` no spec copia o .drawio.svg para obsidian/
-    ai/np lint                      regras do workspace que viraram código (W01–W23)
+    ai/np lint                      regras do workspace que viraram código (W01–W24)
     ai/np test                      testes das ferramentas (tools/test_*.py)
     ai/np check                     o check do app (make check: ruff, mypy, pytest, tsc, build)
 
@@ -504,8 +504,28 @@ def checar_comentarios(texto: str) -> list[int]:
     return [n for n in sozinhos if n - 1 in sozinhos]
 
 
+def _textos(no: ast.AST) -> list[str]:
+    """As strings literais dentro de um valor (soma, f-string, tupla, parênteses)."""
+    return [
+        x.value for x in ast.walk(no)
+        if isinstance(x, ast.Constant) and isinstance(x.value, str)
+    ]
+
+
+def checar_prompts(texto: str) -> list[int]:
+    """Linhas de variável global cujo texto parece prompt (8 palavras ou mais): instrução para
+    o modelo mora num .md do serviço, lido pelo código, nunca numa global (2026-11-03)."""
+    out = []
+    for no in ast.parse(texto).body:
+        if not isinstance(no, (ast.Assign, ast.AnnAssign)) or no.value is None:
+            continue
+        if len(" ".join(_textos(no.value)).split()) >= 8:
+            out.append(no.lineno)
+    return out
+
+
 def _chamadas() -> list[str]:
-    """W18–W23 no Python do app criado ou mexido na branch."""
+    """W18–W24 no Python do app criado ou mexido na branch."""
     base = git("merge-base", "master", "HEAD")
     mexidos = git("diff", "--name-only", "--diff-filter=AM", base, "--", "apps").splitlines()
     mexidos += git("ls-files", "--others", "--exclude-standard", "apps").splitlines()
@@ -535,6 +555,9 @@ def _chamadas() -> list[str]:
             for i in checar_docstrings(texto):
                 out.append(f"W21 {n}:{i}: função ou classe sem docstring; explique dentro"
                            " dela, não em comentário em cima")
+            for i in checar_prompts(texto):
+                out.append(f"W24 {n}:{i}: global com texto de prompt; leve para um .md"
+                           " do serviço e leia o arquivo")
         if "/routers/" in n:
             for i in checar_camadas(texto, pacote):
                 out.append(f"W22 {n}:{i}: router importa de clients/, connections,"

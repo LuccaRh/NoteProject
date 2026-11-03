@@ -118,6 +118,10 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   usada direto pelas funções do próprio módulo; outro módulo importa a função, nunca a
   constante, e a constante não vira argumento de chamada (`create_workspace_folder(ichiro=...)`
   em vez de `create_note(title=WORKSPACE, ...)`). Lint W18 (`ai/np lint`).
+- **Prompt fica em `.md`, nunca no código** (2026-11-03): instrução para o modelo (system,
+  cabeçalho de regras, dica de onde buscar) mora num `.md` do serviço (`create_workspace.md`),
+  lido pelo código; nada de prompt em variável global nem em string montada com `.format`. O
+  código só junta dados (data, id, notas). Lint W24 (`ai/np lint`).
 - **Valor fixo vira global, não parâmetro** (2026-11-02): o que não muda durante a vida do
   processo (cliente de outro serviço, URL, config) e seria passado de função em função vira
   global, e as funções usam direto; parâmetro fica para o que muda a cada chamada. Instância
@@ -179,7 +183,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 | `ai/np contexto <área>` / `areas` | o que ler para uma área / o vocabulário |
 | `ai/np obsidian [-q]` / `duvidas [pág]` | sincronia vault ↔ `ai/obsidian/` / marcas `[!duvida]` `[fix]` `[coment]` |
 | `ai/np diagrama <spec> [--png]` | YAML → draw.io (`ai/tools/diagrama.py`, nó `banco` para BD) |
-| `ai/np lint` / `test` | regras do workspace (W01–W23) / testes das ferramentas |
+| `ai/np lint` / `test` | regras do workspace (W01–W24) / testes das ferramentas |
 
 Ambiente: Arch Linux, Python 3.14 + uv, Node 22, Docker, `drawio` CLI, poppler (`pdftotext`).
 Hooks do Claude Code em `.claude/settings.json`; do git em `ai/tools/githooks/` (`ai/tools/instalar.sh`).
