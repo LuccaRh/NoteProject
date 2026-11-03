@@ -118,6 +118,10 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
   usada direto pelas funções do próprio módulo; outro módulo importa a função, nunca a
   constante, e a constante não vira argumento de chamada (`create_workspace_folder(ichiro=...)`
   em vez de `create_note(title=WORKSPACE, ...)`). Lint W18 (`ai/np lint`).
+- **Prompt fica em `.md`, nunca no código** (2026-11-03): instrução para o modelo (system,
+  cabeçalho de regras, dica de onde buscar) mora num `.md` do serviço (`create_workspace.md`),
+  lido pelo código; nada de prompt em variável global nem em string montada com `.format`. O
+  código só junta dados (data, id, notas). Lint W24 (`ai/np lint`).
 - **Valor fixo vira global, não parâmetro** (2026-11-02): o que não muda durante a vida do
   processo (cliente de outro serviço, URL, config) e seria passado de função em função vira
   global, e as funções usam direto; parâmetro fica para o que muda a cada chamada. Instância
@@ -179,7 +183,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 | `ai/np contexto <área>` / `areas` | o que ler para uma área / o vocabulário |
 | `ai/np obsidian [-q]` / `duvidas [pág]` | sincronia vault ↔ `ai/obsidian/` / marcas `[!duvida]` `[fix]` `[coment]` |
 | `ai/np diagrama <spec> [--png]` | YAML → draw.io (`ai/tools/diagrama.py`, nó `banco` para BD) |
-| `ai/np lint` / `test` | regras do workspace (W01–W23) / testes das ferramentas |
+| `ai/np lint` / `test` | regras do workspace (W01–W24) / testes das ferramentas |
 
 Ambiente: Arch Linux, Python 3.14 + uv, Node 22, Docker, `drawio` CLI, poppler (`pdftotext`).
 Hooks do Claude Code em `.claude/settings.json`; do git em `ai/tools/githooks/` (`ai/tools/instalar.sh`).
@@ -217,7 +221,7 @@ ai/                todo o resto do workspace de IA:
   build/           gerado (estado dos hooks, png de diagrama), fora do git
 ```
 
-## Estado (2026-11-02)
+## Estado (2026-11-03)
 
 - M0, #46, #62, #64, #65, #69, #16, #80, #82, #74, #73, #98 e #100 mergeados (PRs #66–#68,
   #70–#72, #81, #83–#85, #88, #93–#96, #99, #101, #102); `master` local = remoto; branches
@@ -257,14 +261,13 @@ ai/                todo o resto do workspace de IA:
   pop-up "Create workspace" (`chat/workspace-dialog.ts`, texto já preenchido); chimchar
   0.7.0. Conferido no navegador pelo Caddy (Playwright). Escrita pela sessão, cliente-api
   incluso (o Lucca pediu pronto).
-- #56 na branch `ichiro/search-notes-with-postgres-full-text-search` (sem push):
+- #56 mergeada (PR #110, `ichiro/search-notes-with-postgres-full-text-search`):
   `GET /notes/search?q=&parent_id=` → `[{id, title}]` por título, notas (não pastas) com as
   palavras no título ou corpo, só dentro de `parent_id` (qualquer profundidade) quando vem;
   índice GIN sobre `to_tsvector('simple', title || ' ' || body)`, sem coluna (migration
   `4f274e14b79c`); sem ranking, trecho nem limite; ichiro 0.13.0. Vault: `Conceitos/Banco
   de dados/Índice` e `Busca full-text no Postgres`.
-- #107 na branch `ichiro/search-notes-by-title` (sem push), **em cima da #56**: rebase na
-  `master` depois do merge dela. `GET /notes/search-titles?q=&parent_id=` → `[{id, title,
+- #107 mergeada (PR #111, `ichiro/search-notes-by-title`): `GET /notes/search-titles?q=&parent_id=` → `[{id, title,
   is_folder}]`, `ILIKE` no título (pedaço de palavra, notas e pastas, `%`/`_` escapados),
   sem índice; cada busca escreve a CTE do filtro por pasta na própria consulta
   (`repositories/notes.py`); ichiro 0.14.0.
@@ -276,14 +279,19 @@ ai/                todo o resto do workspace de IA:
   `notes/search.ts` (botão, `Ctrl+O`, lupa da pasta), nomes na hora + corpos/títulos do
   servidor, palavras marcadas na nota (`decorations/found.ts`); chimchar 0.8.0. Escrita
   pelo Lucca, commits da sessão; falta conferir no navegador.
-- #77 na branch `lonzo/let-the-chat-read-and-search-notes` (sem push), feita no worktree
+- #77 no PR #114 (`lonzo/let-the-chat-read-and-search-notes`, rebase na `master` com a #56), feita no worktree
   `../NoteProject-lonzo-search`: o chat responde pelo `tool_runner(stream=True)` com
   `search_notes`, `search_titles`, `list_folder`, `read_note`, `create_note`, `create_folder`,
   todas no `NoteTools` (`services/note_tools.py`, um conjunto só, o mesmo da #73), sem trava de
   pasta (2026-11-03: a IA lê e cria em qualquer pasta; `folder_id` opcional, sem ele a raiz); o
   ponto de partida é o id da pasta, que o `create_workspace.md` manda gravar no `CLAUDE.md`
-  do workspace (o `FOLDER_HINT` saiu do código, e o `RULES_HEADER` também: o `CLAUDE.md` abre com ele). Usa `/notes/search` e `/notes/search-titles` da #56: PR depois do merge dela.
+  do workspace (o `FOLDER_HINT` saiu do código, e o `RULES_HEADER` também: o `CLAUDE.md` abre com ele). Usa `/notes/search` e `/notes/search-titles` da #56.
   Conferido ao vivo (container temporário na rede do compose). lonzo 0.6.0.
+- #78 no PR #115 (`lonzo/let-the-chat-create-edit-and-delete-notes`), **em cima da
+  #77**: `edit_note` (trecho velho → novo) e `delete_note` no `NoteTools`; lonzo 0.7.0.
+  Conferido ao vivo contra o ichiro (sem o Claude). Achado: no ichiro o commit do `get_conn`
+  sai depois da resposta (`Depends` sem `scope="function"`), e ler logo depois de apagar às
+  vezes ainda acha a nota.
 - IA (2026-10-31): chat com o workspace no servidor; vault `IA no projeto/Chat com o workspace` e
   `Caminho de uma pergunta`. Workspace = pasta com `.workspace/`, vários por pessoa.
 - #31 (Ctrl+D) e #5 (chips) sem milestone, para depois; `decorations/replace.ts` (#5) fora do git.
@@ -299,6 +307,8 @@ Plano: vault `Plano do projeto/Roadmap` (navegador → app desktop → celular) 
 1. Entrega de 2026-11-06 (vault `Plano do projeto/Entrega de 2026-11-06`): #74 ✅ → #73 ✅ workspace criado pela IA a partir de um texto breve
    (esqueleto; vault `Workspace no app#Como nasce`) → #98 ✅ ichiro em camadas → #75 conversas (2 branches prontas, falta PR), #76 tela do chat (branch pronta, falta PR) → #56 busca e #107 busca por título (branches prontas, falta PR), #77 ler/buscar
    → #78 criar/editar/apagar, #51 → #6 pastas, #79 importar o vault → #17 se sobrar.
+   (esqueleto; vault `Workspace no app#Como nasce`) → #98 ✅ ichiro em camadas → #75 conversas (2 branches prontas, falta PR), #76 tela do chat (branch pronta, falta PR) → #56 busca, #77 ler/buscar
+   → #78 criar/editar/apagar (branch pronta, falta PR), #51 → #6 pastas, #79 importar o vault → #17 se sobrar.
 2. M2 login (#48, #17) → M3 AWS (#18–#25, #47) → M4 edição ao vivo (#26, #27, #30).
 - v1 = ler notas no navegador com o servidor na AWS (vault `Plano do projeto/Objetivo do app`);
   o chat não vai para a AWS antes do login.

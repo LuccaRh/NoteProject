@@ -164,3 +164,36 @@ class IchiroClient:
         response.raise_for_status()
 
         return Note.model_validate(response.json())
+
+    async def update_note(self, note_id: UUID, body: str) -> Note | None:
+        """
+        PATCH /notes/{id}: the new body of a note, as ichiro saved it;
+        None when the note doesn't exist
+        """
+
+        response = await self.http.patch(
+            f"/notes/{note_id}",
+            json={"body": body},
+        )
+
+        if response.status_code == 404:
+            return None
+
+        response.raise_for_status()
+
+        return Note.model_validate(response.json())
+
+    async def delete_note(self, note_id: UUID) -> bool:
+        """
+        DELETE /notes/{id}: a note, or a folder with everything inside it;
+        False when it doesn't exist
+        """
+
+        response = await self.http.delete(f"/notes/{note_id}")
+
+        if response.status_code == 404:
+            return False
+
+        response.raise_for_status()
+
+        return True

@@ -2,7 +2,7 @@
 import asyncio
 from collections.abc import Iterator
 from unittest.mock import patch
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import pytest
 from fakes import FakeIchiro
@@ -146,3 +146,50 @@ def test_create_folder_at_the_root(ichiro: FakeIchiro) -> None:
 
     assert call(name="create_folder", path="Physics") == "created Physics/"
     assert ichiro.rows[id_of(fake=ichiro, title="Physics")]["is_folder"]
+
+
+def test_edit_note_changes_only_the_piece(ichiro: FakeIchiro) -> None:
+
+    batting = id_of(fake=ichiro, title="Batting")
+    edited = call(
+        name="edit_note",
+        note_id=batting,
+        old_text="left",
+        new_text="right",
+    )
+
+    assert edited == "edited Batting"
+    assert ichiro.rows[batting]["body"] == "Bats right, hits far."
+
+
+def test_edit_note_without_the_old_text(ichiro: FakeIchiro) -> None:
+
+    batting = id_of(fake=ichiro, title="Batting")
+
+    with pytest.raises(ValueError, match="is not in Batting"):
+        call(name="edit_note", note_id=batting, old_text="x", new_text="y")
+
+
+def test_edit_note_with_the_old_text_twice(ichiro: FakeIchiro) -> None:
+
+    batting = id_of(fake=ichiro, title="Batting")
+
+    with pytest.raises(ValueError, match="is 2 times in Batting"):
+        call(name="edit_note", note_id=batting, old_text="ts", new_text="")
+
+    assert ichiro.rows[batting]["body"] == "Bats left, hits far."
+
+
+def test_delete_a_folder_with_what_is_inside(ichiro: FakeIchiro) -> None:
+
+    stats = id_of(fake=ichiro, title="Stats")
+
+    assert call(name="delete_note", note_id=stats) == f"deleted {stats}"
+    titles = {row["title"] for row in ichiro.rows.values()}
+    assert titles == {"Baseball", "Calculus", "Limits"}
+
+
+def test_delete_a_missing_note(ichiro: FakeIchiro) -> None:
+
+    with pytest.raises(ValueError, match="there is no note"):
+        call(name="delete_note", note_id=uuid4())

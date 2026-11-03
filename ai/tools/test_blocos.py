@@ -10,6 +10,7 @@ from np import (
     checar_layout,
     checar_parametros,
     checar_posicionais,
+    checar_prompts,
 )
 
 
@@ -150,3 +151,17 @@ class TestCamadas(unittest.TestCase):
     def test_comentario_de_duas_linhas(self) -> None:
         texto = "def f():\n    # first\n    # second\n    return 1\n"
         self.assertEqual(checar_comentarios(texto), [3])
+
+    def test_prompt_em_global(self) -> None:
+        texto = (
+            '# Global variables\nHINT = (\n    "Search the folder first and then"\n'
+            '    " every note before saying no."\n)\n'
+        )
+        self.assertEqual(checar_prompts(texto), [2])
+
+    def test_global_curta_nao_e_prompt(self) -> None:
+        texto = (
+            'URL = "http://ichiro:8000"\nFOLDERS = ["kb", "skills"]\n'
+            'def f():\n    x = "a long error message with many words in it"\n'
+        )
+        self.assertEqual(checar_prompts(texto), [])
