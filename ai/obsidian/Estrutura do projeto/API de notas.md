@@ -12,6 +12,7 @@ O serviço `ichiro` do [[Back — daemon e servidor|servidor]]: a API que o [[Na
 | `GET /health` | responde 200 se o processo está de pé; o healthcheck do [[Docker Compose\|compose]] usa ([[Observabilidade]]) | ⏳ M0 (#10) |
 | `/notes` | CRUD das notas e pastas no [[Postgres]] | ⏳ M1 (#46) |
 | `GET /notes/search?q=&parent_id=` | [[Busca full-text no Postgres\|busca full-text]] no título e no corpo, `[{id, title}]` por título, só dentro de `parent_id` (qualquer profundidade) quando vem; declarada antes de `/notes/{note_id}`, que pegaria o `search` | ✅ M1 (#56) |
+| `GET /notes/search-titles?q=&parent_id=` | `ILIKE` no título: acha pedaço de palavra, em notas e pastas, `[{id, title, is_folder}]` por título; o mesmo filtro por pasta da busca acima | ✅ M1 (#107) |
 
 O build do editor não passa pela api: o [[Reverse proxy|Caddy]] serve os [[Arquivo estático|arquivos estáticos]] na mesma origem ([[Navegador]], #47).
 
