@@ -10,7 +10,7 @@ O primeiro uso da IA no app é o [[Chat com o workspace|chat com o workspace]]: 
 | 1 | serviço `lonzo` com a lib `anthropic`, respondendo com as regras de um `.md` no `system` | sim | #74 | [[Chat com o workspace]] |
 | 2 | workspaces: qualquer pasta com `.workspace/`, que o `lonzo` cria preenchendo um esqueleto a partir de um texto breve; as regras dele passam a ir no `system` | sim | #73 (parte da #42) | [[Workspace no app#Como nasce]] |
 | 3 | conversas no banco do `lonzo` + tela de chat | sim | #75, #76 | [[Chat com o workspace]] |
-| 4 | ferramentas de nota no chat (`search_notes`, `list_folder`, `read_note`, `create_note`, `edit_note`, `delete_note`), presas ao workspace: a IA monta o workspace | sim | #77, #78 | [[Chat com o workspace#Ferramentas]] |
+| 4 | ferramentas de nota no chat (`search_notes`, `search_titles`, `list_folder`, `read_note`, `create_note`, `create_folder`, `edit_note`, `delete_note`), em qualquer pasta: a IA monta o workspace | sim | #77, #78 | [[Chat com o workspace#Ferramentas]] |
 | 5 | operação por âncora + sugestão com `Tab`/`Esc`: a edição da IA vira proposta | não | #32 | [[Edição por âncora]] |
 | 6 | scripts do `.workspace/` em [[Sandbox\|sandbox]] | sim | a abrir | [[Workspace no app#Scripts]] |
 | 7 | servidor [[MCP]] para agente de fora (o Claude Code no PC) | sim | #34 | [[MCP — a IA como cliente do daemon]] |
