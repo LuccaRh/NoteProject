@@ -467,3 +467,67 @@ def test_search_empty_query(client: TestClient) -> None:
     response = client.get("/notes/search", params={"q": ""})
 
     assert response.status_code == 422
+
+
+# Title search finds the text mid-word, in notes and folders, by title
+def test_search_titles_mid_word(client: TestClient) -> None:
+
+    folder = create(client=client, title="Old Wumbleton", is_folder=True)
+    note = create(client=client, title="A WUMBLETON list")
+    create(client=client, title="Other", body="wumbleton")
+
+    response = client.get("/notes/search-titles", params={"q": "umblet"})
+
+    assert response.status_code == 200
+    assert response.json() == [
+        {"id": note["id"], "title": "A WUMBLETON list", "is_folder": False},
+        {"id": folder["id"], "title": "Old Wumbleton", "is_folder": True},
+    ]
+
+
+# % and _ in the text match themselves, not any text
+def test_search_titles_wildcards(client: TestClient) -> None:
+
+    match = create(client=client, title="Grobnik 100% done")
+    create(client=client, title="Grobnik 100 done")
+
+    response = client.get("/notes/search-titles", params={"q": "grobnik 100%"})
+
+    assert response.json() == [
+        {"id": match["id"], "title": "Grobnik 100% done", "is_folder": False},
+    ]
+
+
+# With parent_id, only the titles inside that folder, at any depth
+def test_search_titles_inside_a_folder(client: TestClient) -> None:
+
+    folder = create(client=client, title="Titles", is_folder=True)
+    sub = create(
+        client=client,
+        title="Fizzlecrank sub",
+        is_folder=True,
+        parent_id=folder["id"],
+    )
+    create(client=client, title="Fizzlecrank outside")
+
+    response = client.get(
+        "/notes/search-titles",
+        params={"q": "fizzlecrank", "parent_id": folder["id"]},
+    )
+
+    assert response.json() == [
+        {"id": sub["id"], "title": "Fizzlecrank sub", "is_folder": True},
+    ]
+
+
+# A parent_id that doesn't exist is 404, an empty text is 422
+def test_search_titles_bad_params(client: TestClient) -> None:
+
+    missing = client.get(
+        "/notes/search-titles",
+        params={"q": "x", "parent_id": MISSING_ID},
+    )
+    empty = client.get("/notes/search-titles", params={"q": ""})
+
+    assert missing.status_code == 404
+    assert empty.status_code == 422
