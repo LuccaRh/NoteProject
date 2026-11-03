@@ -15,6 +15,7 @@ type Handlers = {
     open: (note: Note) => void
     rename: (note: Note, title: string) => void
     remove: (note: Note) => void
+    search: (folder: Note) => void
 }
 
 // Key of the top level in the children cache
@@ -27,6 +28,11 @@ const CHEVRON = '<svg aria-hidden="true" width="12" height="12"'
     + ' viewBox="0 0 24 24" fill="none" stroke="currentColor"'
     + ' stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">'
     + '<path d="M9 6l6 6-6 6"/></svg>'
+
+const MAGNIFIER = '<svg aria-hidden="true" width="14" height="14"'
+    + ' viewBox="0 0 24 24" fill="none" stroke="currentColor"'
+    + ' stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
+    + '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>'
 
 const PENCIL = '<svg aria-hidden="true" width="14" height="14"'
     + ' viewBox="0 0 24 24" fill="none" stroke="currentColor"'
@@ -217,7 +223,7 @@ export class Tree {
         return items
     }
 
-    /** Build the row of a note: name, rename and delete buttons. */
+    /** Build the row of a note: name, search (folders), rename, delete. */
     row(note: Note, depth: number): HTMLLIElement {
 
         const item = document.createElement('li')
@@ -256,7 +262,15 @@ export class Tree {
         const remove = iconButton(TRASH, `Delete ${note.title}`)
         remove.addEventListener('click', () => this.handlers.remove(note))
 
-        item.append(open, rename, remove)
+        item.append(open)
+
+        if (note.is_folder) {
+            const search = iconButton(MAGNIFIER, `Search in ${note.title}`)
+            search.addEventListener('click', () => this.handlers.search(note))
+            item.append(search)
+        }
+
+        item.append(rename, remove)
 
         return item
     }
