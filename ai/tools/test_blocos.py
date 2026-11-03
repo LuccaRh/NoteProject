@@ -139,6 +139,10 @@ class TestCamadas(unittest.TestCase):
         texto = "from ichiro.repositories.notes import select_note\n"
         self.assertEqual(checar_camadas(texto, "ichiro"), [1])
 
+    def test_router_com_conexao_do_banco(self) -> None:
+        texto = "from ichiro.db import get_conn\nfrom ichiro import db\n"
+        self.assertEqual(checar_camadas(texto, "ichiro"), [1, 2])
+
     def test_comentario_de_uma_linha(self) -> None:
         texto = "# Code\n# Fake stream\nx = 1  # a\n# b\ny = 2\n"
         self.assertEqual(checar_comentarios(texto), [])
