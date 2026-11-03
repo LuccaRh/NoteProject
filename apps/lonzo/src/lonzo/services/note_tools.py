@@ -1,18 +1,20 @@
 # Imports
+from collections.abc import Sequence
 from typing import Any
 from uuid import UUID
 
 from anthropic.lib.tools import BetaAsyncFunctionTool, beta_async_tool
 
 from lonzo.connections import ichiro
-from lonzo.schemas.notes import Note
+from lonzo.schemas.notes import Note, TitleMatch
 
 
 # Code
 class NoteTools:
     """
-    The tools the model uses on the notes, in any folder, by paths of
-    titles from a folder (or the root), as a coding agent does with files
+    The tools the model uses to find, read and write notes, in any
+    folder; writes go by paths of titles from a folder (or the root), as
+    a coding agent does with files
     """
 
     created: list[Note]
@@ -29,6 +31,72 @@ class NoteTools:
         The tools for the tool runner; each docstring below is the
         description the model reads, and the parameters are its schema
         """
+
+        @beta_async_tool(strict=True)
+        async def search_notes(
+            query: str,
+            folder_id: UUID | None = None,
+        ) -> str:
+            """
+            Finds the notes whose title or body has all the words of query
+            Whole words only, notes only (not folders), as `id title` lines.
+            With folder_id, only inside that folder, at any depth.
+            """
+
+            notes = await ichiro.search_notes(query=query, parent_id=folder_id)
+
+            if not notes:
+                return "no notes found"
+
+            return "\n".join(f"{note.id} {note.title}" for note in notes)
+
+        @beta_async_tool(strict=True)
+        async def search_titles(
+            text: str,
+            folder_id: UUID | None = None,
+        ) -> str:
+            """
+            Finds the notes and folders with text anywhere in the title
+            Also matches part of a word; folders end in /, as `id title`
+            lines. With folder_id, only inside that folder, at any depth.
+            """
+
+            notes = await ichiro.search_titles(text=text, parent_id=folder_id)
+
+            if not notes:
+                return "no titles found"
+
+            return lines(notes=notes)
+
+        @beta_async_tool(strict=True)
+        async def list_folder(folder_id: UUID | None = None) -> str:
+            """
+            Lists what is right inside a folder, or the top level without one
+            Folders end in /, as `id title` lines.
+            """
+
+            notes = await ichiro.list_notes(parent_id=folder_id)
+
+            if not notes:
+                return "the folder is empty"
+
+            return lines(notes=notes)
+
+        @beta_async_tool(strict=True)
+        async def read_note(note_id: UUID) -> str:
+            """
+            Reads one note by its id: the title and the whole body
+            """
+
+            note = await ichiro.get_note(note_id=note_id)
+
+            if note is None:
+                raise ValueError(f"there is no note {note_id}")
+
+            if note.is_folder:
+                raise ValueError(f"{note.title} is a folder: use list_folder")
+
+            return f"# {note.title}\n\n{note.body}"
 
         @beta_async_tool(strict=True)
         async def create_note(
@@ -64,7 +132,14 @@ class NoteTools:
 
             return f"created {path}/"
 
-        return [create_note, create_folder]
+        return [
+            search_notes,
+            search_titles,
+            list_folder,
+            read_note,
+            create_note,
+            create_folder,
+        ]
 
     def split(self, path: str) -> list[str]:
         """
@@ -135,3 +210,14 @@ class NoteTools:
         self.created.append(note)
 
         return note
+
+
+def lines(notes: Sequence[Note | TitleMatch]) -> str:
+    """
+    One `id title` line per note, with a / after the folders
+    """
+
+    return "\n".join(
+        f"{note.id} {note.title}{'/' if note.is_folder else ''}"
+        for note in notes
+    )
