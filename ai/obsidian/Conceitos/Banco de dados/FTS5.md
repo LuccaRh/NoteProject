@@ -5,7 +5,7 @@ tags: [noteproject, conceito, dados]
 
 Achar notas por palavra com `LIKE '%palavra%'` lê todas as linhas, uma por uma. A busca full-text resolve isso com um índice próprio para texto.
 
-- **FTS5**: extensão do [[SQLite]] para busca full-text. Monta um índice invertido: palavra → linhas onde ela aparece.
+- **FTS5**: extensão do [[SQLite]] para busca full-text. Monta um [[Índice|índice invertido]]: palavra → linhas onde ela aparece.
 
 ## Como o índice acompanha a tabela
 

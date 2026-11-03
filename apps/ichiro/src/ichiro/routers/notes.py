@@ -2,11 +2,17 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy import Connection
 
 from ichiro.db import get_conn
-from ichiro.schemas.notes import Note, NoteCreate, NotePath, NoteUpdate
+from ichiro.schemas.notes import (
+    Note,
+    NoteCreate,
+    NoteMatch,
+    NotePath,
+    NoteUpdate,
+)
 from ichiro.services.notes import (
     create_note,
     find_by_path,
@@ -14,6 +20,7 @@ from ichiro.services.notes import (
     list_notes,
     list_tree,
     remove_note,
+    search_notes,
     update_note,
 )
 
@@ -60,6 +67,21 @@ def get_by_path(
     """
 
     return find_by_path(conn=conn, path=path, parent_id=parent_id)
+
+
+@router.get("/search")
+def get_search(
+    conn: Conn,
+    q: Annotated[str, Query(min_length=1)],
+    parent_id: UUID | None = None,
+) -> list[NoteMatch]:
+    """
+    Notes (not folders) whose title or body has the words of q, by
+    title; only the ones inside parent_id, at any depth, when one is
+    given; 404 when parent_id doesn't exist
+    """
+
+    return search_notes(conn=conn, query=q, parent_id=parent_id)
 
 
 @router.get("/{note_id}")

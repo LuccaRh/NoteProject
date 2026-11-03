@@ -18,11 +18,18 @@ from ichiro.repositories.notes import (
     select_children,
     select_is_folder,
     select_is_inside,
+    select_matches,
     select_note,
     select_tree,
     update_fields,
 )
-from ichiro.schemas.notes import Note, NoteCreate, NotePath, NoteUpdate
+from ichiro.schemas.notes import (
+    Note,
+    NoteCreate,
+    NoteMatch,
+    NotePath,
+    NoteUpdate,
+)
 
 
 # Code
@@ -81,6 +88,23 @@ def list_tree(conn: Connection, parent_id: UUID | None) -> list[NotePath]:
         find_note(conn=conn, note_id=parent_id)
 
     return select_tree(conn=conn, parent_id=parent_id)
+
+
+def search_notes(
+    conn: Connection,
+    query: str,
+    parent_id: UUID | None,
+) -> list[NoteMatch]:
+    """
+    Notes (not folders) whose title or body has the words of query, by
+    title, inside parent_id when one is given; NoteNotFound when
+    parent_id doesn't exist
+    """
+
+    if parent_id is not None:
+        find_note(conn=conn, note_id=parent_id)
+
+    return select_matches(conn=conn, query=query, parent_id=parent_id)
 
 
 def find_by_path(conn: Connection, path: str, parent_id: UUID | None) -> Note:

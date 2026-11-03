@@ -7,7 +7,7 @@ from sqlalchemy import Connection, text
 from sqlalchemy.exc import IntegrityError
 
 from ichiro.errors import ParentNotFound, TitleTaken
-from ichiro.schemas.notes import Note, NoteCreate, NotePath
+from ichiro.schemas.notes import Note, NoteCreate, NoteMatch, NotePath
 
 
 # Global variables
@@ -137,6 +137,37 @@ def select_by_path(
         return None
 
     return Note.model_validate(row)
+
+
+def select_matches(
+    conn: Connection,
+    query: str,
+    parent_id: UUID | None,
+) -> list[NoteMatch]:
+    """
+    Notes (not folders) whose title or body has the words of query, by
+    title; only the ones inside parent_id, at any depth, when one is given
+    """
+
+    # Same expression as notes_search_idx, or Postgres reads every row
+    rows = conn.execute(
+        text(
+            "WITH RECURSIVE tree AS ("
+            " SELECT id FROM notes WHERE parent_id = :parent_id"
+            " UNION ALL"
+            " SELECT n.id FROM notes n JOIN tree t ON n.parent_id = t.id"
+            ") SELECT id, title FROM notes"
+            " WHERE NOT is_folder"
+            " AND to_tsvector('simple', title || ' ' || body)"
+            " @@ websearch_to_tsquery('simple', :query)"
+            " AND (CAST(:parent_id AS uuid) IS NULL"
+            " OR id IN (SELECT id FROM tree))"
+            " ORDER BY title"
+        ),
+        {"query": query, "parent_id": parent_id},
+    ).mappings()
+
+    return [NoteMatch.model_validate(row) for row in rows]
 
 
 def select_note(conn: Connection, note_id: UUID) -> Note | None:
