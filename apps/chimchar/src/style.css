@@ -331,6 +331,23 @@ button {
     outline: none;
 }
 
+/* Searched words: a flash, then a soft mark until the first edit */
+.cm-found {
+    border-radius: 3px;
+    background: rgb(226 192 108 / 0.22);
+    box-shadow: 0 0 0 1px rgb(226 192 108 / 0.35);
+    color: var(--text);
+    animation: found-flash 1.4s ease-out;
+}
+
+@keyframes found-flash {
+    0%,
+    30% {
+        background: rgb(226 192 108 / 0.6);
+        box-shadow: 0 0 0 3px rgb(226 192 108 / 0.35);
+    }
+}
+
 .md-h1,
 .md-h2,
 .md-h3 {

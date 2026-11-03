@@ -4,12 +4,15 @@ import { markdown } from '@codemirror/lang-markdown'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { tags } from '@lezer/highlight'
 import { headings } from './decorations/headings.ts'
+import { found, showFound } from './decorations/found.ts'
 
 
 export type Editor = {
     view: EditorView
     // Replaces the text without calling onChange, with a fresh undo history
     load: (text: string) => void
+    // Marks the words in the text and scrolls to the first
+    mark: (words: string[]) => void
 }
 
 // Markdown colors on the dark page; the # and ** marks stay faint
@@ -83,6 +86,7 @@ export function createEditor(
         theme,
         EditorView.lineWrapping,
         headings,
+        found,
         EditorView.updateListener.of(update => {
             if (update.docChanged) onChange?.(update.state.doc.toString())
         }),
@@ -100,5 +104,6 @@ export function createEditor(
                 extensions,
             }),
         ),
+        mark: words => showFound(view, words),
     }
 }

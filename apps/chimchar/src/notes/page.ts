@@ -79,6 +79,12 @@ export class Page {
         this.els.empty.hidden = true
     }
 
+    /** Draw attention to the searched words in the open note. */
+    mark(words: string[]): void {
+
+        this.editor.mark(words)
+    }
+
     /** Save pending edits, then hide the note and show the empty page. */
     async close(): Promise<void> {
 
