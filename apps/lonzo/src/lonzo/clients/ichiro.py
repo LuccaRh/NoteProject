@@ -6,7 +6,7 @@ import httpx2
 from pydantic import TypeAdapter
 
 from lonzo.errors import TitleTaken
-from lonzo.schemas.notes import Note
+from lonzo.schemas.notes import Note, NoteMatch, TitleMatch
 
 
 # Global variables
@@ -88,6 +88,46 @@ class IchiroClient:
         response.raise_for_status()
 
         return Note.model_validate(response.json())
+
+    async def search_notes(
+        self,
+        query: str,
+        parent_id: UUID | None,
+    ) -> list[NoteMatch]:
+        """
+        GET /notes/search: the notes whose title or body has the words of
+        query, inside parent_id at any depth (None = all of them)
+        """
+
+        params = {"q": query}
+
+        if parent_id is not None:
+            params["parent_id"] = str(parent_id)
+
+        response = await self.http.get("/notes/search", params=params)
+        response.raise_for_status()
+
+        return TypeAdapter(list[NoteMatch]).validate_python(response.json())
+
+    async def search_titles(
+        self,
+        text: str,
+        parent_id: UUID | None,
+    ) -> list[TitleMatch]:
+        """
+        GET /notes/search-titles: the notes and folders with text anywhere
+        in the title, inside parent_id at any depth (None = all of them)
+        """
+
+        params = {"q": text}
+
+        if parent_id is not None:
+            params["parent_id"] = str(parent_id)
+
+        response = await self.http.get("/notes/search-titles", params=params)
+        response.raise_for_status()
+
+        return TypeAdapter(list[TitleMatch]).validate_python(response.json())
 
     async def create_note(
         self,
