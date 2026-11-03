@@ -25,6 +25,26 @@ export type NoteUpdate = {
     parent_id?: string | null
 }
 
+// One entry of the whole tree, with its titles joined by "/"
+export type NotePath = {
+    id: string
+    path: string
+    is_folder: boolean
+}
+
+// A note found by its words, only what is needed to open it
+export type NoteMatch = {
+    id: string
+    title: string
+}
+
+// A note or folder found by a text in its title
+export type TitleMatch = {
+    id: string
+    title: string
+    is_folder: boolean
+}
+
 
 // Code
 /** Call the notes API through the /api proxy; throw on error. */
@@ -46,6 +66,44 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export function listNotes(parentId: string | null): Promise<Note[]> {
 
     return request(parentId ? `?parent_id=${parentId}` : '')
+}
+
+/** Everything at any depth, each with its path of titles. */
+export function listTree(): Promise<NotePath[]> {
+
+    return request('/tree')
+}
+
+/** Ask a search route for a text, only inside a folder if given. */
+function search<T>(
+    route: string,
+    query: string,
+    parentId: string | null,
+): Promise<T[]> {
+
+    const params = new URLSearchParams({ q: query })
+
+    if (parentId) params.set('parent_id', parentId)
+
+    return request(`/${route}?${params}`)
+}
+
+/** Notes whose title or body has the words; only inside a folder if given. */
+export function searchNotes(
+    query: string,
+    parentId: string | null,
+): Promise<NoteMatch[]> {
+
+    return search('search', query, parentId)
+}
+
+/** Notes and folders whose title contains the text, even mid-word. */
+export function searchTitles(
+    query: string,
+    parentId: string | null,
+): Promise<TitleMatch[]> {
+
+    return search('search-titles', query, parentId)
 }
 
 /** Fetch one note by id. */
