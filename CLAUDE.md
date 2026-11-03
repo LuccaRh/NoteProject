@@ -276,6 +276,14 @@ ai/                todo o resto do workspace de IA:
   `notes/search.ts` (botão, `Ctrl+O`, lupa da pasta), nomes na hora + corpos/títulos do
   servidor, palavras marcadas na nota (`decorations/found.ts`); chimchar 0.8.0. Escrita
   pelo Lucca, commits da sessão; falta conferir no navegador.
+- #77 na branch `lonzo/let-the-chat-read-and-search-notes` (sem push), feita no worktree
+  `../NoteProject-lonzo-search`: o chat responde pelo `tool_runner(stream=True)` com
+  `search_notes`, `search_titles`, `list_folder`, `read_note`, `create_note`, `create_folder`,
+  todas no `NoteTools` (`services/note_tools.py`, um conjunto só, o mesmo da #73), sem trava de
+  pasta (2026-11-03: a IA lê e cria em qualquer pasta; `folder_id` opcional, sem ele a raiz); o
+  ponto de partida é o id da pasta, que o `create_workspace.md` manda gravar no `CLAUDE.md`
+  do workspace (o `FOLDER_HINT` saiu do código, e o `RULES_HEADER` também: o `CLAUDE.md` abre com ele). Usa `/notes/search` e `/notes/search-titles` da #56: PR depois do merge dela.
+  Conferido ao vivo (container temporário na rede do compose). lonzo 0.6.0.
 - IA (2026-10-31): chat com o workspace no servidor; vault `IA no projeto/Chat com o workspace` e
   `Caminho de uma pergunta`. Workspace = pasta com `.workspace/`, vários por pessoa.
 - #31 (Ctrl+D) e #5 (chips) sem milestone, para depois; `decorations/replace.ts` (#5) fora do git.
