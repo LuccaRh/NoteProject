@@ -12,10 +12,6 @@ from lonzo.services.note_tools import NoteTools
 # Global variables
 WORKSPACE = ".workspace"
 WORKSPACE_FOLDERS = ["kb", "skills", "scripts", "hooks"]
-RULES_HEADER = (
-    "These notes are the person's workspace. Follow them in every answer;"
-    " they win over your own defaults (language, length, format)."
-)
 PROMPT_PATH = Path(__file__).parent.parent / "create_workspace.md"
 
 
@@ -36,8 +32,9 @@ async def find_workspace(parent_id: UUID) -> UUID | None:
 
 async def workspace_rules(folder_id: UUID | None) -> str:
     """
-    Rules for a question: notes of the folder's .workspace; empty with no
-    folder or no .workspace (the root never has one)
+    Rules for a question: notes of the folder's .workspace, as written
+    (the CLAUDE.md opens saying they win); empty with no folder or no
+    .workspace (the root never has one)
     """
 
     if folder_id is None:
@@ -54,10 +51,7 @@ async def workspace_rules(folder_id: UUID | None) -> str:
         if not note.is_folder
     ]
 
-    if not parts:
-        return ""
-
-    return "\n\n".join([RULES_HEADER, *parts])
+    return "\n\n".join(parts)
 
 
 async def create_workspace_folders(parent_id: UUID) -> list[Note]:
