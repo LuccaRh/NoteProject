@@ -1,6 +1,7 @@
 import { EditorView, minimalSetup } from 'codemirror'
 import { EditorState } from '@codemirror/state'
-import { markdown } from '@codemirror/lang-markdown'
+import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
+import { languages } from '@codemirror/language-data'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { tags } from '@lezer/highlight'
 import { headings } from './decorations/headings.ts'
@@ -50,6 +51,32 @@ const highlight = HighlightStyle.define([
         tag: [tags.processingInstruction, tags.meta],
         color: 'var(--faint)',
     },
+    // Code inside fenced blocks
+    {
+        tag: [tags.keyword, tags.operatorKeyword, tags.modifier],
+        color: 'var(--code-keyword)',
+    },
+    {
+        tag: [tags.string, tags.regexp],
+        color: 'var(--code-string)',
+    },
+    {
+        tag: [tags.number, tags.bool, tags.null, tags.atom],
+        color: 'var(--code-number)',
+    },
+    {
+        tag: [tags.comment, tags.lineComment, tags.blockComment],
+        color: 'var(--faint)',
+        fontStyle: 'italic',
+    },
+    {
+        tag: [tags.function(tags.variableName), tags.typeName, tags.className],
+        color: 'var(--code-name)',
+    },
+    {
+        tag: tags.propertyName,
+        color: 'var(--soft)',
+    },
 ])
 
 const theme = EditorView.theme({
@@ -81,7 +108,7 @@ export function createEditor(
 ): Editor {
     const extensions = [
         minimalSetup,
-        markdown(),
+        markdown({ base: markdownLanguage, codeLanguages: languages }),
         syntaxHighlighting(highlight),
         theme,
         EditorView.lineWrapping,

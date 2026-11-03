@@ -14,6 +14,11 @@
     --sans: Jost, system-ui, sans-serif;
     --serif: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
     --mono: ui-monospace, 'JetBrains Mono', monospace;
+    --code-bg: #23272b;
+    --code-keyword: #c69fd5;
+    --code-string: #a8c98a;
+    --code-number: #e0b07a;
+    --code-name: #8fb8de;
     color-scheme: dark;
 }
 
