@@ -36,6 +36,8 @@ mostrar de forma mais organizada tudo que esta ocorrendo numa request, do que no
 
 atualizar o navegador automaticamente sem precisar apertar f5
 
+usar o serviço lonzo para fora do projeto, podendo usar a antropic para codar também, assim não precisando pagar a mensalidade dela, e pagar apenas o necessário, muitas vezes uso menos token do que é o limite no mes. Pagando por token vou ter o valor exato, que provavelmente será bem menos. O unico porém é o mcp (do github, overleaf, etc), não sei se consigo usar pela api
+
 https://www.figma.com/resource-library/web-design-trends/
 https://www.designrush.com/agency/website-design-development/trends/web-design-trends
 https://claude.ai/artifact/J1zxf5yrPvuFBS4ZunhBX1#play-b5870ad06ee7
