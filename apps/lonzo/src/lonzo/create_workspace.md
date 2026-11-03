@@ -17,14 +17,15 @@ first `.workspace/CLAUDE.md`, then one note per piece, e.g.
   It goes into every question asked in the folder, so every line is paid
   again in every answer: keep it short and specific. Cover the goal (the
   subject, who the person is, what they want), how to answer (length,
-  tone, level, format), fixed facts, the dated state (today's date, where
-  the person is now and what comes next), where the material is, the
-  subfolders of `.workspace/` with what goes in each and how the workspace
-  grows (below). Keep a part short rather than invent facts. It also
-  orders the model to keep the workspace out of its answers: the person
-  sees only the notes and the subject, so it never names `CLAUDE.md`,
-  `.workspace/`, its subfolders, rules or skills unless the person asks
-  about them.
+  tone, level, format), fixed facts (first the id of the workspace folder:
+  the model starts there to find notes and to save new ones), the dated
+  state (today's date, where the person is now and what comes next), where
+  the material is, the subfolders of `.workspace/` with what goes in each
+  and how the workspace grows (below). Keep a part short rather than
+  invent facts. It also orders the model to keep the workspace out of its
+  answers: the person sees only the notes and the subject, so it never
+  names `CLAUDE.md`, `.workspace/`, its subfolders, rules or skills unless
+  the person asks about them.
 - kb: notes for the `kb/` folder, the subject's knowledge base: short
   facts and summaries the model reads by part instead of the whole
   material. Only what the text already says.
