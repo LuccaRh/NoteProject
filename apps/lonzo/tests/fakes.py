@@ -56,6 +56,30 @@ class FakeIchiro:
 
             return httpx2.Response(200, json=row)
 
+        if request.method == "GET" and path == "/notes/search":
+            words = request.url.params["q"].lower().split()
+            rows = self.inside(parent_id=request.url.params.get("parent_id"))
+            rows = [
+                {"id": r["id"], "title": r["title"]}
+                for r in rows
+                if not r["is_folder"]
+                and all(w in f"{r['title']} {r['body']}".lower() for w in words)
+            ]
+
+            return httpx2.Response(200, json=rows)
+
+        if request.method == "GET" and path == "/notes/search-titles":
+            text = request.url.params["q"].lower()
+            rows = self.inside(parent_id=request.url.params.get("parent_id"))
+            fields = ("id", "title", "is_folder")
+            rows = [
+                {field: r[field] for field in fields}
+                for r in rows
+                if text in str(r["title"]).lower()
+            ]
+
+            return httpx2.Response(200, json=rows)
+
         if request.method == "GET" and path.startswith("/notes/"):
             row = self.rows.get(UUID(path.removeprefix("/notes/")))
 
@@ -95,6 +119,21 @@ class FakeIchiro:
                 return row
 
         return None
+
+    def inside(self, parent_id: str | None) -> list[dict[str, object]]:
+
+        if parent_id is None:
+            return list(self.rows.values())
+
+        rows = self.rows.values()
+        children = [r for r in rows if r["parent_id"] == parent_id]
+
+        return children + [
+            row
+            for child in children
+            if child["is_folder"]
+            for row in self.inside(parent_id=str(child["id"]))
+        ]
 
     def walk(
         self,
