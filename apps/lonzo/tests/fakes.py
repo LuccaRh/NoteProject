@@ -88,6 +88,29 @@ class FakeIchiro:
 
             return httpx2.Response(200, json=row)
 
+        if request.method == "PATCH" and path.startswith("/notes/"):
+            row = self.rows.get(UUID(path.removeprefix("/notes/")))
+
+            if row is None:
+                return httpx2.Response(404, json={"detail": "note not found"})
+
+            row.update(json.loads(request.content))
+
+            return httpx2.Response(200, json=row)
+
+        if request.method == "DELETE" and path.startswith("/notes/"):
+            note_id = UUID(path.removeprefix("/notes/"))
+
+            if note_id not in self.rows:
+                return httpx2.Response(404, json={"detail": "note not found"})
+
+            inside = self.inside(parent_id=str(note_id))
+
+            for row in [self.rows[note_id], *inside]:
+                del self.rows[UUID(str(row["id"]))]
+
+            return httpx2.Response(204)
+
         if request.method == "POST" and path == "/notes":
             note = json.loads(request.content)
             parent = note.get("parent_id")
