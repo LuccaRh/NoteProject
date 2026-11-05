@@ -112,6 +112,29 @@ def select_tree(conn: Connection, parent_id: UUID | None) -> list[NotePath]:
     return [NotePath.model_validate(row) for row in rows]
 
 
+def select_path(conn: Connection, note_id: UUID) -> str:
+    """
+    The path of titles of a note from the root, walked up one parent per
+    level in one query; the note must exist
+    """
+
+    return str(
+        conn.execute(
+            text(
+                "WITH RECURSIVE up AS ("
+                " SELECT parent_id, ARRAY[title] AS names FROM notes"
+                " WHERE id = :note_id"
+                " UNION ALL"
+                " SELECT n.parent_id, n.title || u.names FROM notes n"
+                " JOIN up u ON n.id = u.parent_id"
+                ") SELECT array_to_string(names, '/') FROM up"
+                " WHERE parent_id IS NULL"
+            ),
+            {"note_id": note_id},
+        ).scalar_one()
+    )
+
+
 def select_by_path(
     conn: Connection,
     names: list[str],
