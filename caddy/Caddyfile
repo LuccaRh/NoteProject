@@ -5,6 +5,12 @@ notes.localhost {
 
     # Each API prefix goes to its own service, which sees no /api:
     # /api/notes -> ichiro:8000/notes, /api/chat -> lonzo:8000/chat
+    @nujabes path /api/auth /api/auth/*
+    handle @nujabes {
+        uri strip_prefix /api
+        reverse_proxy nujabes:8000
+    }
+
     @ichiro path /api/notes /api/notes/*
     handle @ichiro {
         uri strip_prefix /api
