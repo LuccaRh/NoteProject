@@ -47,3 +47,9 @@ avisa; reconfira as linhas antes de confiar no card. Escolhida em 2026-11-01 no 
   (`types/tool_result_block_param.py:36`).
 - Laço pronto (beta): `client.beta.messages.tool_runner(...)` (`resources/beta/messages/messages.py:1436`),
   com cada ferramenta como função decorada por `@beta_tool` (`lib/tools/_beta_functions.py:354`).
+- Com `stream=True`, cada item do runner é um stream de um turno, e `async for event in stream` traz
+  `text` (`.text`, `lib/streaming/_beta_types.py:20`), `content_block_start` e `content_block_stop`
+  (`.content_block`; 96 e 116). Bloco `tool_use`: no start `input` é `{}`; no stop vem inteiro
+  (conferido com o Haiku 5.5 em 2026-11-05).
+- A ferramenta roda depois do fim do stream do turno: `generate_tool_call_response`
+  (`lib/tools/_beta_runner.py:1311`), salvo com `run_tools_eagerly` (1552), que o lonzo não liga.
