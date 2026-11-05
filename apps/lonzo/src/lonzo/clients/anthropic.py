@@ -90,6 +90,7 @@ class AnthropicClient:
             messages=messages,
             tools=tools,
             max_iterations=TOOLS_MAX_TURNS,
+            cache_control=CACHE,
             stream=True,
         )
 
@@ -113,5 +114,6 @@ class AnthropicClient:
             messages=[{"role": "user", "content": request}],
             tools=tools,
             max_iterations=TOOLS_MAX_TURNS,
+            cache_control=CACHE,
         )
         await runner.until_done()
