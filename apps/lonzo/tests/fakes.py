@@ -5,6 +5,11 @@ from uuid import UUID, uuid4
 import httpx2
 
 
+# Global variables
+# The user Caddy would send in X-User-Id
+USER = UUID("00000000-0000-7000-8000-000000000001")
+
+
 # Code
 # Stands in for ichiro: notes kept in a dict, served through httpx2
 class FakeIchiro:

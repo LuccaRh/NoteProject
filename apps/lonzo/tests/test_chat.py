@@ -9,7 +9,7 @@ from uuid import UUID, uuid4
 
 import httpx2
 from anthropic import omit
-from fakes import FakeIchiro, unreachable
+from fakes import USER, FakeIchiro, unreachable
 from fastapi.testclient import TestClient
 from httpx2 import Response
 
@@ -19,7 +19,7 @@ from lonzo.services.conversations import get_conversation
 
 
 # Global variables
-client = TestClient(app)
+client = TestClient(app, headers={"X-User-Id": str(USER)})
 
 
 # Code

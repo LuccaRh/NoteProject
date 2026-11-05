@@ -5,7 +5,7 @@ from typing import Any, ClassVar
 from unittest.mock import patch
 from uuid import uuid4
 
-from fakes import FakeIchiro
+from fakes import USER, FakeIchiro
 from fastapi.testclient import TestClient
 from httpx2 import Response
 
@@ -15,7 +15,7 @@ from lonzo.main import app
 
 
 # Global variables
-client = TestClient(app)
+client = TestClient(app, headers={"X-User-Id": str(USER)})
 
 
 # Code
