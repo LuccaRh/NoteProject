@@ -12,7 +12,7 @@ from lonzo.services.conversations import (
     start_conversation,
 )
 from lonzo.services.note_tools import NoteTools
-from lonzo.services.workspaces import workspace_rules
+from lonzo.services.workspaces import base_rules, workspace_rules
 
 
 # Global variables
@@ -24,7 +24,7 @@ async def events(
     conversation: Conversation,
     history: list[Message],
     question: str,
-    system: str,
+    system: list[str],
 ) -> AsyncIterator[Event]:
     """
     The events of one answer, as (name, data), while the model writes; the
@@ -118,7 +118,7 @@ async def answer(
             question=question,
         )
 
-    system = await workspace_rules(folder_id=folder_id)
+    system = [base_rules(), await workspace_rules(folder_id=folder_id)]
 
     return events(
         conversation=conversation,

@@ -8,7 +8,6 @@ from unittest.mock import patch
 from uuid import UUID, uuid4
 
 import httpx2
-from anthropic import omit
 from fakes import USER, FakeIchiro, unreachable
 from fastapi.testclient import TestClient
 from httpx2 import Response
@@ -16,6 +15,7 @@ from httpx2 import Response
 from lonzo import connections
 from lonzo.main import app
 from lonzo.services.conversations import get_conversation
+from lonzo.services.workspaces import base_rules
 from lonzo.user import current_user
 
 
@@ -140,11 +140,14 @@ def test_chat_with_notes_service_down() -> None:
     assert response.status_code == 502
 
 
-def test_chat_without_workspace_has_no_rules() -> None:
+def test_chat_without_workspace_has_only_the_base_rules() -> None:
 
     post(body={"question": "Hi"})
 
-    assert FakeMessages.params["system"] is omit
+    system = FakeMessages.params["system"]
+    assert isinstance(system, list)
+    assert [block["text"] for block in system] == [base_rules()]
+    assert system[0]["cache_control"] == {"type": "ephemeral"}
 
 
 def test_chat_uses_the_folder_workspace_rules() -> None:
@@ -160,9 +163,10 @@ def test_chat_uses_the_folder_workspace_rules() -> None:
     body = {"question": "Hi", "folder_id": str(folder)}
     post(body=body, http=ichiro.client())
 
-    system = str(FakeMessages.params["system"])
-    assert system.endswith("# Fixed facts\n\nBats left.")
-    assert "Exam soon." not in system
+    system = FakeMessages.params["system"]
+    assert isinstance(system, list)
+    assert system[-1]["text"].endswith("# Fixed facts\n\nBats left.")
+    assert "Exam soon." not in str(system)
 
 
 def test_chat_gives_the_model_the_note_tools() -> None:

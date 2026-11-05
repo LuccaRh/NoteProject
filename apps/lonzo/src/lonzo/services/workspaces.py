@@ -13,9 +13,19 @@ from lonzo.services.note_tools import NoteTools
 WORKSPACE = ".workspace"
 WORKSPACE_FOLDERS = ["kb", "skills", "scripts", "hooks"]
 PROMPT_PATH = Path(__file__).parent.parent / "create_workspace.md"
+BASE_PATH = Path(__file__).parent.parent / "base_rules.md"
 
 
 # Code
+def base_rules() -> str:
+    """
+    The rules of every question, the same for every person, so they stay
+    in the cache
+    """
+
+    return BASE_PATH.read_text(encoding="utf-8")
+
+
 async def find_workspace(parent_id: UUID) -> UUID | None:
     """
     The .workspace folder right inside a folder, if it has one; titles are

@@ -1,12 +1,16 @@
 # Imports
 from typing import Any, cast
 
-from anthropic import AsyncAnthropic, omit
+from anthropic import AsyncAnthropic
 from anthropic.lib.tools import (
     BetaAsyncFunctionTool,
     BetaAsyncStreamingToolRunner,
 )
-from anthropic.types.beta import BetaMessageParam
+from anthropic.types.beta import (
+    BetaCacheControlEphemeralParam,
+    BetaMessageParam,
+    BetaTextBlockParam,
+)
 
 from lonzo.errors import MissingApiKey
 from lonzo.schemas.conversations import Message
@@ -17,6 +21,7 @@ MODEL = "claude-haiku-5-5"
 CHAT_MAX_TOKENS = 64000
 TOOLS_MAX_TOKENS = 16000
 TOOLS_MAX_TURNS = 20
+CACHE: BetaCacheControlEphemeralParam = {"type": "ephemeral"}
 
 
 # Code
@@ -53,7 +58,7 @@ class AnthropicClient:
 
     def stream_answer(
         self,
-        system: str,
+        system: list[str],
         history: list[Message],
         question: str,
         tools: list[BetaAsyncFunctionTool[Any]],
@@ -61,8 +66,8 @@ class AnthropicClient:
         """
         The answer to one question after the messages of the conversation,
         by the tool runner of the SDK: one stream per turn of the model,
-        until it stops calling tools or reaches TOOLS_MAX_TURNS; an empty
-        system goes as no system prompt
+        until it stops calling tools or reaches TOOLS_MAX_TURNS; the first
+        piece of system is the fixed one, marked for the cache
         """
 
         self.check_key()
@@ -72,12 +77,16 @@ class AnthropicClient:
             for m in history
         ]
         messages.append({"role": "user", "content": question})
+        blocks: list[BetaTextBlockParam] = [
+            {"type": "text", "text": text} for text in system if text
+        ]
+        blocks[0]["cache_control"] = CACHE
 
         return self.sdk.beta.messages.tool_runner(
             model=MODEL,
             max_tokens=CHAT_MAX_TOKENS,
             thinking={"type": "disabled"},
-            system=system or omit,
+            system=blocks,
             messages=messages,
             tools=tools,
             max_iterations=TOOLS_MAX_TURNS,
