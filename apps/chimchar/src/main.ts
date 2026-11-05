@@ -1,5 +1,7 @@
 // Imports
 import './style.css'
+import { isLoggedIn } from './auth/api.ts'
+import { LoginDialog } from './auth/login-dialog.ts'
 import { Chat } from './chat/chat.ts'
 import { WorkspaceDialog } from './chat/workspace-dialog.ts'
 import { createNote, deleteNote, updateNote } from './notes/api.ts'
@@ -66,6 +68,15 @@ const workspaceDialog = new WorkspaceDialog(
     () => tree.folders(),
     folderId => void workspaceCreated(folderId),
 )
+
+const loginDialog = new LoginDialog({
+    dialog: byId('login-dialog'),
+    form: byId('login-form'),
+    email: byId('login-email'),
+    password: byId('login-password'),
+    status: byId('login-status'),
+    submit: byId('login-submit'),
+})
 
 // The note panel doubles as the empty page when no tab is open
 const tabs = new Tabs(byId('tabs'), notePanel, () => void page.close())
@@ -173,6 +184,15 @@ async function remove(note: Note): Promise<void> {
     tree.delete(note)
 }
 
+/** Ask for the login when there is no session, then load the tree. */
+async function start(): Promise<void> {
+
+    if (!(await isLoggedIn())) await loginDialog.open()
+
+    await tree.load(null)
+    serverStatus.textContent = ''
+}
+
 /** Create a note (and open it) or a folder (and rename it). */
 async function create(isFolder: boolean): Promise<void> {
 
@@ -222,6 +242,4 @@ byId('new-workspace').addEventListener('click', () => {
     workspaceDialog.open(tree.target())
 })
 
-void tree.load(null).then(() => {
-    serverStatus.textContent = ''
-})
+void start()

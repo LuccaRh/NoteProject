@@ -119,6 +119,29 @@
 
         </div>
 
+        <!-- Log in: email and password, driven by auth/login-dialog.ts -->
+        <dialog id="login-dialog" class="dialog"
+            aria-labelledby="login-heading">
+            <form id="login-form" class="dialog-form">
+                <h2 id="login-heading">Log in</h2>
+
+                <label for="login-email">Email</label>
+                <input id="login-email" type="email" autocomplete="username"
+                    required />
+
+                <label for="login-password">Password</label>
+                <input id="login-password" type="password"
+                    autocomplete="current-password" required />
+
+                <!-- Wrong password or server down -->
+                <p id="login-status" class="status" role="status"></p>
+
+                <div class="dialog-actions">
+                    <button id="login-submit" type="submit">Log in</button>
+                </div>
+            </form>
+        </dialog>
+
         <!-- Create workspace: folder and description, driven by
             chat/workspace-dialog.ts -->
         <dialog id="workspace-dialog" class="dialog"
