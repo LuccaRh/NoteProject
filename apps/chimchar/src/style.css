@@ -584,7 +584,6 @@ button {
 
 .message {
     max-width: 85%;
-    white-space: pre-wrap;
     overflow-wrap: anywhere;
     font-size: 15px;
     line-height: 1.65;
@@ -597,10 +596,98 @@ button {
     border-radius: 12px;
     background: var(--active);
     color: var(--text);
+    white-space: pre-wrap;
+}
+
+.message.assistant > :first-child {
+    margin-top: 0;
+}
+
+.message.assistant > :last-child {
+    margin-bottom: 0;
+}
+
+.message.assistant :is(p, ul, ol, pre, table, blockquote) {
+    margin: 0 0 12px;
+}
+
+.message.assistant :is(ul, ol) {
+    padding-left: 24px;
+}
+
+.message.assistant :is(h1, h2, h3, h4, h5, h6) {
+    margin: 18px 0 8px;
+    font-family: var(--serif);
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text);
+}
+
+.message.assistant h1 {
+    font-size: 26px;
+}
+
+.message.assistant strong {
+    color: var(--text);
+}
+
+.message.assistant a {
+    color: var(--code-name);
+}
+
+.message.assistant code {
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--code-bg);
+}
+
+.message.assistant pre {
+    overflow-x: auto;
+    padding: 8px 14px;
+    border-radius: 6px;
+    line-height: 1.6;
+    background: var(--code-bg);
+}
+
+.message.assistant pre code {
+    padding: 0;
+    background: none;
+}
+
+.message.assistant blockquote {
+    padding-left: 14px;
+    border-left: 3px solid var(--line);
+    color: var(--muted);
+}
+
+.message.assistant table {
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+}
+
+.message.assistant :is(th, td) {
+    padding: 5px 10px;
+    border: 1px solid var(--line);
+}
+
+.message.assistant hr {
+    border: 0;
+    border-top: 1px solid var(--line);
+}
+
+/* A long formula scrolls by itself, not the whole page */
+.message.assistant .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 /* Blinking bar while the answer is still coming */
-.message.streaming::after {
+.message.streaming:empty::after,
+.message.streaming > :last-child::after {
     content: '';
     display: inline-block;
     width: 7px;

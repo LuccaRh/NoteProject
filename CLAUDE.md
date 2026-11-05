@@ -221,7 +221,7 @@ ai/                todo o resto do workspace de IA:
   build/           gerado (estado dos hooks, png de diagrama), fora do git
 ```
 
-## Estado (2026-11-03)
+## Estado (2026-11-05)
 
 - Mergeados até o PR #116: M0, #46, #62, #64, #65, #69, #16, #80, #82, #74, #73, #98, #100,
   #75 (PRs #103, #104), #76 (#105, #106), #56 (#110), #107 (#111), #108 (#112), #109 (#113),
@@ -244,6 +244,9 @@ ai/                todo o resto do workspace de IA:
   `/docs` do FastAPI quebra atrás do `/api` (precisa de `root_path`).
 - chimchar: abas (nota/chat, `tabs.ts`), chat com SSE (`chat/`), pop-up "Create workspace",
   busca (`notes/search.ts`, `Ctrl+O`, `decorations/found.ts`), `.dockerignore` (#51).
+- Chat (2026-11-05): branch `chimchar/render-the-chat-answers` (#128), em cima da
+  `chimchar/cancel-a-chat-answer` (#127, sem Esc; só o botão cancela): resposta em Markdown e
+  LaTeX (`chat/markdown.ts`: marked, DOMPurify, KaTeX) e rolagem ao mandar. chimchar 0.14.0.
 - #117 (milestone Editor) no PR da branch `chimchar/render-markdown-in-the-editor`: live
   preview no editor (`decorations/preview.ts`: títulos, tabela GFM, bloco de código com cor,
   marcas escondidas fora do cursor); chimchar 0.10.0. Callout `[!tipo]` fica para a #5.
