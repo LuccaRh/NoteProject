@@ -269,9 +269,17 @@ export class Chat {
     /** Redraw the answer so far; keep following it at the bottom. */
     show(answer: HTMLElement, source: string): void {
 
+        this.follow(() => {
+            answer.innerHTML = renderMarkdown(source)
+        })
+    }
+
+    /** Change the page; stay at the bottom if it was following it. */
+    follow(change: () => void): void {
+
         const box = this.messages
         const gap = box.scrollHeight - box.scrollTop - box.clientHeight
-        answer.innerHTML = renderMarkdown(source)
+        change()
 
         if (gap < FOLLOW_PX) this.scrollToEnd()
     }
