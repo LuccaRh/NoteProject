@@ -69,6 +69,7 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[DNS]] | traduz o nome no IP |
 | [[Domínio]] | nome fixo, alugado, que segue valendo quando a máquina muda |
 | [[TLS]] | conexão cifrada e servidor comprovado; HTTPS é HTTP por dentro dele |
+| [[CA]] | quem assina os certificados; o navegador só aceita as CAs da lista dele |
 | [[Reverse proxy]] | uma porta na frente de todos os serviços |
 | [[CORS]] | o navegador só deixa a página ler respostas da mesma origem, salvo se o servidor liberar |
 | [[Cookie]] | texto que o servidor pede para o navegador guardar e devolver em todo pedido |

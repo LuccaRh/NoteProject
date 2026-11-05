@@ -28,7 +28,7 @@ O motivo 4 também é aprendizado: lidar com várias pessoas faz parte do que se
 
 ## v1
 
-A primeira versão que substitui o Obsidian no uso diário: **ler e navegar notas `.md` organizadas, com links entre elas, no navegador, com as notas no servidor na AWS**. A v1 não tem IA: as notas são escritas no editor do app ou importadas do Obsidian. A IA entra depois, já dentro do app ([[Workspace no app]]), e não pelo Claude Code com arquivos locais.
+A primeira versão que substitui o Obsidian no uso diário: **ler e navegar notas `.md` organizadas, com links entre elas, no navegador, com as notas no servidor na AWS**. A v1 não tem IA: as notas são escritas no editor do app, sem importar do Obsidian. A IA entra depois, já dentro do app ([[Workspace no app]]), e não pelo Claude Code com arquivos locais.
 
 | Opção | Onde as notas ficam | Ensina | Pronta em |
 |---|---|---|---|

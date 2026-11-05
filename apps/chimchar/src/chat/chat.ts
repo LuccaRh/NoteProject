@@ -30,6 +30,8 @@ export class Chat {
     conversationId: string | null = null
     // One question at a time per tab
     busy: boolean = false
+    // Closes the request of the answer being written
+    controller: AbortController | null = null
     options: Options
     panel: HTMLElement
     workspace: HTMLSelectElement
@@ -88,7 +90,9 @@ export class Chat {
         form.append(this.question, this.send)
         form.addEventListener('submit', event => {
             event.preventDefault()
-            void this.askQuestion()
+
+            if (this.busy) this.controller?.abort()
+            else void this.askQuestion()
         })
 
         // Enter sends, Shift+Enter breaks the line
@@ -99,7 +103,8 @@ export class Chat {
             if (event.isComposing) return
 
             event.preventDefault()
-            form.requestSubmit()
+
+            if (!this.busy) form.requestSubmit()
         })
 
         const main = element('div', 'chat-main')
@@ -198,13 +203,14 @@ export class Chat {
         if (!question || this.busy) return
 
         this.busy = true
-        this.send.disabled = true
+        this.send.textContent = 'Cancel'
         this.question.value = ''
         this.messages.querySelector('.chat-empty')?.remove()
         this.bubble('user').textContent = question
         const answer = this.bubble('assistant')
         answer.classList.add('streaming')
         const isNew = this.conversationId === null
+        const { signal } = this.controller = new AbortController()
 
         try {
             await ask(
@@ -220,14 +226,21 @@ export class Chat {
                     text: piece => this.append(answer, piece),
                     error: message => this.fail(answer, message),
                 },
+                signal,
             )
         } catch (error) {
-            this.fail(answer, 'The chat service did not answer')
-            console.error(error)
+
+            if (!signal.aborted) {
+                this.fail(answer, 'The chat service did not answer')
+                console.error(error)
+            }
         } finally {
             answer.classList.remove('streaming')
+
+            if (!answer.textContent) answer.remove()
+
             this.busy = false
-            this.send.disabled = false
+            this.send.textContent = 'Send'
         }
 
         if (isNew) this.options.onTitle(question)

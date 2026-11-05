@@ -93,17 +93,19 @@ export function createWorkspace(
 
 /**
  * Ask a question and hand each server-sent event to the handlers as it
- * arrives; resolves when the answer ends.
+ * arrives; resolves when the answer ends, rejects when signal aborts.
  */
 export async function ask(
     question: Question,
     handlers: AnswerHandlers,
+    signal: AbortSignal,
 ): Promise<void> {
 
     const res = await fetch(BASE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(question),
+        signal,
     })
 
     if (!res.ok || !res.body) throw new Error(`POST ${BASE}: ${res.status}`)

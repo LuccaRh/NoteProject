@@ -1,0 +1,63 @@
+---
+tags: [noteproject, plano]
+---
+# Prioridade das features
+
+As ideias soltas em [[Features]] não têm ordem nem dizem o que já existe. Esta página põe todas numa fila só, para escolher a próxima tarefa do [[Roadmap]].
+
+## Critério
+
+1. Risco primeiro: o que gasta token à toa ou expõe dados.
+2. Depois, o que leva à v1 do [[Objetivo do app]]: ler notas no navegador, com o servidor na AWS.
+3. Depois, o que melhora o uso diário, com o menor esforço na frente.
+4. Dependência manda: nenhuma ideia vem antes daquela de que precisa.
+
+Esforço é estimativa: **P** até um dia, **M** alguns dias, **G** uma milestone ou mais.
+
+## Fila
+
+| # | Faixa | Ideia | Por que nesta posição | Estado | Issue | Esforço |
+|---|---|---|---|---|---|---|
+| 1 | Agora | Autenticação | destrava AWS, chave por conta e senha em pastas | ⏳ PRs #119–#124 abertos ([[Login no navegador]]) | #48 | P |
+| 2 | Agora | Aviso de conexão insegura no navegador | passos prontos no README; em produção quem resolve é o [[TLS]] da #22 | ✅ feito em 2026-11-05: [[CA]] local do [[Reverse proxy\|Caddy]] instalada | — | P |
+| 3 | Agora | Cancelar um pedido à IA, como o Esc do Claude Code | pedido longo gasta token até o fim; hoje o front não aborta o [[Chat com o workspace\|chat]] | ⏳ | — | P |
+| 4 | Agora | Lidar com erros | falha da API ou da IA precisa aparecer na tela; o back já traduz erros em `handlers.py`, o front falta mapear | ⏳ parcial | — | M |
+| 5 | Agora | Modo de leitura | evita edição sem querer; a IA escreve quase tudo, e o preview da #117 já faz boa parte | ⏳ | — | P |
+| 6 | Antes da AWS | Segurança do app | a porta aberta para a internet vem depois disso; precisa virar lista concreta (limite de tentativas de login, cabeçalhos, segredos) | ⏳ sem recorte | — | M |
+| 7 | Antes da AWS | AWS | é a v1; a ordem está na [[Trilha de infra]] | ⏳ M3 | #18–#25, #47 | G |
+| 8 | Depois da v1 | Chave da Anthropic nas configurações da conta | sem ela, uma chave só paga o uso de todos; só importa com mais gente no app | ⏳ depende do 1 | — | M |
+| 9 | Depois da v1 | Atualizar o navegador sem F5 | é a M4, com [[WebSocket]] | ⏳ M4 | #26, #27, #30 | G |
+| 10 | Depois da v1 | Mostrar de forma organizada o que ocorre num pedido | as chamadas de ferramenta já existem no [[Laço de ferramentas]]; falta desenhar a tela | ⏳ | — | M |
+| 11 | Depois da v1 | Workspace invisível, com opção de ver e alterar | esconde o `.workspace/` do dia a dia sem tirar o controle ([[Workspace no app]]) | ⏳ | parte da #42 | M |
+| 12 | Depois da v1 | Organizador de workspaces de IA | a base existe (criar `.workspace/`); falta gerenciar vários | ⏳ parcial | #42 | G |
+| 13 | Depois da v1 | Agrupar abas, inclusive por workspace | a base de abas (nota e chat) já existe | ⏳ parcial | — | M |
+| 14 | Depois da v1 | IA lendo ao vivo a página em edição, para tirar dúvidas e completar | muda o uso diário; a parte de completar se apoia na [[Edição por âncora]] | ⏳ | ligada à #32 | M |
+| 15 | Depois da v1 | Aviso nas páginas com `[duvida]`, ou forma melhor de marcar | a marca só existe porque Claude Code e Obsidian são separados; com a IA no app, o desenho pode mudar ([[Marcar dúvida]]) | ⏳ | #45, #5 | M |
+| 16 | Depois da v1 | Slash commands para criar coisas | atalho barato no editor | ⏳ | #33 | M |
+| 17 | Depois da v1 | Base para várias notas (uma nota por exercício, já com enunciado e equações) | uso direto em disciplinas; a IA já cria notas pelo chat | ⏳ | — | M |
+| 18 | Depois da v1 | Links para um ponto específico da página | pré-requisito dos links dentro de imagens | ⏳ | — | M |
+| 19 | Depois da v1 | Imagens fora das páginas do vault | sem isso, desenho no app não tem onde morar | ⏳ | #44 | M |
+| 20 | Depois da v1 | Desenhos no app | sentido a fechar; a #37 cobre só Mermaid | ⏳ depende do 19 | #37 | G |
+| 21 | Depois da v1 | Links dentro de imagens e visão visual de páginas e conceitos | ajuda a navegar, mas exige os itens 18 a 20 | ⏳ | — | G |
+| 22 | Depois da v1 | Modo "explicar o que entendi", com esboços para a IA revisar | a parte de texto cabe numa skill do [[Workspace no app\|workspace]] agora; a de esboço depende do 20 | ⏳ | — | M |
+| 23 | Depois da v1 | Juntar informações de várias conversas sobre o mesmo assunto | as conversas já ficam no banco do `lonzo`; pede desenho de busca entre elas | ⏳ | — | G |
+| 24 | Depois da v1 | Versionamento de notas | adiado em 2026-11-05; pede decisão de modelo de dados. Até lá, `DELETE` e `edit_note` da IA não têm volta além do [[Backup\|backup]] | ⏳ | — | M |
+| 25 | Quando sobrar | Usar o app inteiro pelo teclado | conforto; cresce junto com cada tela nova | ⏳ | #43 | M |
+| 26 | Quando sobrar | Pastas de cores diferentes | pequeno e isolado | ⏳ | #39 | P |
+| 27 | Quando sobrar | Estilos diferentes de frontend | estético; melhor depois que as telas pararem de mudar | ⏳ | — | M |
+| 28 | Quando sobrar | Exemplos de como tudo foi usado no Obsidian | sentido a fechar: pode ser conteúdo de exemplo do app | ⏳ | — | P |
+| 29 | Quando sobrar | Senha em pastas | tem pouco efeito com uma pessoa só no app | ⏳ depende do 1 | #38 | M |
+| 30 | Quando sobrar | Falar com a IA por voz | caro e sem pedido real no uso atual | ⏳ | — | G |
+| 31 | Quando sobrar | Usar o `lonzo` fora do projeto para programar, pagando por token | projeto à parte, com a dúvida do [[MCP]] pela API em aberto | ⏳ | — | G |
+| 32 | Sem data | Editar notas pelo Neovim, falando com o [[O daemon notesd\|`notesd`]] | exige o app desktop | ⏳ fora do plano | — | G |
+| 33 | Sem data | Celular | milestone depois do desktop | ⏳ | Mobile app | G |
+
+## Já feito
+
+- ✅ Abas com nota e chat (`tabs.ts`); falta só o agrupamento, item 13.
+- ✅ Tabelas e títulos no CodeMirror: live preview da #117 (`decorations/preview.ts`).
+
+## O que faria mudar a ordem
+
+- Se a data da entrevista do Nubank estiver perto, a preparação (lista em [[Features]], fora desta fila por não ser feature) e o que aparece na demonstração passam na frente: itens 3, 5 e 10.
+- Se mais gente for usar o app logo depois da AWS, o item 8 vai para antes do 7.
