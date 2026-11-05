@@ -1,5 +1,6 @@
 # Imports
 from typing import Any
+from uuid import uuid4
 
 from fastapi.testclient import TestClient
 
@@ -338,6 +339,45 @@ def test_get_by_empty_path(client: TestClient) -> None:
     response = client.get("/notes/by-path", params={"path": "//"})
 
     assert response.status_code == 422
+
+
+# The path of a note goes from the root, through every folder above it
+def test_path_of_a_note(client: TestClient) -> None:
+
+    top = create(client=client, title="Work", is_folder=True)
+    plans = create(
+        client=client,
+        title="Plans",
+        parent_id=top["id"],
+        is_folder=True,
+    )
+    week = create(client=client, title="Week", parent_id=plans["id"])
+
+    response = client.get(f"/notes/{week['id']}/path")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": week["id"],
+        "path": "Work/Plans/Week",
+        "is_folder": False,
+    }
+
+
+# A note at the root is its own path
+def test_path_of_a_note_at_the_root(client: TestClient) -> None:
+
+    work = create(client=client, title="Work", is_folder=True)
+
+    response = client.get(f"/notes/{work['id']}/path")
+
+    assert response.json()["path"] == "Work"
+
+
+def test_path_of_a_missing_note(client: TestClient) -> None:
+
+    response = client.get(f"/notes/{uuid4()}/path")
+
+    assert response.status_code == 404
 
 
 # The tree of a folder: every level, with paths, in file tree order

@@ -16,6 +16,7 @@ from ichiro.services.notes import (
     create_note,
     find_by_path,
     find_note,
+    find_path,
     list_notes,
     list_tree,
     remove_note,
@@ -98,6 +99,16 @@ def get_note(note_id: UUID) -> Note:
     """
 
     return find_note(note_id=note_id)
+
+
+@router.get("/{note_id}/path")
+def get_path(note_id: UUID) -> NotePath:
+    """
+    A note with its path of titles from the root; 404 when it doesn't
+    exist
+    """
+
+    return find_path(note_id=note_id)
 
 
 @router.post("", status_code=201)

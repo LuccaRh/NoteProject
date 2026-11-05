@@ -21,6 +21,7 @@ from ichiro.repositories.notes import (
     select_is_inside,
     select_matches,
     select_note,
+    select_path,
     select_title_matches,
     select_tree,
     update_fields,
@@ -169,6 +170,19 @@ def find_note(note_id: UUID) -> Note:
 
     with transaction() as conn:
         return load_note(conn=conn, note_id=note_id)
+
+
+def find_path(note_id: UUID) -> NotePath:
+    """
+    A note with its path of titles from the root; NoteNotFound when it
+    doesn't exist
+    """
+
+    with transaction() as conn:
+        note = load_note(conn=conn, note_id=note_id)
+        path = select_path(conn=conn, note_id=note_id)
+
+    return NotePath(id=note.id, path=path, is_folder=note.is_folder)
 
 
 def create_note(note: NoteCreate) -> Note:
