@@ -2,6 +2,7 @@
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
+from uuid import UUID
 
 import pytest
 from alembic import command
@@ -16,6 +17,7 @@ from ichiro.services import health, notes
 
 # Global variables
 ALEMBIC_INI = Path(__file__).parent.parent / "alembic.ini"
+USER = UUID("00000000-0000-7000-8000-000000000001")
 
 
 # Code
@@ -27,11 +29,10 @@ def migrate() -> None:
     command.upgrade(Config(ALEMBIC_INI), "head")
 
 
-# Client whose requests share one connection, undone after the test
+# One connection per test, rolled back so the dev database keeps none
 @pytest.fixture
-def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
+def conn(monkeypatch: pytest.MonkeyPatch) -> Iterator[Connection]:
 
-    # One transaction per test, rolled back so the dev database keeps none
     with engine.connect() as conn:
         outer = conn.begin()
 
@@ -45,6 +46,14 @@ def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
         monkeypatch.setattr(health, "transaction", test_transaction)
         monkeypatch.setattr(notes, "transaction", test_transaction)
 
-        yield TestClient(app)
+        yield conn
 
         outer.rollback()
+
+
+# Client logged in as USER: the X-User-Id that Caddy would send
+@pytest.fixture
+def client(conn: Connection) -> TestClient:
+
+    return TestClient(app, headers={"X-User-Id": str(USER)})
+
