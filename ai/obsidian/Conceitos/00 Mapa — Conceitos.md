@@ -68,6 +68,7 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[TLS]] | conexão cifrada e servidor comprovado; HTTPS é HTTP por dentro dele |
 | [[Reverse proxy]] | uma porta na frente de todos os serviços |
 | [[CORS]] | o navegador só deixa a página ler respostas da mesma origem, salvo se o servidor liberar |
+| [[Cookie]] | texto que o servidor pede para o navegador guardar e devolver em todo pedido |
 | [[URL relativa]] | o código escreve só o caminho; o navegador completa com a origem da página |
 | [[Proxy de desenvolvimento]] | o servidor do front repassa `/api` à api, e tudo fica na mesma origem |
 | [[Servidor de desenvolvimento]] | quem responde `/` com o `index.html` e converte o `.ts` na hora; o `Content-Type` diz o que o navegador faz |
@@ -111,6 +112,8 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | Página | Ideia |
 |---|---|
 | [[Token por dispositivo]] | um [[Token por dispositivo\|token por dispositivo]], mandado em todo pedido |
+| [[Sessão de login]] | o servidor lembra do login numa tabela; o cliente guarda só um token |
+| [[Hash de senha]] | conta de mão única e lenta: guarda a senha sem poder lê-la |
 | [[OIDC]] | o GitHub entra na AWS sem chave guardada |
 
 ## AWS

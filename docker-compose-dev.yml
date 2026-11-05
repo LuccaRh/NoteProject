@@ -14,6 +14,7 @@ services:
             - chimchar
             - ichiro
             - lonzo
+            - nujabes
 
     chimchar:
         build:
@@ -49,6 +50,18 @@ services:
             - ICHIRO_URL=http://ichiro:8000
         depends_on:
             - ichiro
+            - postgres
+
+    nujabes:
+        build:
+            context: ./apps/nujabes
+            dockerfile: Dockerfile.dev
+        volumes:
+            - ./apps/nujabes:/app
+            - /app/.venv
+        environment:
+            - NUJABES_DATABASE_URL=${NUJABES_DATABASE_URL}
+        depends_on:
             - postgres
 
     postgres:

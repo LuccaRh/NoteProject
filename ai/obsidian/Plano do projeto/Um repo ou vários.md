@@ -39,7 +39,7 @@ infra/         compose, Caddyfile, Terraform: o papel do repo de entrega
 
 - A pasta `infra/` faz o papel do repo de entrega: o [[Docker Compose|compose]] de produção aponta para as imagens no [[CD|GHCR]] com tag.
 - Cada API tem a própria pasta, imagem e [[Container|container]]; nada de uma API geral para tudo. O [[Reverse proxy|Caddy]] manda cada caminho (`/api/notes`, `/api/auth`) para a API dela; o caminho nomeia o recurso, não o serviço, e o front não muda quando uma rota troca de serviço ([[Reverse proxy#Prefixo nomeia o recurso|prefixo por recurso]]).
-- Cada serviço Python (`ichiro`, `auth`, `worker`, `sync`) é um projeto uv próprio com a mesma forma: `pyproject.toml`, `src/<serviço>/` e `tests/`, criado com `uv init --python 3.14` na pasta do serviço; o porquê da estrutura `src/` está em [[API de notas]].
+- Cada serviço Python (`ichiro`, `auth`, `worker`, `sync`) é um [[Criar um serviço Python|projeto uv]] próprio com a mesma forma: `pyproject.toml`, `src/<serviço>/` e `tests/`, criado com `uv init --python 3.14` na pasta do serviço; o porquê da estrutura `src/` está em [[API de notas]].
 - Em aberto: como `ichiro` confere o login feito em `auth` (tabela de sessões no mesmo [[Postgres]], pedido ao `auth` ou token assinado) e onde fica o código Python que as APIs compartilham.
 
 ## Revisar se...

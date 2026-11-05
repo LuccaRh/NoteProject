@@ -29,6 +29,7 @@ O app em três partes (front, back, infra), marcando o que já existe no código
 |---|---|
 | [[Como ler o front]] | a ordem para ler `apps/chimchar/`, do formato da nota até a tela |
 | [[API de notas]] | o serviço `ichiro` em [[FastAPI]]: rotas, etapas e o esqueleto da #10 |
+| [[Criar um serviço Python]] | o roteiro de um serviço novo em `apps/`: uv, ruff e mypy, health, container, Caddy, banco e Alembic |
 | [[O daemon notesd]] | desenho do [[Daemon\|daemon]] do app desktop: camadas, rotas, busca |
 | [[Pastas, campos e views]] | organizar = escolher onde criar a nota |
 | [[Comandos do Docker no dev]] | o alias `dc` e os comandos de subir, apagar, psql e migrations |
