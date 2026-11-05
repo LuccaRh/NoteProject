@@ -1,6 +1,6 @@
 // Imports
 import './style.css'
-import { isLoggedIn } from './auth/api.ts'
+import { isLoggedIn, logOut } from './auth/api.ts'
 import { LoginDialog } from './auth/login-dialog.ts'
 import { Chat } from './chat/chat.ts'
 import { WorkspaceDialog } from './chat/workspace-dialog.ts'
@@ -184,6 +184,14 @@ async function remove(note: Note): Promise<void> {
     tree.delete(note)
 }
 
+/** Send pending edits, end the session and start again at the login. */
+async function leave(): Promise<void> {
+
+    await page.flush()
+    await logOut()
+    location.reload()
+}
+
 /** Ask for the login when there is no session, then load the tree. */
 async function start(): Promise<void> {
 
@@ -241,5 +249,7 @@ byId('new-chat').addEventListener('click', () => openChat(tree.target()))
 byId('new-workspace').addEventListener('click', () => {
     workspaceDialog.open(tree.target())
 })
+
+byId('log-out').addEventListener('click', () => void leave())
 
 void start()
