@@ -69,6 +69,7 @@ jobs:
           --health-retries 15
     env:
       LONZO_DATABASE_URL: postgresql+psycopg://lonzo@localhost:5432/lonzo
+      LONZO_MIGRATION_URL: postgresql+psycopg://lonzo@localhost:5432/lonzo
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v10.3.0
