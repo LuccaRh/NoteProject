@@ -3,7 +3,7 @@ import asyncio
 import json
 from collections.abc import AsyncIterator, Mapping
 from types import SimpleNamespace
-from typing import ClassVar
+from typing import Any, ClassVar
 from unittest.mock import patch
 from uuid import UUID, uuid4
 
@@ -27,6 +27,9 @@ client = TestClient(app, headers={"X-User-Id": str(USER)})
 # Stands in for the stream of the anthropic client: before, then two chunks
 class FakeStream:
     before: ClassVar[list[SimpleNamespace]] = []
+    content: ClassVar[list[SimpleNamespace]] = [
+        SimpleNamespace(type="text", text="Hello there"),
+    ]
 
     async def __aiter__(self) -> AsyncIterator[SimpleNamespace]:
 
@@ -48,17 +51,23 @@ class FakeStream:
             model="claude-haiku-5-5",
             stop_reason="end_turn",
             usage=usage,
+            content=FakeStream.content,
         )
 
 
 # Stands in for the tool runner: one stream per turn of the model
 class FakeRunner:
     turns: ClassVar[int] = 1
+    results: ClassVar[dict[str, Any] | None] = None
 
     async def __aiter__(self) -> AsyncIterator[FakeStream]:
 
         for _ in range(FakeRunner.turns):
             yield FakeStream()
+
+    async def generate_tool_call_response(self) -> dict[str, Any] | None:
+
+        return FakeRunner.results
 
 
 # Keeps the parameters of the last call, to check the system prompt
