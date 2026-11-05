@@ -247,6 +247,10 @@ ai/                todo o resto do workspace de IA:
 - Chat (2026-11-05): branch `chimchar/render-the-chat-answers` (#128), em cima da
   `chimchar/cancel-a-chat-answer` (#127, sem Esc; só o botão cancela): resposta em Markdown e
   LaTeX (`chat/markdown.ts`: marked, DOMPurify, KaTeX) e rolagem ao mandar. chimchar 0.14.0.
+- Status da IA (2026-11-05, #129): branches `lonzo/show-what-the-ai-is-doing-while-it-answers`
+  (evento SSE `tool_use` com `name` e `target`, títulos num dicionário do `NoteTools`; lonzo
+  0.10.0) e `chimchar/show-what-the-ai-is-doing-while-it-answers` (linha `.chat-status`;
+  chimchar 0.15.0), em cima da `chimchar/render-the-chat-answers`.
 - #117 (milestone Editor) no PR da branch `chimchar/render-markdown-in-the-editor`: live
   preview no editor (`decorations/preview.ts`: títulos, tabela GFM, bloco de código com cor,
   marcas escondidas fora do cursor); chimchar 0.10.0. Callout `[!tipo]` fica para a #5.
