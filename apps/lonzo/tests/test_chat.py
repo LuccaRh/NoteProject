@@ -38,7 +38,11 @@ class FakeStream:
 
     async def get_final_message(self) -> SimpleNamespace:
 
-        usage = SimpleNamespace(input_tokens=10, output_tokens=2)
+        usage = SimpleNamespace(
+            input_tokens=10,
+            output_tokens=2,
+            cache_read_input_tokens=7,
+        )
 
         return SimpleNamespace(
             model="claude-haiku-5-5",
@@ -218,7 +222,11 @@ def test_chat_streams_the_text_of_every_turn() -> None:
     text = "".join(str(data["text"]) for name, data in events
                    if name == "text_delta")
     assert text == "Hello there\n\nHello there"
-    assert events[-1][1]["usage"] == {"input_tokens": 20, "output_tokens": 4}
+    assert events[-1][1]["usage"] == {
+        "input_tokens": 20,
+        "output_tokens": 4,
+        "cached_tokens": 14,
+    }
 
 
 def tool_event(kind: str, tool_input: dict[str, object]) -> SimpleNamespace:

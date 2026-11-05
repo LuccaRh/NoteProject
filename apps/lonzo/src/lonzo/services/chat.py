@@ -36,7 +36,7 @@ async def events(
 
     yield ("message_start", {"conversation_id": str(conversation.id)})
     chunks: list[str] = []
-    usage = {"input_tokens": 0, "output_tokens": 0}
+    usage = {"input_tokens": 0, "output_tokens": 0, "cached_tokens": 0}
     end: dict[str, object] = {"usage": usage}
     tools = NoteTools()
     runner = claude.stream_answer(
@@ -74,6 +74,7 @@ async def events(
             final = await stream.get_final_message()
             usage["input_tokens"] += final.usage.input_tokens
             usage["output_tokens"] += final.usage.output_tokens
+            usage["cached_tokens"] += final.usage.cache_read_input_tokens or 0
             end["model"] = final.model
             end["stop_reason"] = final.stop_reason
 
