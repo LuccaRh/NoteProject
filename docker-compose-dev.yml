@@ -47,6 +47,7 @@ services:
         environment:
             - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
             - LONZO_DATABASE_URL=${LONZO_DATABASE_URL}
+            - LONZO_MIGRATION_URL=${LONZO_MIGRATION_URL}
             - ICHIRO_URL=http://ichiro:8000
         depends_on:
             - ichiro

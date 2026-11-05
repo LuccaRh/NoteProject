@@ -22,6 +22,8 @@ TEST_ICHIRO_DATABASE_URL = \
 	$(subst @postgres:,@localhost:,$(ICHIRO_DATABASE_URL))
 TEST_LONZO_DATABASE_URL = \
 	$(subst @postgres:,@localhost:,$(LONZO_DATABASE_URL))
+TEST_LONZO_MIGRATION_URL = \
+	$(subst @postgres:,@localhost:,$(LONZO_MIGRATION_URL))
 TEST_NUJABES_DATABASE_URL = \
 	$(subst @postgres:,@localhost:,$(NUJABES_DATABASE_URL))
 
@@ -32,7 +34,8 @@ check-ichiro:
 
 check-lonzo:
 	cd apps/lonzo && uv run ruff check && uv run mypy src tests \
-		&& LONZO_DATABASE_URL='$(TEST_LONZO_DATABASE_URL)' uv run pytest
+		&& LONZO_MIGRATION_URL='$(TEST_LONZO_MIGRATION_URL)' \
+		LONZO_DATABASE_URL='$(TEST_LONZO_DATABASE_URL)' uv run pytest
 
 check-nujabes:
 	cd apps/nujabes && uv run ruff check && uv run mypy src tests \
