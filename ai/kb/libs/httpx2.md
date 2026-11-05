@@ -14,6 +14,8 @@ API; é a que a `anthropic` 2.3.0 (`anthropic/_base_client.py:40`) e o `TestClie
 ## Cliente (`_client.py`)
 - `httpx2.AsyncClient(base_url=, transport=)` (1401): `async with` fecha as conexões no fim.
 - `await client.get(url, params=)`, `await client.post(url, json=)` devolvem `Response`.
+- `AsyncClient(event_hooks={"request": [hook]})` (190): `await hook(request)` antes de cada
+  envio (1877); no async o hook tem de ser `async`. O lonzo põe o `X-User-Id` assim.
 - `response.raise_for_status()` (`_models.py:794`): 4xx/5xx viram `HTTPStatusError`.
 
 ## Erros (`_exceptions.py`)
