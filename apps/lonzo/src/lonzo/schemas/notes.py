@@ -19,11 +19,12 @@ class Note(BaseModel):
 
 class NoteMatch(BaseModel):
     """
-    A note found by the words in its title or body
+    A note found by the words in its title or body, never a folder
     """
 
     id: UUID
     title: str
+    is_folder: bool = False
 
 
 class TitleMatch(BaseModel):

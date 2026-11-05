@@ -193,3 +193,55 @@ def test_delete_a_missing_note(ichiro: FakeIchiro) -> None:
 
     with pytest.raises(ValueError, match="there is no note"):
         call(name="delete_note", note_id=uuid4())
+
+
+def test_target_is_the_search_or_the_last_name_of_the_path() -> None:
+
+    tools = NoteTools()
+
+    assert tools.target(tool_input={"query": "bats"}) == "bats"
+    assert tools.target(tool_input={"text": "bat"}) == "bat"
+    assert tools.target(tool_input={"path": "Games/Chess/"}) == "Chess"
+
+
+def test_target_is_none_before_the_input_comes() -> None:
+
+    assert NoteTools().target(tool_input={}) is None
+
+
+def test_target_is_the_title_of_a_note_seen_by_a_search(
+    ichiro: FakeIchiro,
+) -> None:
+
+    tools = NoteTools()
+    by_name = {tool.name: tool for tool in tools.tools()}
+    asyncio.run(by_name["search_notes"].call({"query": "left"}))
+    note_id = str(id_of(fake=ichiro, title="Batting"))
+
+    assert tools.target(tool_input={"note_id": note_id}) == "Batting"
+    assert tools.target(tool_input={"note_id": str(uuid4())}) is None
+
+
+def test_target_is_the_title_of_a_folder_seen_in_a_listing(
+    ichiro: FakeIchiro,
+) -> None:
+
+    tools = NoteTools()
+    by_name = {tool.name: tool for tool in tools.tools()}
+    asyncio.run(by_name["list_folder"].call({}))
+    folder_id = str(id_of(fake=ichiro, title="Baseball"))
+
+    assert tools.target(tool_input={"folder_id": folder_id}) == "Baseball"
+
+
+def test_target_is_the_title_of_a_note_just_created(
+    ichiro: FakeIchiro,
+) -> None:
+
+    tools = NoteTools()
+    by_name = {tool.name: tool for tool in tools.tools()}
+    body = {"path": "Games/Chess", "body": "Openings"}
+    asyncio.run(by_name["create_note"].call(body))
+    note_id = str(id_of(fake=ichiro, title="Chess"))
+
+    assert tools.target(tool_input={"note_id": note_id}) == "Chess"

@@ -28,20 +28,22 @@ async def events(
 ) -> AsyncIterator[Event]:
     """
     The events of one answer, as (name, data), while the model writes; the
-    text of every turn goes out, between the reads of notes by the tools.
-    The question and the whole answer are kept at the end, and an error of
-    the API mid-answer becomes an error event, with nothing kept
+    text of every turn goes out, between the calls to the tools, each sent
+    when it starts and again with its whole input. The question and the
+    whole answer are kept at the end, and an error of the API mid-answer
+    becomes an error event, with nothing kept
     """
 
     yield ("message_start", {"conversation_id": str(conversation.id)})
     chunks: list[str] = []
     usage = {"input_tokens": 0, "output_tokens": 0}
     end: dict[str, object] = {"usage": usage}
+    tools = NoteTools()
     runner = claude.stream_answer(
         system=system,
         history=history,
         question=question,
-        tools=NoteTools().tools(),
+        tools=tools.tools(),
     )
 
     try:
@@ -49,10 +51,25 @@ async def events(
             # The text of a new turn starts a paragraph of its own
             gap = "\n\n" if chunks else ""
 
-            async for text in stream.text_stream:
-                chunks.append(gap + text)
-                yield ("text_delta", {"text": gap + text})
-                gap = ""
+            async for event in stream:
+
+                if event.type == "text":
+                    chunks.append(gap + event.text)
+                    yield ("text_delta", {"text": gap + event.text})
+                    gap = ""
+
+                if (
+                    event.type == "content_block_start"
+                    or event.type == "content_block_stop"
+                ):
+                    block = event.content_block
+
+                    if block.type == "tool_use":
+                        target = tools.target(tool_input=block.input)
+                        yield (
+                            "tool_use",
+                            {"name": block.name, "target": target},
+                        )
 
             final = await stream.get_final_message()
             usage["input_tokens"] += final.usage.input_tokens
