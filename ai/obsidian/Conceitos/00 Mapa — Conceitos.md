@@ -114,6 +114,7 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[Token por dispositivo]] | um [[Token por dispositivo\|token por dispositivo]], mandado em todo pedido |
 | [[Sessão de login]] | o servidor lembra do login numa tabela; o cliente guarda só um token |
 | [[Hash de senha]] | conta de mão única e lenta: guarda a senha sem poder lê-la |
+| [[Forward auth]] | o proxy pergunta a um serviço se o pedido pode passar |
 | [[OIDC]] | o GitHub entra na AWS sem chave guardada |
 
 ## AWS
