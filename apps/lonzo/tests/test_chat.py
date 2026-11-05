@@ -27,11 +27,10 @@ client = TestClient(app, headers={"X-User-Id": str(USER)})
 # Stands in for the stream of the anthropic client: two chunks of text
 class FakeStream:
 
-    @property
-    async def text_stream(self) -> AsyncIterator[str]:
+    async def __aiter__(self) -> AsyncIterator[SimpleNamespace]:
 
         for text in ("Hello", " there"):
-            yield text
+            yield SimpleNamespace(type="text", text=text)
 
     async def get_final_message(self) -> SimpleNamespace:
 
