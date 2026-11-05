@@ -1,6 +1,7 @@
 # Imports
 from uuid import uuid4
 
+from fakes import USER
 from fastapi.testclient import TestClient
 from test_chat import conversation_of, post
 
@@ -8,7 +9,7 @@ from lonzo.main import app
 
 
 # Global variables
-client = TestClient(app)
+client = TestClient(app, headers={"X-User-Id": str(USER)})
 
 
 # Code

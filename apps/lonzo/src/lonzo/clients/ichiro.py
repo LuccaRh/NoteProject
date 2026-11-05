@@ -7,6 +7,7 @@ from pydantic import TypeAdapter
 
 from lonzo.errors import TitleTaken
 from lonzo.schemas.notes import Note, NoteMatch, TitleMatch
+from lonzo.user import current_user
 
 
 # Global variables
@@ -14,6 +15,18 @@ ICHIRO_URL = os.environ.get("ICHIRO_URL", "http://ichiro:8000")
 
 
 # Code
+async def add_user(request: httpx2.Request) -> None:
+    """
+    Sends ichiro the user of the chat request in X-User-Id, so its
+    row-level security keeps the chat inside the notes of that user
+    """
+
+    user_id = current_user.get()
+
+    if user_id is not None:
+        request.headers["X-User-Id"] = str(user_id)
+
+
 class IchiroClient:
     """
     The notes service, straight through the compose network: one method
@@ -24,10 +37,14 @@ class IchiroClient:
 
     def __init__(self) -> None:
         """
-        One pool of connections to ichiro, at ICHIRO_URL
+        One pool of connections to ichiro, at ICHIRO_URL, each request
+        with the user of the chat request
         """
 
-        self.http = httpx2.AsyncClient(base_url=ICHIRO_URL)
+        self.http = httpx2.AsyncClient(
+            base_url=ICHIRO_URL,
+            event_hooks={"request": [add_user]},
+        )
 
     async def close(self) -> None:
         """
