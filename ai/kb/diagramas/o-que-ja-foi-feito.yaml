@@ -1,25 +1,27 @@
-titulo: "NoteProject em 2026-11-03 por rede (dev): feito (✅) e em andamento (⏳)"
+titulo: "NoteProject em 2026-11-04 por rede (dev): feito (✅) e em andamento (⏳)"
 tipo: blocos
 grade: [370, 170]
 destino: Plano do projeto/Issues feitas/Figuras
 nos:
   nav:   {tipo: bloco, pos: [0, 0], texto: "navegador<br>https://notes.localhost<br>(*.localhost = loopback)", cor: azul}
-  fr:    {tipo: nota, pos: [0, 1], texto: "o código do chimchar roda aqui:<br>notes/api.ts → fetch /api/notes/*<br>chat/api.ts → fetch /api/chat/* (SSE)"}
+  fr:    {tipo: nota, pos: [0, 1], texto: "o código do chimchar roda aqui:<br>notes/api.ts → fetch /api/notes/*<br>chat/api.ts → fetch /api/chat/* (SSE)<br>auth/api.ts → fetch /api/auth/* ⏳ #48"}
   term:  {tipo: bloco, pos: [0, 2], texto: "terminal<br>pytest, curl -N<br>psql :5432 → gateway → postgres", cor: cinza}
   proxy: {tipo: bloco, pos: [1, 1], texto: "docker-proxy (processo do PC)<br>escuta 127.0.0.1:80 · 443 · 5432<br>(ports: no compose)", cor: roxo}
   gw:    {tipo: bloco, pos: [2, 1], texto: "PC na rede Docker<br>br-9964… 172.18.0.1<br>(gateway)", cor: roxo}
-  cad:   {tipo: bloco, pos: [3, 1], texto: "<font style='font-size:15px'><b>caddy</b></font><br>172.18.0.6:443<br>tls internal (CA local) ✅ #16<br>um prefixo por serviço ✅ #74", cor: vermelho}
-  web:   {tipo: bloco, pos: [4.25, 0], texto: "<font style='font-size:15px'><b>chimchar</b></font> · 172.18.0.3:5173<br>Vite + CodeMirror 6, sem porta no PC<br>abas nota | chat, pop-up workspace ✅ #76<br>busca (Ctrl+O) ✅ #109", cor: azul}
-  api:   {tipo: bloco, pos: [4.25, 1], texto: "<font style='font-size:15px'><b>ichiro</b></font> · 172.18.0.4:8000<br>routers → services → repositories ✅ #98 #108<br>/notes CRUD, /tree, /by-path ✅ #46<br>/search (FTS) ✅ #56 · /search-titles ✅ #107", cor: verde}
-  lonzo: {tipo: bloco, pos: [4.25, 2.4], texto: "<font style='font-size:15px'><b>lonzo</b></font> · 172.18.0.5:8000<br>POST /chat em SSE ✅ #74 · /conversations ✅ #75<br>POST /workspaces ✅ #73<br>ferramentas: ler/buscar ⏳ #77<br>criar/editar/apagar ⏳ #78", cor: verde}
-  dbn:   {tipo: banco, pos: [5.25, 1], texto: "<b>banco notes</b> (do ichiro)<br>notes: id · parent_id → notes.id<br>is_folder · title · body · datas<br>índice GIN full-text ✅ #56", cor: amarelo}
-  dbl:   {tipo: banco, pos: [5.25, 2.4], texto: "<b>banco lonzo</b> ✅ #75<br>conversations: id · folder_id · title<br>messages: id · conversation_id →<br>conversations.id · role · content jsonb", cor: amarelo}
-  pg:    {tipo: grupo, contem: [dbn, dbl], texto: "postgres · 172.18.0.2:5432 · Alembic por serviço · volume db", cor: amarelo}
-  ant:   {tipo: bloco, pos: [4.25, 3.5], texto: "API da Anthropic (internet)<br>Haiku 5.5, sem thinking<br>tool_runner com as ferramentas", cor: cinza}
+  cad:   {tipo: bloco, pos: [3, 1], texto: "<font style='font-size:15px'><b>caddy</b></font><br>172.18.0.6:443<br>tls internal (CA local) ✅ #16<br>um prefixo por serviço ✅ #74<br>forward_auth ⏳ #48", cor: vermelho}
+  web:   {tipo: bloco, pos: [4.25, 0], texto: "<font style='font-size:15px'><b>chimchar</b></font> · 172.18.0.3:5173<br>Vite + CodeMirror 6, sem porta no PC<br>abas nota | chat, pop-up workspace ✅ #76<br>busca (Ctrl+O) ✅ #109<br>pop-up de login, log out ⏳ #48", cor: azul}
+  api:   {tipo: bloco, pos: [4.25, 2], texto: "<font style='font-size:15px'><b>ichiro</b></font> · 172.18.0.4:8000<br>routers → services → repositories ✅ #98 #108<br>/notes CRUD, /tree, /by-path ✅ #46<br>/search (FTS) ✅ #56 · /search-titles ✅ #107<br>X-User-Id + RLS ⏳ #48", cor: verde}
+  lonzo: {tipo: bloco, pos: [4.25, 3.4], texto: "<font style='font-size:15px'><b>lonzo</b></font> · 172.18.0.5:8000<br>POST /chat em SSE ✅ #74 · /conversations ✅ #75<br>POST /workspaces ✅ #73<br>ferramentas: ler/buscar ✅ #77<br>criar/editar/apagar ✅ #78<br>X-User-Id + RLS ⏳ #48", cor: verde}
+  dbn:   {tipo: banco, pos: [5.25, 2], texto: "<b>banco notes</b> (do ichiro)<br>notes: id · parent_id → notes.id<br>is_folder · title · body · datas<br>índice GIN full-text ✅ #56<br>owner_id + policy ⏳ #48", cor: amarelo}
+  dbl:   {tipo: banco, pos: [5.25, 3.4], texto: "<b>banco lonzo</b> ✅ #75<br>conversations: id · folder_id · title<br>messages: id · conversation_id →<br>conversations.id · role · content jsonb<br>owner_id + policy ⏳ #48", cor: amarelo}
+  nuj:   {tipo: bloco, pos: [4.25, 1], texto: "<font style='font-size:15px'><b>nujabes</b></font> · :8000 ⏳ #48<br>POST /auth/login · /auth/logout<br>GET /auth/session (cookie → X-User-Id)", cor: verde}
+  dbj:   {tipo: banco, pos: [5.25, 1], texto: "<b>banco nujabes</b> ⏳ #48<br>users: email · password_hash<br>sessions: token_hash · user_id ·<br>expires_at", cor: amarelo}
+  pg:    {tipo: grupo, contem: [dbj, dbn, dbl], texto: "postgres · 172.18.0.2:5432 · Alembic por serviço · volume db", cor: amarelo}
+  ant:   {tipo: bloco, pos: [4.25, 4.6], texto: "API da Anthropic (internet)<br>Haiku 5.5, sem thinking<br>tool_runner com as ferramentas", cor: cinza}
   lo:    {tipo: grupo, contem: [nav, fr, term, proxy], texto: "rede loopback lo · 127.0.0.0/8 · só dentro do PC", cor: azul}
-  rede:  {tipo: grupo, contem: [gw, cad, web, api, lonzo, pg], texto: "rede bridge noteproject_default · 172.18.0.0/16 · DNS pelo nome do serviço", cor: laranja}
-  env:   {tipo: nota, pos: [2.6, 3.5], texto: ".env fora do git ✅ #13: senhas, DATABASE_URL,<br>LONZO_DATABASE_URL e ANTHROPIC_API_KEY"}
-  ci:    {tipo: bloco, pos: [0, 4.4], texto: "CI (GitHub Actions)<br>jobs chimchar · ichiro · lonzo · tools<br>Postgres próprio no job", cor: roxo}
+  rede:  {tipo: grupo, contem: [gw, cad, web, nuj, api, lonzo, pg], texto: "rede bridge noteproject_default · 172.18.0.0/16 · DNS pelo nome do serviço", cor: laranja}
+  env:   {tipo: nota, pos: [3, 5.3], texto: ".env fora do git ✅ #13: senhas, DATABASE_URL,<br>LONZO_DATABASE_URL, NUJABES_DATABASE_URL,<br>ICHIRO_DATABASE_URL e ANTHROPIC_API_KEY"}
+  ci:    {tipo: bloco, pos: [0, 4.4], texto: "CI (GitHub Actions)<br>jobs chimchar · ichiro · lonzo ·<br>nujabes (⏳ #48) · tools<br>Postgres próprio no job", cor: roxo}
   ws:    {tipo: bloco, pos: [1, 4.4], texto: "workspace de IA ✅ #4<br>ai/np, lint W01–W24,<br>hooks, skills", cor: roxo}
   vault: {tipo: bloco, pos: [2, 4.4], texto: "vault ai/obsidian/<br>notas e figuras", cor: roxo}
 arestas:
@@ -28,12 +30,14 @@ arestas:
   - [proxy, gw, {rotulo: "TCP novo,<br>origem .1"}]
   - [gw, cad, {rotulo: ":443"}]
   - [cad.c, web.e, {rotulo: "resto → chimchar:5173"}]
+  - [cad, nuj, {rotulo: "/api/auth/* e<br>forward_auth"}]
   - [cad, api, {rotulo: "/api/notes/*<br>→ ichiro"}]
   - [cad.b, lonzo.e, {rotulo: "/api/chat/*<br>→ lonzo:8000"}]
   - [lonzo.c, api.b, {rotulo: "HTTP ichiro:8000 (IchiroClient)<br>GET /notes, /{id}, /by-path,<br>/search, /search-titles<br>POST · PATCH · DELETE /notes"}]
+  - [nuj, dbj, {rotulo: "SQL"}]
   - [api, dbn, {rotulo: "SQL"}]
   - [lonzo, dbl, {rotulo: "SQL"}]
   - [dbl.c, dbn.b, {rotulo: "folder_id (lógico,<br>sem FK)", tracejada: true}]
   - [lonzo, ant, {rotulo: "HTTPS, resposta<br>aos pedaços"}]
   - [ws, vault, {rotulo: "sync"}]
-legenda: {"✅": "PR mergeado", "⏳": "PR aberto", "loopback": "outro aparelho na rede de casa não alcança", "Caddy": "lê o nome (SNI/Host) e escolhe o bloco notes.localhost; corta o /api antes de repassar; outro /api/* → 404", "IP": "o Docker sorteia a cada subida (aqui, 2026-11-03)"}
+legenda: {"✅": "PR mergeado", "⏳": "branch pronta ou PR aberto, sem merge", "loopback": "outro aparelho na rede de casa não alcança", "Caddy": "lê o nome (SNI/Host) e escolhe o bloco notes.localhost; corta o /api antes de repassar; outro /api/* → 404", "IP": "o Docker sorteia a cada subida (aqui, 2026-11-03; o do nujabes varia)"}

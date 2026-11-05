@@ -1,0 +1,30 @@
+titulo: "Login no navegador: entrar uma vez (em cima) e cada pedido depois (embaixo)"
+tipo: blocos
+grade: [440, 175]
+destino: Estrutura do projeto/Figuras
+nos:
+  a1: {tipo: bloco, pos: [0, 0], texto: "<b>navegador</b><br>pop-up de login<br>(chimchar)", cor: azul}
+  a2: {tipo: bloco, pos: [1, 0], texto: "<b>caddy</b><br>/api/auth vai direto,<br>sem checar sessão", cor: vermelho}
+  a3: {tipo: bloco, pos: [2, 0], texto: "<b>nujabes</b><br>sorteia o token<br>secrets.token_urlsafe(32)", cor: verde}
+  a4: {tipo: banco, pos: [3, 0], texto: "<b>banco nujabes</b><br>users: email · password_hash<br>sessions: token_hash ·<br>user_id · expires_at", cor: amarelo}
+  a5: {tipo: nota, pos: [1, 0.85], texto: "4. resposta 204, pelo caddy<br>Set-Cookie: session=token<br>HttpOnly · Secure · SameSite=Lax"}
+  log: {tipo: grupo, contem: [a1, a2, a3, a4, a5], texto: "Login: uma vez, a cada 30 dias", cor: cinza}
+  b1: {tipo: bloco, pos: [0, 2], texto: "<b>navegador</b><br>guardou session=token<br>manda sozinho", cor: azul}
+  b2: {tipo: bloco, pos: [1, 2], texto: "<b>caddy</b><br>forward_auth<br>apaga X-User-Id forjado", cor: vermelho}
+  b4: {tipo: bloco, pos: [2, 2], texto: "<b>ichiro</b> ou <b>lonzo</b><br>guarda o id do pedido<br>set_config('app.user_id', id)", cor: verde}
+  b5: {tipo: banco, pos: [3, 2], texto: "<b>banco notes</b> ou <b>lonzo</b><br>a policy junta<br>owner_id = app.user_id", cor: amarelo}
+  b3: {tipo: bloco, pos: [1, 3], texto: "<b>nujabes</b><br>GET /auth/session<br>de quem é esse token?", cor: verde}
+  b6: {tipo: banco, pos: [2, 3], texto: "<b>banco nujabes</b><br>sessions", cor: amarelo}
+  ped: {tipo: grupo, contem: [b1, b2, b3, b4, b5, b6], texto: "Cada pedido de notas ou de chat", cor: cinza}
+arestas:
+  - [a1, a2, {rotulo: "1. POST /api/auth/login<br>email + senha (HTTPS)"}]
+  - [a2, a3, {rotulo: "2. repassa"}]
+  - [a3, a4, {rotulo: "3. confere a senha com crypt()<br>grava o hash do token"}]
+  - [a3.b, a5.d, {tracejada: true}]
+  - [a5.e, a1.b, {tracejada: true}]
+  - [b1, b2, {rotulo: "1. GET /api/notes<br>Cookie: session=token"}]
+  - [b2.b, b3.c, {rotulo: "2. pergunta, com o cookie<br>3. volta 200 + X-User-Id,<br>ou 401 sem sessão"}]
+  - [b3, b6, {rotulo: "busca o<br>hash do token"}]
+  - [b2, b4, {rotulo: "4. pedido + X-User-Id<br>(com 401, para aqui)"}]
+  - [b4, b5, {rotulo: "5. SQL igual,<br>filtrado pela policy"}]
+legenda: {"token": "aleatório, sem id nem senha dentro; a tabela guarda só o hash", "X-User-Id": "só existe depois do Caddy; o navegador não consegue escolher o valor"}
