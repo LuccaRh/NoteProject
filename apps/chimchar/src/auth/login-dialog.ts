@@ -28,6 +28,7 @@ export class LoginDialog {
             event.preventDefault()
             void this.submit()
         })
+        els.form.addEventListener('input', () => this.updateSubmit())
         els.dialog.addEventListener('cancel', event => event.preventDefault())
     }
 
@@ -35,12 +36,19 @@ export class LoginDialog {
     open(): Promise<void> {
 
         this.els.status.textContent = ''
+        this.updateSubmit()
         this.els.dialog.showModal()
         this.els.email.focus()
 
         return new Promise(resolve => {
             this.done = resolve
         })
+    }
+
+    /** Let the button work only with a valid email and a password. */
+    updateSubmit(): void {
+
+        this.els.submit.disabled = !this.els.form.checkValidity()
     }
 
     /** Send email and password; close on success, say why if not. */
@@ -67,7 +75,7 @@ export class LoginDialog {
 
             return
         } finally {
-            this.els.submit.disabled = false
+            this.updateSubmit()
         }
 
         this.els.password.value = ''
