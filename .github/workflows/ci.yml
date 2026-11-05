@@ -37,7 +37,8 @@ jobs:
           --health-interval 2s
           --health-retries 15
     env:
-      DATABASE_URL: postgresql+psycopg://postgres@localhost:5432/postgres
+      ICHIRO_MIGRATION_URL: >-
+        postgresql+psycopg://postgres@localhost:5432/postgres
       ICHIRO_DATABASE_URL: postgresql+psycopg://ichiro@localhost:5432/postgres
     steps:
       - uses: actions/checkout@v4
