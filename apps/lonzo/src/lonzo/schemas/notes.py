@@ -17,6 +17,16 @@ class Note(BaseModel):
     body: str
 
 
+class NotePath(BaseModel):
+    """
+    A note or folder with its path of titles from the root
+    """
+
+    id: UUID
+    path: str
+    is_folder: bool
+
+
 class NoteMatch(BaseModel):
     """
     A note found by the words in its title or body, never a folder
