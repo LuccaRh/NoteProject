@@ -24,10 +24,14 @@ client = TestClient(app, headers={"X-User-Id": str(USER)})
 
 
 # Code
-# Stands in for the stream of the anthropic client: two chunks of text
+# Stands in for the stream of the anthropic client: before, then two chunks
 class FakeStream:
+    before: ClassVar[list[SimpleNamespace]] = []
 
     async def __aiter__(self) -> AsyncIterator[SimpleNamespace]:
+
+        for event in FakeStream.before:
+            yield event
 
         for text in ("Hello", " there"):
             yield SimpleNamespace(type="text", text=text)
@@ -189,6 +193,47 @@ def test_chat_streams_the_text_of_every_turn() -> None:
                    if name == "text_delta")
     assert text == "Hello there\n\nHello there"
     assert events[-1][1]["usage"] == {"input_tokens": 20, "output_tokens": 4}
+
+
+def tool_event(kind: str, tool_input: dict[str, object]) -> SimpleNamespace:
+
+    block = SimpleNamespace(
+        type="tool_use",
+        name="create_note",
+        input=tool_input,
+    )
+
+    return SimpleNamespace(type=kind, content_block=block)
+
+
+def test_chat_streams_the_tool_calls() -> None:
+
+    start = tool_event(kind="content_block_start", tool_input={})
+    stop = tool_event(
+        kind="content_block_stop",
+        tool_input={"path": "Games/Chess", "body": "Long body"},
+    )
+
+    with patch.object(FakeStream, "before", [start, stop]):
+        response = post(body={"question": "Hi"})
+
+    tools = [data for name, data in parse(body=response.text)
+             if name == "tool_use"]
+    assert tools == [
+        {"name": "create_note", "target": None},
+        {"name": "create_note", "target": "Chess"},
+    ]
+
+
+def test_chat_ignores_blocks_that_are_not_tools() -> None:
+
+    block = SimpleNamespace(type="text")
+    start = SimpleNamespace(type="content_block_start", content_block=block)
+
+    with patch.object(FakeStream, "before", [start]):
+        response = post(body={"question": "Hi"})
+
+    assert "tool_use" not in [name for name, _ in parse(body=response.text)]
 
 
 def conversation_of(response: Response) -> str:
