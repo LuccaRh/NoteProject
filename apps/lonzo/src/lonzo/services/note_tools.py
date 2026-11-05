@@ -1,5 +1,5 @@
 # Imports
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Any
 from uuid import UUID
 
@@ -280,3 +280,24 @@ class NoteTools:
             f"{note.id} {note.title}{'/' if note.is_folder else ''}"
             for note in notes
         )
+
+    def target(self, tool_input: Mapping[str, object]) -> str | None:
+        """
+        What a tool call acts on, for the status of the chat: the words
+        searched, the last name of the path or the title of the note;
+        None while the input is still coming, or for an id never seen
+        """
+
+        search = tool_input.get("query") or tool_input.get("text")
+
+        if search is not None:
+            return str(search)
+
+        path = tool_input.get("path")
+
+        if path is not None:
+            return str(path).rstrip("/").rsplit("/", 1)[-1]
+
+        note_id = tool_input.get("note_id") or tool_input.get("folder_id")
+
+        return self.titles.get(str(note_id))
