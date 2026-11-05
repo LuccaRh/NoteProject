@@ -175,13 +175,17 @@ async function remove(note: Note): Promise<void> {
     if (!confirm(`Delete ${what}? "${note.title}"`)) return
 
     // Close first, so pending edits never go to a deleted note
-    const inside = (id: string): boolean => tree.isInside(id, note.id)
-    tabs.closeWhere(tab => tab.kind === 'note' && inside(tab.id))
-
-    if (page.note && inside(page.note.id)) await page.close()
-
+    await closeNotes(id => tree.isInside(id, note.id))
     await deleteNote(note.id)
     tree.delete(note)
+}
+
+/** Close the tabs of some notes, and the page if it shows one of them. */
+async function closeNotes(test: (id: string) => boolean): Promise<void> {
+
+    tabs.closeWhere(tab => tab.kind === 'note' && test(tab.id))
+
+    if (page.note && test(page.note.id)) await page.close()
 }
 
 /** Send pending edits, end the session and start again at the login. */
