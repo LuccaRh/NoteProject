@@ -90,7 +90,9 @@ export class Chat {
         form.append(this.question, this.send)
         form.addEventListener('submit', event => {
             event.preventDefault()
-            void this.askQuestion()
+
+            if (this.busy) this.controller?.abort()
+            else void this.askQuestion()
         })
 
         // Enter sends, Shift+Enter breaks the line
@@ -101,7 +103,8 @@ export class Chat {
             if (event.isComposing) return
 
             event.preventDefault()
-            form.requestSubmit()
+
+            if (!this.busy) form.requestSubmit()
         })
 
         const main = element('div', 'chat-main')
@@ -200,7 +203,7 @@ export class Chat {
         if (!question || this.busy) return
 
         this.busy = true
-        this.send.disabled = true
+        this.send.textContent = 'Cancel'
         this.question.value = ''
         this.messages.querySelector('.chat-empty')?.remove()
         this.bubble('user').textContent = question
@@ -237,7 +240,7 @@ export class Chat {
             if (!answer.textContent) answer.remove()
 
             this.busy = false
-            this.send.disabled = false
+            this.send.textContent = 'Send'
         }
 
         if (isNew) this.options.onTitle(question)

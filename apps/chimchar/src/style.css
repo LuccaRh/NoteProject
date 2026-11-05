@@ -516,7 +516,7 @@ button {
 }
 
 .new-conversation:hover,
-.send:hover:enabled {
+.send:hover {
     background: var(--hover);
 }
 
@@ -644,11 +644,6 @@ button {
     background: var(--panel);
     flex: 1;
     resize: none;
-}
-
-.send:disabled {
-    opacity: 0.5;
-    cursor: default;
 }
 
 /* Create workspace dialog */
