@@ -29,6 +29,7 @@ O app em três partes (front, back, infra), marcando o que já existe no código
 |---|---|
 | [[Como ler o front]] | a ordem para ler `apps/chimchar/`, do formato da nota até a tela |
 | [[API de notas]] | o serviço `ichiro` em [[FastAPI]]: rotas, etapas e o esqueleto da #10 |
+| [[Bancos dos serviços]] | um banco e dois usuários por serviço: quem é dono, quem conecta e quais variáveis |
 | [[Login no navegador]] | o caminho do login e de cada pedido: cookie, `nujabes`, Caddy, `X-User-Id` e [[Row-Level Security\|RLS]] |
 | [[Criar um serviço Python]] | o roteiro de um serviço novo em `apps/`: uv, ruff e mypy, health, container, Caddy, banco e Alembic |
 | [[O daemon notesd]] | desenho do [[Daemon\|daemon]] do app desktop: camadas, rotas, busca |

@@ -23,8 +23,8 @@ O build do editor não passa pela api: o [[Reverse proxy|Caddy]] serve os [[Arqu
 
 | Peça | Onde | Etapa |
 |---|---|---|
-| `DATABASE_URL` no `.env`, com o host `postgres` (nome do serviço) | raiz, injetada pelo [[Docker Compose\|compose]] | ⏳ #12 |
-| [[Migration\|migrations]]: `alembic.ini`, `migrations/env.py` (lê a `DATABASE_URL`), `migrations/versions/` | `apps/ichiro` | ⏳ #12 |
+| `ICHIRO_DATABASE_URL` no `.env`, com o host `postgres` (nome do serviço) | raiz, injetada pelo [[Docker Compose\|compose]] | ⏳ #12 |
+| [[Migration\|migrations]]: `alembic.ini`, `migrations/env.py` (lê a `ICHIRO_MIGRATION_URL`), `migrations/versions/` | `apps/ichiro` | ⏳ #12 |
 | primeira migration: `users` e `notes` | `migrations/versions/` | ⏳ #12 |
 | [[SQLAlchemy\|engine]] criado com a mesma URL; `/health` faz um `SELECT 1` | `apps/ichiro/src/ichiro/` | ⏳ #12 |
 | conexão por pedido (`Depends`) e as consultas das rotas | `apps/ichiro/src/ichiro/` | ⏳ #46 |

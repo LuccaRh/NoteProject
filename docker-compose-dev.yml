@@ -62,6 +62,7 @@ services:
             - /app/.venv
         environment:
             - NUJABES_DATABASE_URL=${NUJABES_DATABASE_URL}
+            - NUJABES_MIGRATION_URL=${NUJABES_MIGRATION_URL}
         depends_on:
             - postgres
 

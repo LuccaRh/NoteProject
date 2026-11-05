@@ -35,6 +35,7 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[Busca full-text no Postgres]] | `to_tsvector` quebra o texto em palavras; o índice GIN sobre a expressão acha as linhas |
 | [[Postgres]] | banco que roda como serviço; muitos clientes escrevem ao mesmo tempo |
 | [[Migration]] | cada mudança do schema é um arquivo versionado: `upgrade` aplica, `downgrade` reverte |
+| [[Usuários do banco]] | admin, migrator e app: cada um com só o que precisa, e o dono da tabela é quem roda migration |
 | [[SQLAlchemy]] | a API guarda conexões abertas e empresta uma por pedido |
 | [[Transação]] | vários comandos num bloco de tudo ou nada: `COMMIT` ou `ROLLBACK` |
 | [[Row-Level Security]] | o Postgres junta uma *policy* a toda consulta e esconde as linhas de outro usuário |

@@ -64,6 +64,7 @@ value. Docker Compose loads `.env` into the `postgres` and `ichiro` containers (
 | `ICHIRO_DB_PASSWORD`, `ICHIRO_MIGRATOR_PASSWORD` | `postgres/init` | passwords of the `ichiro` and `ichiro_migrator` users |
 | `ICHIRO_DATABASE_URL` | notes API | `postgresql+psycopg://ichiro:<password>@postgres:5432/ichiro` |
 | `ICHIRO_MIGRATION_URL` | notes Alembic | the same database, as `ichiro_migrator`, which owns the tables |
+| `LONZO_*`, `NUJABES_*` | `lonzo`, `nujabes`, `postgres/init` | the same four variables for each service |
 | `ANTHROPIC_API_KEY` | chat service | one Anthropic API key for every chat, until there is a login |
 
 The host in these URLs is `postgres`, the service name in the compose file, which only

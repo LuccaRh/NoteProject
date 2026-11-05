@@ -18,7 +18,7 @@ O [[Postgres]] do `ichiro`: schema, conexões e a tabela de notas ([[Issues 12 e
 ## 3. Como o Alembic sabe em qual banco aplicar?
 
 > [!note]- Resposta
-> O `migrations/env.py` lê a `DATABASE_URL`, que vem do `.env` pelo `env_file` do compose. A API cria a engine com a mesma URL ([[API de notas]]).
+> O `migrations/env.py` lê a `ICHIRO_MIGRATION_URL`, que vem do `.env` pelo `env_file` do compose. A API cria a engine com a mesma URL ([[API de notas]]).
 
 ## 4. Para que serve o pool de conexões da engine do [[SQLAlchemy]]?
 

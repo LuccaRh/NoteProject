@@ -26,6 +26,8 @@ TEST_LONZO_MIGRATION_URL = \
 	$(subst @postgres:,@localhost:,$(LONZO_MIGRATION_URL))
 TEST_NUJABES_DATABASE_URL = \
 	$(subst @postgres:,@localhost:,$(NUJABES_DATABASE_URL))
+TEST_NUJABES_MIGRATION_URL = \
+	$(subst @postgres:,@localhost:,$(NUJABES_MIGRATION_URL))
 
 check-ichiro:
 	cd apps/ichiro && uv run ruff check && uv run mypy src tests \
@@ -39,7 +41,8 @@ check-lonzo:
 
 check-nujabes:
 	cd apps/nujabes && uv run ruff check && uv run mypy src tests \
-		&& NUJABES_DATABASE_URL='$(TEST_NUJABES_DATABASE_URL)' uv run pytest
+		&& NUJABES_MIGRATION_URL='$(TEST_NUJABES_MIGRATION_URL)' \
+		NUJABES_DATABASE_URL='$(TEST_NUJABES_DATABASE_URL)' uv run pytest
 
 # Development workspace tools (ai/tools, ai/kb): tests + lint.
 check-tools:

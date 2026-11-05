@@ -95,6 +95,7 @@ CMD ["uv", "run", "fastapi", "dev", "src/auth/main.py", \
             - /app/.venv
         environment:
             - AUTH_DATABASE_URL=${AUTH_DATABASE_URL}
+            - AUTH_MIGRATION_URL=${AUTH_MIGRATION_URL}
         depends_on:
             - postgres
 ```
@@ -117,16 +118,16 @@ Antes do `handle /api/*` que responde 404. O serviço vê `/auth/...`, sem o `/a
 
 ## 6. Banco próprio e Alembic
 
-Cada serviço tem o seu banco no mesmo [[Postgres]], com usuário próprio, e as suas [[Migration|migrations]].
+Cada serviço tem o seu banco no mesmo [[Postgres]], com dois [[Usuários do banco|usuários]], e as suas [[Migration|migrations]] ([[Bancos dos serviços]]).
 
 | Peça | Onde |
 |---|---|
-| usuário e banco | `postgres/init/create-auth-database.sh` (cópia do do `lonzo`): roda só na primeira subida, com o volume vazio; no volume do dev, roda-se o mesmo SQL à mão |
-| senha e URL | `.env` e `.env.example`: `AUTH_DB_PASSWORD` e `AUTH_DATABASE_URL` (`postgresql+psycopg://auth:...@postgres:5432/auth`) |
+| usuários e banco | `postgres/init/create-auth-database.sh` (cópia do do `lonzo`): roda só na primeira subida, com o volume vazio; no volume do dev, roda-se o mesmo SQL à mão |
+| senhas e URLs | `.env` e `.env.example`: `AUTH_DB_PASSWORD`, `AUTH_MIGRATOR_PASSWORD`, `AUTH_DATABASE_URL` (`postgresql+psycopg://auth:...@postgres:5432/auth`) e `AUTH_MIGRATION_URL` (`auth_migrator`) |
 | libs | `uv add alembic 'psycopg[binary]' 'sqlalchemy[asyncio]'` |
-| Alembic | `uv run alembic init migrations`; no `migrations/env.py`, `config.set_main_option("sqlalchemy.url", os.environ["AUTH_DATABASE_URL"])` |
+| Alembic | `uv run alembic init migrations`; no `migrations/env.py`, `config.set_main_option("sqlalchemy.url", os.environ["AUTH_MIGRATION_URL"])` |
 | conexão | `src/auth/db.py`: `engine` global e `transaction()` (`engine.begin()`) |
-| testes | o `check-auth` passa `AUTH_DATABASE_URL` com `localhost` no lugar de `postgres`, como o `check-lonzo` |
+| testes | o `check-auth` passa `AUTH_DATABASE_URL` e `AUTH_MIGRATION_URL` com `localhost` no lugar de `postgres`, como o `check-lonzo` |
 
 O banco e o script do Postgres vão numa branch `postgres/...`; o resto, na do serviço, um commit por linha da tabela.
 
