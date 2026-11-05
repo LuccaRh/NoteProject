@@ -40,6 +40,7 @@ export type Question = {
 export type AnswerHandlers = {
     start: (conversationId: string) => void
     text: (text: string) => void
+    tool: (name: string, target: string | null) => void
     error: (message: string) => void
 }
 
@@ -144,6 +145,8 @@ function dispatch(event: string, handlers: AnswerHandlers): void {
     if (name === 'message_start') handlers.start(payload.conversation_id)
 
     if (name === 'text_delta') handlers.text(payload.text)
+
+    if (name === 'tool_use') handlers.tool(payload.name, payload.target)
 
     if (name === 'error') handlers.error(payload.message)
 }

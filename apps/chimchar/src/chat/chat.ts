@@ -23,6 +23,18 @@ const NO_WORKSPACE = ''
 // How close to the bottom still counts as following the answer
 const FOLLOW_PX = 40
 
+// What each tool of the AI does, and what to call its target without a name
+const TOOL_STATUS: Record<string, [string, string]> = {
+    search_notes: ['Searching', 'the notes'],
+    search_titles: ['Searching', 'the titles'],
+    list_folder: ['Opening', 'a folder'],
+    read_note: ['Reading', 'a note'],
+    create_note: ['Creating', 'a note'],
+    create_folder: ['Creating', 'a folder'],
+    edit_note: ['Editing', 'a note'],
+    delete_note: ['Deleting', 'a note'],
+}
+
 
 // Code
 /** One chat tab: a workspace, its conversations and the open one. */
@@ -217,6 +229,8 @@ export class Chat {
         const answer = this.bubble('assistant')
         this.scrollToEnd()
         answer.classList.add('streaming')
+        const status = element('p', 'chat-status')
+        answer.after(status)
         let source = ''
         const isNew = this.conversationId === null
         const { signal } = this.controller = new AbortController()
@@ -233,10 +247,16 @@ export class Chat {
                         this.conversationId = id
                     },
                     text: piece => {
+                        status.textContent = ''
                         source += piece
                         this.frame ||= requestAnimationFrame(() => {
                             this.frame = 0
                             this.show(answer, source)
+                        })
+                    },
+                    tool: (name, target) => {
+                        this.follow(() => {
+                            status.textContent = toolStatus(name, target)
                         })
                     },
                     error: message => this.fail(answer, message),
@@ -252,6 +272,7 @@ export class Chat {
         } finally {
             cancelAnimationFrame(this.frame)
             this.frame = 0
+            status.remove()
             this.show(answer, source)
             answer.classList.remove('streaming')
 
@@ -269,9 +290,17 @@ export class Chat {
     /** Redraw the answer so far; keep following it at the bottom. */
     show(answer: HTMLElement, source: string): void {
 
+        this.follow(() => {
+            answer.innerHTML = renderMarkdown(source)
+        })
+    }
+
+    /** Change the page; stay at the bottom if it was following it. */
+    follow(change: () => void): void {
+
         const box = this.messages
         const gap = box.scrollHeight - box.scrollTop - box.clientHeight
-        answer.innerHTML = renderMarkdown(source)
+        change()
 
         if (gap < FOLLOW_PX) this.scrollToEnd()
     }
@@ -316,6 +345,14 @@ export class Chat {
             row.ariaCurrent = current ? 'true' : null
         })
     }
+}
+
+/** The status of a tool call, with the name of what it acts on if known. */
+function toolStatus(name: string, target: string | null): string {
+
+    const [verb, nameless] = TOOL_STATUS[name] ?? ['Using', 'a tool']
+
+    return `${verb} ${target ? `"${target}"` : nameless}`
 }
 
 /** Create an element of a tag with a class. */
