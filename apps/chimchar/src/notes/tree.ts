@@ -60,6 +60,10 @@ export class Tree {
 
         this.list = list
         this.handlers = handlers
+        this.list.addEventListener('click', event => {
+
+            if (event.target === this.list) this.unselect()
+        })
     }
 
     /** Fetch the children of a folder (null = root) and redraw. */
@@ -137,6 +141,13 @@ export class Tree {
         return this.selected.is_folder
             ? this.selected.id
             : this.selected.parent_id
+    }
+
+    /** Drop the selection, so new items go to the root. */
+    unselect(): void {
+
+        this.selected = null
+        this.render()
     }
 
     /** Put a new note in the tree, open its folder and select it. */
