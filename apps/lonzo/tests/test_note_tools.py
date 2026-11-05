@@ -143,6 +143,24 @@ def test_create_folder_at_the_root(ichiro: FakeIchiro) -> None:
     assert ichiro.rows[id_of(fake=ichiro, title="Physics")]["is_folder"]
 
 
+def test_create_note_refuses_a_path_from_nowhere(ichiro: FakeIchiro) -> None:
+
+    with pytest.raises(ValueError, match="must be a whole path"):
+        call(name="create_note", path="kb/Summary", body="Sums.")
+
+    assert "kb" not in {row["title"] for row in ichiro.rows.values()}
+
+
+def test_create_note_refuses_an_unknown_first_folder(
+    ichiro: FakeIchiro,
+) -> None:
+
+    with pytest.raises(ValueError, match="no folder /kb at the root"):
+        call(name="create_note", path="/kb/Summary", body="Sums.")
+
+    assert "kb" not in {row["title"] for row in ichiro.rows.values()}
+
+
 def test_edit_note_changes_only_the_piece(ichiro: FakeIchiro) -> None:
 
     batting = id_of(fake=ichiro, title="Batting")
