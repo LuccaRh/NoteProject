@@ -1,5 +1,6 @@
 // Imports
 import { ask, getConversation, listConversations } from './api.ts'
+import { renderMarkdown } from './markdown.ts'
 
 import type { Folder } from '../notes/tree.ts'
 import type { Block, Conversation } from './api.ts'
@@ -32,6 +33,8 @@ export class Chat {
     busy: boolean = false
     // Closes the request of the answer being written
     controller: AbortController | null = null
+    // Pieces that arrive before the next frame share one redraw
+    frame: number = 0
     options: Options
     panel: HTMLElement
     workspace: HTMLSelectElement
@@ -175,7 +178,11 @@ export class Chat {
         this.messages.replaceChildren()
 
         for (const message of conversation.messages) {
-            this.bubble(message.role).textContent = text(message.content)
+            const bubble = this.bubble(message.role)
+            const content = text(message.content)
+
+            if (message.role === 'user') bubble.textContent = content
+            else bubble.innerHTML = renderMarkdown(content)
         }
 
         this.scrollToEnd()
@@ -210,6 +217,7 @@ export class Chat {
         const answer = this.bubble('assistant')
         this.scrollToEnd()
         answer.classList.add('streaming')
+        let source = ''
         const isNew = this.conversationId === null
         const { signal } = this.controller = new AbortController()
 
@@ -224,7 +232,13 @@ export class Chat {
                     start: id => {
                         this.conversationId = id
                     },
-                    text: piece => this.append(answer, piece),
+                    text: piece => {
+                        source += piece
+                        this.frame ||= requestAnimationFrame(() => {
+                            this.frame = 0
+                            this.show(answer, source)
+                        })
+                    },
                     error: message => this.fail(answer, message),
                 },
                 signal,
@@ -236,6 +250,9 @@ export class Chat {
                 console.error(error)
             }
         } finally {
+            cancelAnimationFrame(this.frame)
+            this.frame = 0
+            this.show(answer, source)
             answer.classList.remove('streaming')
 
             if (!answer.textContent) answer.remove()
@@ -249,12 +266,12 @@ export class Chat {
         await this.loadConversations()
     }
 
-    /** Add a piece of the answer; keep following it at the bottom. */
-    append(answer: HTMLElement, piece: string): void {
+    /** Redraw the answer so far; keep following it at the bottom. */
+    show(answer: HTMLElement, source: string): void {
 
         const box = this.messages
         const gap = box.scrollHeight - box.scrollTop - box.clientHeight
-        answer.textContent += piece
+        answer.innerHTML = renderMarkdown(source)
 
         if (gap < FOLLOW_PX) this.scrollToEnd()
     }
