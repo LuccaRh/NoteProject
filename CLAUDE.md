@@ -251,7 +251,6 @@ ai/                todo o resto do workspace de IA:
   Workspace = pasta com `.workspace/`, vários por pessoa.
 - Para depois: #6 (mover notas entre pastas, 2026-11-03), #31 (Ctrl+D), #5 (chips;
   `decorations/replace.ts` fora do git).
-- Falta: confiar na CA local do Caddy no navegador (README).
 - Serviços (2026-11-01): `chimchar` (front), `ichiro` (notas), `lonzo` (IA). Tabela, rotas `/notes`
   e `notes.localhost` ficam (são o domínio, não o serviço).
 
