@@ -190,8 +190,12 @@ export class Chat {
         this.messages.replaceChildren()
 
         for (const message of conversation.messages) {
-            const bubble = this.bubble(message.role)
             const content = text(message.content)
+
+            // A turn of tool calls and their results has nothing to show
+            if (!content) continue
+
+            const bubble = this.bubble(message.role)
 
             if (message.role === 'user') bubble.textContent = content
             else bubble.innerHTML = renderMarkdown(content)
