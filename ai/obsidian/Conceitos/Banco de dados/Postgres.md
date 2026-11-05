@@ -27,6 +27,7 @@ A imagem oficial `postgres` traz um script de entrada (`docker-entrypoint.sh`) q
 | `POSTGRES_USER` | nome do superusuário, criado com um banco de mesmo nome | `postgres` |
 | `POSTGRES_DB` | nome do banco criado na primeira subida | o de `POSTGRES_USER` |
 
+- Os outros [[Usuários do banco|usuários]] e bancos saem de scripts em `/docker-entrypoint-initdb.d`, que rodam só nessa primeira subida.
 - As variáveis só valem com a pasta vazia: trocar a senha depois não muda o banco. Saída: `ALTER USER` no `psql`, ou apagar o volume e perder os dados.
 - Do 18 em diante, os dados ficam em `/var/lib/postgresql/18/docker` e o volume da imagem é `/var/lib/postgresql`; até o 17, `/var/lib/postgresql/data`. O volume montado no caminho antigo deixa os dados fora dele.
 

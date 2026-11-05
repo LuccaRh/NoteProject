@@ -55,7 +55,7 @@ Os padrões são da classe `QueuePool` (SQLAlchemy 2.1.6, `sqlalchemy/pool/impl.
 ## Quem usa o banco, e quando
 
 ```
-.env (DATABASE_URL)
+.env (ICHIRO_DATABASE_URL)
  ├─► Alembic ──(SQLAlchemy)──► cria/altera tabelas   [só quando o schema muda]
  └─► API ──────(SQLAlchemy)──► lê/escreve linhas     [a cada pedido]
 ```
@@ -64,6 +64,6 @@ Os padrões são da classe `QueuePool` (SQLAlchemy 2.1.6, `sqlalchemy/pool/impl.
 - Os dois usam o SQLAlchemy por baixo e a mesma URL do `.env`, cada um com o seu engine; um não usa a configuração do outro.
 
 > [!example] No NoteProject
-> A [[API de notas]] cria o engine com a `DATABASE_URL`, e cada função de serviço abre uma transação com uma conexão do pool; a rota não recebe conexão.
+> A [[API de notas]] cria o engine com a `ICHIRO_DATABASE_URL`, e cada função de serviço abre uma transação com uma conexão do pool; a rota não recebe conexão.
 
 Docs: [SQLAlchemy — engines e conexões](https://docs.sqlalchemy.org/en/20/core/connections.html), [pool](https://docs.sqlalchemy.org/en/20/core/pooling.html). Postgres: [max_connections](https://www.postgresql.org/docs/current/runtime-config-connection.html). PgBouncer: [pgbouncer.org](https://www.pgbouncer.org/).

@@ -37,7 +37,7 @@ O caminho de um pedido do navegador até o [[Postgres]], no compose de dev (#16)
 > [!note]- Resposta
 > O notebook não: a porta só existe no loopback do host. O pytest sim, por `localhost:5432` ([[Rede]], [[Issues 12 e 13 — Postgres com migrations e .env|#12]]).
 
-## 6. Dentro do container `ichiro`, a `DATABASE_URL` aponta para `localhost:5432`. O que acontece?
+## 6. Dentro do container `ichiro`, a `ICHIRO_DATABASE_URL` aponta para `localhost:5432`. O que acontece?
 
 > [!note]- Resposta
 > `Connection refused`: dentro do container, `localhost` é o próprio container. O host certo é `postgres`, o nome do serviço, que o DNS do Docker resolve ([[Rede de containers]]).
