@@ -709,6 +709,16 @@ button {
     color: var(--muted);
 }
 
+.chat-status {
+    margin: -6px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.chat-status:empty {
+    display: none;
+}
+
 .chat-error {
     margin: -6px 0 0;
     font-size: 13px;
