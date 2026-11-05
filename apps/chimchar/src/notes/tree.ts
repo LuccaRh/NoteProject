@@ -73,6 +73,22 @@ export class Tree {
         this.render()
     }
 
+    /** Fetch every folder already loaded again and redraw. */
+    async reload(): Promise<void> {
+
+        const ids = [...this.children.keys()]
+        const lists = await Promise.all(
+            ids.map(id => listNotes(id === ROOT ? null : id)),
+        )
+        ids.forEach((id, index) => this.children.set(id, lists[index]))
+
+        if (this.selected) {
+            this.selected = this.find(this.selected.id) ?? null
+        }
+
+        this.render()
+    }
+
     /** Look up a note among the folders already loaded. */
     find(id: string): Note | undefined {
 

@@ -4,7 +4,12 @@ import { isLoggedIn, logOut } from './auth/api.ts'
 import { LoginDialog } from './auth/login-dialog.ts'
 import { Chat } from './chat/chat.ts'
 import { WorkspaceDialog } from './chat/workspace-dialog.ts'
-import { createNote, deleteNote, updateNote } from './notes/api.ts'
+import {
+    createNote,
+    deleteNote,
+    listTree,
+    updateNote,
+} from './notes/api.ts'
 import { Page } from './notes/page.ts'
 import { Search } from './notes/search.ts'
 import { Tree } from './notes/tree.ts'
@@ -127,6 +132,7 @@ function openChat(folderId: string | null): void {
         folderId,
         folders: () => tree.folders(),
         onTitle: title => tabs.rename(id, title),
+        onNotesChanged: () => void notesChanged(),
     })
     void tabs.open({
         id,
@@ -175,13 +181,27 @@ async function remove(note: Note): Promise<void> {
     if (!confirm(`Delete ${what}? "${note.title}"`)) return
 
     // Close first, so pending edits never go to a deleted note
-    const inside = (id: string): boolean => tree.isInside(id, note.id)
-    tabs.closeWhere(tab => tab.kind === 'note' && inside(tab.id))
-
-    if (page.note && inside(page.note.id)) await page.close()
-
+    await closeNotes(id => tree.isInside(id, note.id))
     await deleteNote(note.id)
     tree.delete(note)
+}
+
+/** Close the tabs of some notes, and the page if it shows one of them. */
+async function closeNotes(test: (id: string) => boolean): Promise<void> {
+
+    tabs.closeWhere(tab => tab.kind === 'note' && test(tab.id))
+
+    if (page.note && test(page.note.id)) await page.close()
+}
+
+/** Show what the AI wrote: close what it deleted, fetch the rest again. */
+async function notesChanged(): Promise<void> {
+
+    const entries = await listTree()
+    const ids = new Set(entries.map(entry => entry.id))
+    await closeNotes(id => !ids.has(id))
+    await tree.reload()
+    await page.reload()
 }
 
 /** Send pending edits, end the session and start again at the login. */
