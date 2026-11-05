@@ -18,6 +18,7 @@ from ichiro.services import health, notes
 # Global variables
 ALEMBIC_INI = Path(__file__).parent.parent / "alembic.ini"
 USER = UUID("00000000-0000-7000-8000-000000000001")
+OTHER_USER = UUID("00000000-0000-7000-8000-000000000002")
 
 
 # Code
@@ -59,3 +60,9 @@ def client(conn: Connection) -> TestClient:
 
     return TestClient(app, headers={"X-User-Id": str(USER)})
 
+
+# Client logged in as another user, on the same test connection
+@pytest.fixture
+def other_client(conn: Connection) -> TestClient:
+
+    return TestClient(app, headers={"X-User-Id": str(OTHER_USER)})
