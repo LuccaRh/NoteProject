@@ -16,6 +16,7 @@ from httpx2 import Response
 from lonzo import connections
 from lonzo.main import app
 from lonzo.services.conversations import get_conversation
+from lonzo.user import current_user
 
 
 # Global variables
@@ -204,7 +205,11 @@ def test_chat_keeps_the_question_and_answer() -> None:
 
     response = post(body={"question": "Who bats left?"})
     conversation_id = conversation_of(response=response)
+
+    # Outside a request: the service reads as the user of the chat
+    token = current_user.set(USER)
     found = asyncio.run(get_conversation(conversation_id=UUID(conversation_id)))
+    current_user.reset(token)
 
     assert found.title == "Who bats left?"
     assert [(m.role, m.content) for m in found.messages] == [

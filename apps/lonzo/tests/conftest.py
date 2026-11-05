@@ -7,10 +7,12 @@ from pathlib import Path
 import pytest
 from alembic import command
 from alembic.config import Config
+from fakes import OTHER_USER, USER
 from sqlalchemy import NullPool, text
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from lonzo import db
+from lonzo.user import current_user
 
 
 # Global variables
@@ -27,13 +29,17 @@ async def database_now() -> datetime:
         return now
 
 
+# Each user sees only their own rows: delete as each test user
 async def delete_since(start: datetime) -> None:
 
-    async with db.transaction() as conn:
-        await conn.execute(
-            text("DELETE FROM conversations WHERE created_at >= :start"),
-            {"start": start},
-        )
+    for user_id in (USER, OTHER_USER):
+        current_user.set(user_id)
+
+        async with db.transaction() as conn:
+            await conn.execute(
+                text("DELETE FROM conversations WHERE created_at >= :start"),
+                {"start": start},
+            )
 
 
 # Runs the migrations once, before the first test (CI starts empty)
