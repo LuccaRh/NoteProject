@@ -6,7 +6,7 @@ from uuid import UUID
 from anthropic.lib.tools import BetaAsyncFunctionTool, beta_async_tool
 
 from lonzo.connections import ichiro
-from lonzo.schemas.notes import Note, TitleMatch
+from lonzo.schemas.notes import Note, NoteMatch, TitleMatch
 
 
 # Code
@@ -18,13 +18,15 @@ class NoteTools:
     """
 
     created: list[Note]
+    titles: dict[str, str]
 
     def __init__(self) -> None:
         """
-        Tools with no note created yet
+        Tools with no note created and no title seen yet
         """
 
         self.created = []
+        self.titles = {}
 
     def tools(self) -> list[BetaAsyncFunctionTool[Any]]:
         """
@@ -48,7 +50,7 @@ class NoteTools:
             if not notes:
                 return "no notes found"
 
-            return "\n".join(f"{note.id} {note.title}" for note in notes)
+            return self.lines(notes=notes)
 
         @beta_async_tool(strict=True)
         async def search_titles(
@@ -66,7 +68,7 @@ class NoteTools:
             if not notes:
                 return "no titles found"
 
-            return lines(notes=notes)
+            return self.lines(notes=notes)
 
         @beta_async_tool(strict=True)
         async def list_folder(folder_id: UUID | None = None) -> str:
@@ -80,7 +82,7 @@ class NoteTools:
             if not notes:
                 return "the folder is empty"
 
-            return lines(notes=notes)
+            return self.lines(notes=notes)
 
         @beta_async_tool(strict=True)
         async def read_note(note_id: UUID) -> str:
@@ -262,16 +264,19 @@ class NoteTools:
             is_folder=is_folder,
         )
         self.created.append(note)
+        self.titles[str(note.id)] = note.title
 
         return note
 
+    def lines(self, notes: Sequence[Note | NoteMatch | TitleMatch]) -> str:
+        """
+        One `id title` line per note, with a / after the folders; the
+        titles stay in titles, since the next tools only get the ids
+        """
 
-def lines(notes: Sequence[Note | TitleMatch]) -> str:
-    """
-    One `id title` line per note, with a / after the folders
-    """
+        self.titles.update({str(note.id): note.title for note in notes})
 
-    return "\n".join(
-        f"{note.id} {note.title}{'/' if note.is_folder else ''}"
-        for note in notes
-    )
+        return "\n".join(
+            f"{note.id} {note.title}{'/' if note.is_folder else ''}"
+            for note in notes
+        )
