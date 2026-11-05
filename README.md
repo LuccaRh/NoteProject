@@ -60,11 +60,13 @@ value. Docker Compose loads `.env` into the `postgres` and `ichiro` containers (
 
 | Variable | Read by | Meaning |
 |---|---|---|
-| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | `postgres` image | user, password and database created on the first start |
-| `DATABASE_URL` | notes API and Alembic | `postgresql+psycopg://<user>:<password>@postgres:5432/<db>`, with the three values above |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | `postgres` image | superuser, its password and the database it connects to |
+| `ICHIRO_DB_PASSWORD`, `ICHIRO_MIGRATOR_PASSWORD` | `postgres/init` | passwords of the `ichiro` and `ichiro_migrator` users |
+| `ICHIRO_DATABASE_URL` | notes API | `postgresql+psycopg://ichiro:<password>@postgres:5432/ichiro` |
+| `ICHIRO_MIGRATION_URL` | notes Alembic | the same database, as `ichiro_migrator`, which owns the tables |
 | `ANTHROPIC_API_KEY` | chat service | one Anthropic API key for every chat, until there is a login |
 
-The host in `DATABASE_URL` is `postgres`, the service name in the compose file, which only
+The host in these URLs is `postgres`, the service name in the compose file, which only
 resolves inside the containers. `make check` runs the tests on the host, so it swaps the host
 for `localhost`. The `postgres` image reads its three variables only when the `db` volume is
 empty; after changing them, recreate the volume with
