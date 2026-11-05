@@ -67,7 +67,32 @@ export class Page {
     async open(id: string, path: string[]): Promise<void> {
 
         await this.flush()
-        const note = await getNote(id)
+        this.show(await getNote(id), path)
+    }
+
+    /** Show the server's version of the open note, unless edits wait. */
+    async reload(): Promise<void> {
+
+        const saving = this.saving
+        await saving
+
+        if (!this.note) return
+
+        const note = await getNote(this.note.id)
+
+        // Typed, or changed note, while fetching: the page stays as it is
+        if (this.saving !== saving) return
+
+        if (Object.keys(this.dirty).length > 0) return
+
+        if (note.updated_at !== this.note.updated_at) {
+            this.show(note, this.path)
+        }
+    }
+
+    /** Put a note on the page. */
+    show(note: Note, path: string[]): void {
+
         this.note = note
         this.path = path
         this.dirty = {}
