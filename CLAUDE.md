@@ -223,7 +223,7 @@ ai/                todo o resto do workspace de IA:
 
 ## Estado (2026-11-05)
 
-- Mergeados até o PR #116: M0, #46, #62, #64, #65, #69, #16, #80, #82, #74, #73, #98, #100,
+- Mergeados até o PR #137 (2026-11-05); lista antiga até o PR #116: M0, #46, #62, #64, #65, #69, #16, #80, #82, #74, #73, #98, #100,
   #75 (PRs #103, #104), #76 (#105, #106), #56 (#110), #107 (#111), #108 (#112), #109 (#113),
   #77 (#114), #78 (#115), #51 (#116). `master` local = remoto. Com PR mergeado e ainda
   abertas, o Lucca fecha: #51, #56, #75–#78, #107–#109. #79 (importar o vault) fechada como
@@ -251,6 +251,10 @@ ai/                todo o resto do workspace de IA:
   (evento SSE `tool_use` com `name` e `target`, títulos num dicionário do `NoteTools`; lonzo
   0.10.0) e `chimchar/show-what-the-ai-is-doing-while-it-answers` (linha `.chat-status`;
   chimchar 0.15.0), em cima da `chimchar/render-the-chat-answers`.
+- Agente do chat (2026-11-05, #139): pilha `ichiro` → `chimchar` → `lonzo`
+  `/complete-the-agent-behind-the-chat`, nos PRs (2026-11-05). `base_rules.md` em toda pergunta, pasta atual,
+  caminho inteiro na escrita, lista de skills por código, histórico com ferramentas e cache.
+  lonzo 0.11.0, ichiro 0.18.0, chimchar 0.16.0. Vault `IA no projeto/Harness do lonzo`.
 - #117 (milestone Editor) no PR da branch `chimchar/render-markdown-in-the-editor`: live
   preview no editor (`decorations/preview.ts`: títulos, tabela GFM, bloco de código com cor,
   marcas escondidas fora do cursor); chimchar 0.10.0. Callout `[!tipo]` fica para a #5.
