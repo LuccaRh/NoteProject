@@ -19,6 +19,9 @@
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.38.6",
     "@lezer/highlight": "^1.2.5",
-    "codemirror": "^6.0.2"
+    "codemirror": "^6.0.2",
+    "dompurify": "^3.4.17",
+    "katex": "^0.19.1",
+    "marked": "^18.1.3"
   }
 }
