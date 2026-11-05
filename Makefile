@@ -3,6 +3,7 @@
 
 # Local secrets (database URLs); in CI they come from the job env
 -include .env
+export LONZO_SECRET_KEY
 
 install:
 	cd apps/chimchar && npm install

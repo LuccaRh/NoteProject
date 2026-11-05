@@ -72,6 +72,7 @@ jobs:
         postgresql+psycopg://lonzo@localhost:5432/lonzo
       LONZO_MIGRATION_URL: >-
         postgresql+psycopg://lonzo_migrator@localhost:5432/lonzo
+      LONZO_SECRET_KEY: 8SxW58fut7DVX1A-7kM5zPhVd6S3HMkP2vVzkmId77k=
       PGHOST: localhost
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
