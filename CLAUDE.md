@@ -255,6 +255,8 @@ ai/                todo o resto do workspace de IA:
   `/complete-the-agent-behind-the-chat`, nos PRs (2026-11-05). `base_rules.md` em toda pergunta, pasta atual,
   caminho inteiro na escrita, lista de skills por código, histórico com ferramentas e cache.
   lonzo 0.11.0, ichiro 0.18.0, chimchar 0.16.0. Vault `IA no projeto/Harness do lonzo`.
+- Árvore (2026-11-05, #143): branch `chimchar/clear-the-tree-selection-on-an-empty-click`, em cima da
+  `lonzo/complete-the-agent-behind-the-chat`: clicar no vazio limpa a seleção (criar vai para a raiz). chimchar 0.17.0.
 - #117 (milestone Editor) no PR da branch `chimchar/render-markdown-in-the-editor`: live
   preview no editor (`decorations/preview.ts`: títulos, tabela GFM, bloco de código com cor,
   marcas escondidas fora do cursor); chimchar 0.10.0. Callout `[!tipo]` fica para a #5.
