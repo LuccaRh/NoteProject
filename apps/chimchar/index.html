@@ -72,6 +72,17 @@
                                 M16.5 13v7M13 16.5h7" />
                         </svg>
                     </button>
+
+                    <button id="log-out" class="icon" aria-label="Log out"
+                        title="Log out">
+                        <svg aria-hidden="true" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M10 4H5v16h5M14 8l4 4-4 4M18 12H9" />
+                        </svg>
+                    </button>
                 </div>
 
                 <!-- Tree of notes, filled by notes/tree.ts -->
@@ -118,6 +129,29 @@
             </div>
 
         </div>
+
+        <!-- Log in: email and password, driven by auth/login-dialog.ts -->
+        <dialog id="login-dialog" class="dialog"
+            aria-labelledby="login-heading">
+            <form id="login-form" class="dialog-form">
+                <h2 id="login-heading">Log in</h2>
+
+                <label for="login-email">Email</label>
+                <input id="login-email" type="email" autocomplete="username"
+                    required />
+
+                <label for="login-password">Password</label>
+                <input id="login-password" type="password"
+                    autocomplete="current-password" required />
+
+                <!-- Wrong password or server down -->
+                <p id="login-status" class="status" role="status"></p>
+
+                <div class="dialog-actions">
+                    <button id="login-submit" type="submit">Log in</button>
+                </div>
+            </form>
+        </dialog>
 
         <!-- Create workspace: folder and description, driven by
             chat/workspace-dialog.ts -->

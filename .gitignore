@@ -5,3 +5,6 @@ __pycache__/
 .DS_Store
 .env
 
+
+# lista pessoal do vault; fica so na maquina
+ai/obsidian/Features.md

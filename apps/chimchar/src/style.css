@@ -686,6 +686,7 @@ button {
     color: var(--muted);
 }
 
+.dialog input,
 .dialog select,
 .dialog textarea {
     box-sizing: border-box;
@@ -695,6 +696,7 @@ button {
     background: var(--panel);
 }
 
+.dialog input,
 .dialog select {
     height: 36px;
 }

@@ -33,7 +33,7 @@ A [[UI otimista]] cobre a escrita; a leitura pede ao servidor só o necessário,
 | servidor | expõe as rotas `/notes` (#46) e `/notes/search` (#56) que o front vai chamar | ⏳ |
 | `apps/chimchar/src/notes/api.ts` | cliente da API: chama `/api` na própria origem, o [[Reverse proxy\|Caddy]] repassa | ✅ |
 | front | [[UI otimista]]: estado pendente na tela, desfaz ou tenta de novo se o servidor recusar | ⏳ |
-| login | cookie de sessão (httpOnly, mesma origem), #48 | ⏳ |
+| [[Login no navegador\|login]] | [[Cookie\|cookie]] de sessão (httpOnly, mesma origem), #48 | ⏳ |
 | busca | a busca full-text do [[Postgres]] ([doc](https://www.postgresql.org/docs/current/textsearch.html)) | ⏳ |
 | IA | worker da [[Fila de pedidos\|fila]] no servidor; o navegador só pede e mostra a proposta ([[Workspace no app]]) | ⏳ |
 
