@@ -102,6 +102,8 @@ jobs:
     env:
       NUJABES_DATABASE_URL: >-
         postgresql+psycopg://postgres@localhost:5432/postgres
+      NUJABES_MIGRATION_URL: >-
+        postgresql+psycopg://postgres@localhost:5432/postgres
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v10.3.0
