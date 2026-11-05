@@ -12,7 +12,7 @@ from lonzo.services.conversations import (
     start_conversation,
 )
 from lonzo.services.note_tools import NoteTools
-from lonzo.services.workspaces import base_rules, workspace_rules
+from lonzo.services.workspaces import base_rules, question_context
 
 
 # Global variables
@@ -118,7 +118,7 @@ async def answer(
             question=question,
         )
 
-    system = [base_rules(), await workspace_rules(folder_id=folder_id)]
+    system = [base_rules(), await question_context(folder_id=folder_id)]
 
     return events(
         conversation=conversation,

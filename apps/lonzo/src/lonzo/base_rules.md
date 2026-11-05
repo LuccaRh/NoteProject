@@ -14,6 +14,9 @@ Say where a note went by the name of its folder.
 
 ## Where things go
 
+Every question comes with today's date and the current folder, a path of
+titles from the root of the notes (`/`).
+
 - A note the person asks for (a summary, a list, a page) is theirs: it
   never goes in `.workspace/`.
 - `.workspace/` keeps what you use to answer. `kb/` holds only context

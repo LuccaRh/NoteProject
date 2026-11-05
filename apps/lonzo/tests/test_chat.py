@@ -146,8 +146,9 @@ def test_chat_without_workspace_has_only_the_base_rules() -> None:
 
     system = FakeMessages.params["system"]
     assert isinstance(system, list)
-    assert [block["text"] for block in system] == [base_rules()]
+    assert system[0]["text"] == base_rules()
     assert system[0]["cache_control"] == {"type": "ephemeral"}
+    assert system[1]["text"].endswith("Current folder: /")
 
 
 def test_chat_uses_the_folder_workspace_rules() -> None:

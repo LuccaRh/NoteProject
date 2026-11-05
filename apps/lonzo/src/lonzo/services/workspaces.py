@@ -64,6 +64,24 @@ async def workspace_rules(folder_id: UUID | None) -> str:
     return "\n\n".join(parts)
 
 
+async def question_context(folder_id: UUID | None) -> str:
+    """
+    What changes with the question: today's date, the folder of the
+    conversation by its path from the root, and the rules of its workspace
+    """
+
+    path = "/"
+
+    if folder_id is not None:
+        folder = await ichiro.get_note_path(note_id=folder_id)
+        path = "/" if folder is None else f"/{folder.path}"
+
+    place = f"Today is {date.today().isoformat()}. Current folder: {path}"
+    rules = await workspace_rules(folder_id=folder_id)
+
+    return f"{place}\n\n{rules}" if rules else place
+
+
 async def create_workspace_folders(parent_id: UUID) -> list[Note]:
     """
     The .workspace folder that turns a folder into a workspace, then its
