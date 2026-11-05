@@ -9,7 +9,7 @@ A ordem segue o [[Objetivo do app]]: aprender vem primeiro, e a v1 (ler notas no
 2. **App desktop**: app instalado com o [[O daemon notesd|`notesd`]], que funciona offline.
 3. **Celular**: app do celular.
 
-Para 2026-11-06, a [[Entrega de 2026-11-06|entrega]] puxa notas e IA em localhost para antes do M2. Ideias sem lugar na fila: Neovim/CLI ([[Features]]) e ink. As tarefas ficam como issues no GitHub ([[Tarefas no GitHub]]), agrupadas em milestones.
+Para 2026-11-06, a [[Entrega de 2026-11-06|entrega]] puxa notas e IA em localhost para antes do M2. Ideias sem lugar na fila: Neovim/CLI ([[Features]]) e ink; as de [[Features]] estão ordenadas em [[Prioridade das features]]. As tarefas ficam como issues no GitHub ([[Tarefas no GitHub]]), agrupadas em milestones.
 
 ![[plano-roadmap.drawio.svg]]
 *Trilha principal escrita à mão (M0→M4); trilha do editor delegada, em paralelo; depois desktop e celular.*
