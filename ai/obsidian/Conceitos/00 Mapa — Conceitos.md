@@ -37,6 +37,7 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[Migration]] | cada mudança do schema é um arquivo versionado: `upgrade` aplica, `downgrade` reverte |
 | [[SQLAlchemy]] | a API guarda conexões abertas e empresta uma por pedido |
 | [[Transação]] | vários comandos num bloco de tudo ou nada: `COMMIT` ou `ROLLBACK` |
+| [[Row-Level Security]] | o Postgres junta uma *policy* a toda consulta e esconde as linhas de outro usuário |
 | [[Árvore no banco]] | cada linha aponta para o pai; a pasta é um item da mesma tabela |
 
 ## Python
@@ -51,6 +52,7 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[Decorator]] | o `@` passa a função a outra logo depois do `def`, uma vez, ao importar |
 | [[Context manager]] | o `with` garante a saída; o `yield` divide entrada e saída; o `async with` espera ao abrir e fechar |
 | [[Gerador]] | o `yield` entrega um item por vez e pausa; o `async for` espera cada item sem travar os outros |
+| [[ContextVar]] | uma variável visível de qualquer função, com um valor por pedido |
 | [[FastAPI]] | a função tipada vira rota validada e documentada |
 
 ## Rede

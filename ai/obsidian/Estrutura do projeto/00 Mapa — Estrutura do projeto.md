@@ -42,6 +42,7 @@ O app em três partes (front, back, infra), marcando o que já existe no código
 | [[AWS ou infra própria]] | AWS por fora ([[EC2]], [[S3]], [[IAM]], [[Terraform]]), [[Docker Compose\|compose]] por dentro ([[Docker Compose\|compose]], [[Reverse proxy\|Caddy]], [[Backup\|backup]]) |
 | [[Navegador]] | no navegador, o servidor serve o app e as notas (só online, [[UI otimista]]); offline fica no desktop |
 | [[Custo zero — créditos e free tier]] | créditos da AWS + [[EC2]] grátis até dez/2026 + domínio do GitHub pack |
+| [[RLS ou filtro em cada consulta]] | cada usuário só vê as próprias notas pela *policy* do [[Row-Level Security\|RLS]], sem `WHERE` em cada consulta |
 | [[Trilha de infra]] | os conceitos de infra na ordem em que o projeto pede cada um |
 
 ## Ordem

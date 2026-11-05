@@ -17,6 +17,8 @@ check-chimchar:
 
 # Tests run on the host: reach the compose Postgres through localhost
 TEST_DATABASE_URL = $(subst @postgres:,@localhost:,$(DATABASE_URL))
+TEST_ICHIRO_DATABASE_URL = \
+	$(subst @postgres:,@localhost:,$(ICHIRO_DATABASE_URL))
 TEST_LONZO_DATABASE_URL = \
 	$(subst @postgres:,@localhost:,$(LONZO_DATABASE_URL))
 TEST_NUJABES_DATABASE_URL = \
@@ -24,7 +26,8 @@ TEST_NUJABES_DATABASE_URL = \
 
 check-ichiro:
 	cd apps/ichiro && uv run ruff check && uv run mypy src tests \
-		&& DATABASE_URL='$(TEST_DATABASE_URL)' uv run pytest
+		&& DATABASE_URL='$(TEST_DATABASE_URL)' \
+		ICHIRO_DATABASE_URL='$(TEST_ICHIRO_DATABASE_URL)' uv run pytest
 
 check-lonzo:
 	cd apps/lonzo && uv run ruff check && uv run mypy src tests \
