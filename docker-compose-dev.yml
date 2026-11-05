@@ -33,7 +33,9 @@ services:
         volumes:
             - ./apps/ichiro:/app
             - /app/.venv
-        env_file: .env
+        environment:
+            - ICHIRO_DATABASE_URL=${ICHIRO_DATABASE_URL}
+            - ICHIRO_MIGRATION_URL=${ICHIRO_MIGRATION_URL}
         depends_on:
             - postgres
 
