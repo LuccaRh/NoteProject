@@ -184,6 +184,13 @@ def test_chat_names_the_folder_by_its_whole_path() -> None:
     )
 
 
+def test_chat_marks_the_messages_for_the_cache() -> None:
+
+    post(body={"question": "Hi"})
+
+    assert FakeMessages.params["cache_control"] == {"type": "ephemeral"}
+
+
 def test_chat_gives_the_model_the_note_tools() -> None:
 
     post(body={"question": "Hi"})
