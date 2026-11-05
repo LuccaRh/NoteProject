@@ -59,6 +59,8 @@ services:
         volumes:
             - ./apps/nujabes:/app
             - /app/.venv
+        environment:
+            - NUJABES_DATABASE_URL=${NUJABES_DATABASE_URL}
         depends_on:
             - postgres
 

@@ -19,6 +19,8 @@ check-chimchar:
 TEST_DATABASE_URL = $(subst @postgres:,@localhost:,$(DATABASE_URL))
 TEST_LONZO_DATABASE_URL = \
 	$(subst @postgres:,@localhost:,$(LONZO_DATABASE_URL))
+TEST_NUJABES_DATABASE_URL = \
+	$(subst @postgres:,@localhost:,$(NUJABES_DATABASE_URL))
 
 check-ichiro:
 	cd apps/ichiro && uv run ruff check && uv run mypy src tests \
@@ -30,7 +32,7 @@ check-lonzo:
 
 check-nujabes:
 	cd apps/nujabes && uv run ruff check && uv run mypy src tests \
-		&& uv run pytest
+		&& NUJABES_DATABASE_URL='$(TEST_NUJABES_DATABASE_URL)' uv run pytest
 
 # Development workspace tools (ai/tools, ai/kb): tests + lint.
 check-tools:
