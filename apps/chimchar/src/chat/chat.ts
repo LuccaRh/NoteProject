@@ -15,6 +15,8 @@ type Options = {
     folders: () => Folder[]
     // Called when the tab should show a new title
     onTitle: (title: string) => void
+    // Called after an answer in which the AI wrote to the notes
+    onNotesChanged: () => void
 }
 
 // Option of the workspace list that asks with no workspace
@@ -34,6 +36,14 @@ const TOOL_STATUS: Record<string, [string, string]> = {
     edit_note: ['Editing', 'a note'],
     delete_note: ['Deleting', 'a note'],
 }
+
+// The tools that change the notes
+const WRITE_TOOLS = new Set([
+    'create_note',
+    'create_folder',
+    'edit_note',
+    'delete_note',
+])
 
 
 // Code
@@ -236,6 +246,7 @@ export class Chat {
         const status = element('p', 'chat-status')
         answer.after(status)
         let source = ''
+        let wrote = false
         const isNew = this.conversationId === null
         const { signal } = this.controller = new AbortController()
 
@@ -259,6 +270,7 @@ export class Chat {
                         })
                     },
                     tool: (name, target) => {
+                        wrote ||= WRITE_TOOLS.has(name)
                         this.follow(() => {
                             status.textContent = toolStatus(name, target)
                         })
@@ -285,6 +297,8 @@ export class Chat {
             this.busy = false
             this.send.textContent = 'Send'
         }
+
+        if (wrote) this.options.onNotesChanged()
 
         if (isNew) this.options.onTitle(question)
 
