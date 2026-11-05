@@ -178,7 +178,7 @@ export class Chat {
             this.bubble(message.role).textContent = text(message.content)
         }
 
-        this.messages.scrollTop = this.messages.scrollHeight
+        this.scrollToEnd()
         this.options.onTitle(conversation.title)
         this.markCurrent()
     }
@@ -208,6 +208,7 @@ export class Chat {
         this.messages.querySelector('.chat-empty')?.remove()
         this.bubble('user').textContent = question
         const answer = this.bubble('assistant')
+        this.scrollToEnd()
         answer.classList.add('streaming')
         const isNew = this.conversationId === null
         const { signal } = this.controller = new AbortController()
@@ -255,7 +256,13 @@ export class Chat {
         const gap = box.scrollHeight - box.scrollTop - box.clientHeight
         answer.textContent += piece
 
-        if (gap < FOLLOW_PX) box.scrollTop = box.scrollHeight
+        if (gap < FOLLOW_PX) this.scrollToEnd()
+    }
+
+    /** Move the page down to the last message. */
+    scrollToEnd(): void {
+
+        this.messages.scrollTop = this.messages.scrollHeight
     }
 
     /** Show what went wrong under the answer. */
