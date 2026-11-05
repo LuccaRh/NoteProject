@@ -30,6 +30,8 @@ export class Chat {
     conversationId: string | null = null
     // One question at a time per tab
     busy: boolean = false
+    // Closes the request of the answer being written
+    controller: AbortController | null = null
     options: Options
     panel: HTMLElement
     workspace: HTMLSelectElement
@@ -205,6 +207,7 @@ export class Chat {
         const answer = this.bubble('assistant')
         answer.classList.add('streaming')
         const isNew = this.conversationId === null
+        const { signal } = this.controller = new AbortController()
 
         try {
             await ask(
@@ -220,12 +223,19 @@ export class Chat {
                     text: piece => this.append(answer, piece),
                     error: message => this.fail(answer, message),
                 },
+                signal,
             )
         } catch (error) {
-            this.fail(answer, 'The chat service did not answer')
-            console.error(error)
+
+            if (!signal.aborted) {
+                this.fail(answer, 'The chat service did not answer')
+                console.error(error)
+            }
         } finally {
             answer.classList.remove('streaming')
+
+            if (!answer.textContent) answer.remove()
+
             this.busy = false
             this.send.disabled = false
         }
