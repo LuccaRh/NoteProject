@@ -1,3 +1,12 @@
+# Asks nujabes who owns the session cookie before the request goes on;
+# a X-User-Id sent by the browser is replaced by the one from nujabes
+(logged_in) {
+    forward_auth nujabes:8000 {
+        uri /auth/session
+        copy_headers X-User-Id
+    }
+}
+
 # *.localhost resolves to 127.0.0.1 without /etc/hosts
 notes.localhost {
     # Certificate from Caddy's own local CA (kept in the caddy_data volume)
@@ -11,14 +20,18 @@ notes.localhost {
         reverse_proxy nujabes:8000
     }
 
+    # Notes and chat only with a session: nujabes answers 401 (sent back
+    # as is) or 200 with X-User-Id, which goes on to the service
     @ichiro path /api/notes /api/notes/*
     handle @ichiro {
+        import logged_in
         uri strip_prefix /api
         reverse_proxy ichiro:8000
     }
 
     @lonzo path /api/chat /api/chat/*
     handle @lonzo {
+        import logged_in
         uri strip_prefix /api
         reverse_proxy lonzo:8000
     }
