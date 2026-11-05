@@ -128,7 +128,7 @@ async def create_workspace(folder_id: UUID, description: str) -> list[Note]:
     """
 
     claude.check_key()
-    folder = await ichiro.get_note(note_id=folder_id)
+    folder = await ichiro.get_note_path(note_id=folder_id)
 
     if folder is None:
         raise FolderNotFound("folder not found")
@@ -143,7 +143,7 @@ async def create_workspace(folder_id: UUID, description: str) -> list[Note]:
     system = PROMPT_PATH.read_text(encoding="utf-8")
     request = (
         f"Today is {date.today().isoformat()}. The workspace folder is"
-        f" {folder.id}.\n\n{description}"
+        f" /{folder.path}.\n\n{description}"
     )
     await claude.run_tools(system=system, request=request, tools=notes.tools())
 

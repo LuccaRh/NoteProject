@@ -117,11 +117,11 @@ def test_read_note_of_a_folder(ichiro: FakeIchiro) -> None:
 
 def test_create_note_at_the_root(ichiro: FakeIchiro) -> None:
 
-    assert call(name="create_note", path="Ideas", body="Fly.") == (
-        "created Ideas"
-    )
+    answer = call(name="create_note", path="/Ideas", body="Fly.")
 
-    row = ichiro.rows[id_of(fake=ichiro, title="Ideas")]
+    note_id = id_of(fake=ichiro, title="Ideas")
+    row = ichiro.rows[note_id]
+    assert answer == f"created {note_id} /Ideas"
     assert row["parent_id"] is None
     assert row["body"] == "Fly."
 
@@ -129,12 +129,7 @@ def test_create_note_at_the_root(ichiro: FakeIchiro) -> None:
 def test_create_note_in_any_workspace(ichiro: FakeIchiro) -> None:
 
     calculus = id_of(fake=ichiro, title="Calculus")
-    call(
-        name="create_note",
-        folder_id=calculus,
-        path="Series/Taylor",
-        body="Sums.",
-    )
+    call(name="create_note", path="/Calculus/Series/Taylor", body="Sums.")
 
     series = id_of(fake=ichiro, title="Series")
     assert ichiro.rows[series]["parent_id"] == str(calculus)
@@ -144,7 +139,7 @@ def test_create_note_in_any_workspace(ichiro: FakeIchiro) -> None:
 
 def test_create_folder_at_the_root(ichiro: FakeIchiro) -> None:
 
-    assert call(name="create_folder", path="Physics") == "created Physics/"
+    assert call(name="create_folder", path="/Physics") == "created /Physics/"
     assert ichiro.rows[id_of(fake=ichiro, title="Physics")]["is_folder"]
 
 
@@ -240,7 +235,7 @@ def test_target_is_the_title_of_a_note_just_created(
 
     tools = NoteTools()
     by_name = {tool.name: tool for tool in tools.tools()}
-    body = {"path": "Games/Chess", "body": "Openings"}
+    body = {"path": "/Baseball/Chess", "body": "Openings"}
     asyncio.run(by_name["create_note"].call(body))
     note_id = str(id_of(fake=ichiro, title="Chess"))
 
