@@ -174,6 +174,26 @@ def test_chat_uses_the_folder_workspace_rules() -> None:
     assert "Exam soon." not in str(system)
 
 
+def test_chat_lists_the_skills_without_their_bodies() -> None:
+
+    ichiro = FakeIchiro()
+    folder = ichiro.add(title="Baseball", is_folder=True)
+    workspace = ichiro.add(title=".workspace", parent_id=folder, is_folder=True)
+    skills = ichiro.add(title="skills", parent_id=workspace, is_folder=True)
+    skill = ichiro.add(
+        title="review-swing",
+        parent_id=skills,
+        body="Reviews a swing.\nLook at the video twice.",
+    )
+
+    body = {"question": "Hi", "folder_id": str(folder)}
+    post(body=body, http=ichiro.client())
+
+    system = str(FakeMessages.params["system"])
+    assert f"- {skill} review-swing: Reviews a swing." in system
+    assert "Look at the video" not in system
+
+
 def test_chat_names_the_folder_by_its_whole_path() -> None:
 
     ichiro = FakeIchiro()
