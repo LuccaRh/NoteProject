@@ -325,6 +325,48 @@ def test_chat_keeps_the_question_and_answer() -> None:
     ]
 
 
+def test_chat_keeps_the_tool_calls_of_an_answer() -> None:
+
+    call = SimpleNamespace(
+        type="tool_use",
+        id="toolu_1",
+        name="read_note",
+        input={"note_id": "1"},
+    )
+    result = {"type": "tool_result", "tool_use_id": "toolu_1", "content": "Hi"}
+    results = {"role": "user", "content": [result]}
+
+    with (
+        patch.object(FakeStream, "content", [call]),
+        patch.object(FakeRunner, "results", results),
+    ):
+        response = post(body={"question": "Read it"})
+
+    conversation_id = conversation_of(response=response)
+    second = post(
+        body={"question": "And now?", "conversation_id": conversation_id},
+    )
+
+    assert second.status_code == 200
+    messages = FakeMessages.params["messages"]
+    assert isinstance(messages, list)
+    assert [m["role"] for m in messages] == [
+        "user",
+        "assistant",
+        "user",
+        "user",
+    ]
+    assert messages[1]["content"] == [
+        {
+            "type": "tool_use",
+            "id": "toolu_1",
+            "name": "read_note",
+            "input": {"note_id": "1"},
+        }
+    ]
+    assert messages[2]["content"] == [result]
+
+
 def test_chat_sends_the_history_of_the_conversation() -> None:
 
     first = post(body={"question": "Who bats left?"})
@@ -350,3 +392,18 @@ def test_chat_in_a_missing_conversation() -> None:
     response = post(body=body)
 
     assert response.status_code == 404
+
+
+def test_chat_keeps_no_empty_turn() -> None:
+
+    empty = SimpleNamespace(type="text", text="")
+
+    with patch.object(FakeStream, "content", [empty]):
+        response = post(body={"question": "Hi"})
+
+    conversation_id = conversation_of(response=response)
+    post(body={"question": "Still there?", "conversation_id": conversation_id})
+
+    messages = FakeMessages.params["messages"]
+    assert isinstance(messages, list)
+    assert [m["role"] for m in messages] == ["user", "user"]
