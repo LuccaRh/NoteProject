@@ -10,7 +10,7 @@ from alembic.config import Config
 from fastapi.testclient import TestClient
 from sqlalchemy import Connection
 
-from ichiro.db import engine
+from ichiro.db import engine, set_user
 from ichiro.main import app
 from ichiro.services import health, notes
 
@@ -41,6 +41,8 @@ def conn(monkeypatch: pytest.MonkeyPatch) -> Iterator[Connection]:
         def test_transaction() -> Iterator[Connection]:
 
             with conn.begin_nested():
+                set_user(conn=conn)
+
                 yield conn
 
         monkeypatch.setattr(health, "transaction", test_transaction)
