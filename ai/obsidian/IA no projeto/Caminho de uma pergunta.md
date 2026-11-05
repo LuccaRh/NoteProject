@@ -40,6 +40,17 @@ Exemplo das duas figuras: "atualiza a nota do Caddy com o que vimos, cria uma de
 - O `answer` fica parado em dois lugares: no `yield` (até a lib pedir o próximo) e no `async for` ([[Gerador|async for]]) da linha 53 (até a Anthropic mandar o próximo pedaço).
 - Erro da Anthropic depois do 200 só pode ir como evento `error`: o status já saiu.
 
+### Streams, blocos e eventos ✅
+
+![[pergunta-com-streams.drawio.svg]]
+*"Já tem nota de TLS? Se não, cria uma": três requests, três streams; o `tool_runner` roda a ferramenta entre um stream e o outro, e os eventos SSE só mostram o andamento no navegador.*
+
+- **Stream**: um turno do modelo, a resposta inteira de uma request. É o que sai do `async for stream in runner` no `lonzo`.
+- **Bloco**: uma parte dessa resposta, `text` ou `tool_use`. Uma resposta pode ter vários, em ordem.
+- **Evento**: um pedacinho do stream. `content_block_start` e `content_block_stop` marcam o começo e o fim de um bloco; entre eles chegam os pedaços.
+- **`input`**: os argumentos da ferramenta, em JSON, que o modelo escolhe (`{"query": "TLS"}`). No começo do bloco está vazio; no fim, completo.
+- O evento SSE `tool_use` vai para o navegador, não para o modelo; ele existe só para a linha de status. O modelo recebe o resultado pelo `tool_result`, na request seguinte.
+
 ## No Claude Code hoje ✅
 
 ![[pergunta-no-claude-code.drawio.svg]]
