@@ -6,7 +6,7 @@ import httpx2
 from pydantic import TypeAdapter
 
 from lonzo.errors import TitleTaken
-from lonzo.schemas.notes import Note, NoteMatch, TitleMatch
+from lonzo.schemas.notes import Note, NoteMatch, NotePath, TitleMatch
 from lonzo.user import current_user
 
 
@@ -89,6 +89,21 @@ class IchiroClient:
         response.raise_for_status()
 
         return Note.model_validate(response.json())
+
+    async def get_note_path(self, note_id: UUID) -> NotePath | None:
+        """
+        GET /notes/{id}/path: the path of titles of a note from the root;
+        None when there is no such note
+        """
+
+        response = await self.http.get(f"/notes/{note_id}/path")
+
+        if response.status_code == 404:
+            return None
+
+        response.raise_for_status()
+
+        return NotePath.model_validate(response.json())
 
     async def get_note_by_path(
         self,

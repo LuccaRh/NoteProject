@@ -53,3 +53,10 @@ avisa; reconfira as linhas antes de confiar no card. Escolhida em 2026-11-01 no 
   (conferido com o Haiku 5.5 em 2026-11-05).
 - A ferramenta roda depois do fim do stream do turno: `generate_tool_call_response`
   (`lib/tools/_beta_runner.py:1311`), salvo com `run_tools_eagerly` (1552), que o lonzo não liga.
+
+## Cache de prompt (tool_runner)
+
+- `tool_runner` aceita `cache_control` no topo (`resources/beta/messages/messages.py:1443`): marca o último bloco a cada volta.
+- `system` pode ser lista de `BetaTextBlockParam` com `cache_control` em um bloco (`:1459`).
+- Lido do cache: `usage.cache_read_input_tokens` (`types/beta/beta_usage.py:21`); não entra em `input_tokens`.
+- `await runner.generate_tool_call_response()` guarda o resultado e o laço segue com ele (`lib/tools/_beta_runner.py:776`, `:1288`).

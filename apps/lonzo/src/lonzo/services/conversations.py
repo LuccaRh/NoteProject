@@ -10,7 +10,11 @@ from lonzo.repositories.conversations import (
     select_conversations,
     select_messages,
 )
-from lonzo.schemas.conversations import Conversation, ConversationWithMessages
+from lonzo.schemas.conversations import (
+    Conversation,
+    ConversationWithMessages,
+    Turn,
+)
 
 
 # Global variables
@@ -75,10 +79,11 @@ async def get_conversation(conversation_id: UUID) -> ConversationWithMessages:
 async def save_exchange(
     conversation_id: UUID,
     question: str,
-    answer: str,
+    turns: list[Turn],
 ) -> None:
     """
-    Keeps a question and its answer, both or neither, as text blocks
+    Keeps a question and the turns of its answer, tool calls and results
+    included, all or none, in the shape the API takes them back
     """
 
     async with transaction() as conn:
@@ -88,9 +93,11 @@ async def save_exchange(
             role="user",
             content=[{"type": "text", "text": question}],
         )
-        await insert_message(
-            conn=conn,
-            conversation_id=conversation_id,
-            role="assistant",
-            content=[{"type": "text", "text": answer}],
-        )
+
+        for role, content in turns:
+            await insert_message(
+                conn=conn,
+                conversation_id=conversation_id,
+                role=role,
+                content=content,
+            )

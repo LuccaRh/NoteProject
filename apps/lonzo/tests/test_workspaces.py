@@ -84,14 +84,12 @@ def test_workspace_saves_rules_and_skills_in_the_folder() -> None:
     body = {"folder_id": str(folder), "description": "I play baseball"}
     rules = call(
         name="create_note",
-        folder_id=str(folder),
-        path=".workspace/CLAUDE.md",
+        path="/Baseball/.workspace/CLAUDE.md",
         body="# Workspace\n\nHit better.",
     )
     skill = call(
         name="create_note",
-        folder_id=str(folder),
-        path=".workspace/skills/review-swing",
+        path="/Baseball/.workspace/skills/review-swing",
         body="Look at the video.",
     )
     response = post(ichiro=ichiro, body=body, turns=[[rules], [skill]])
@@ -123,14 +121,12 @@ def test_note_creates_the_folders_on_its_path() -> None:
     body = {"folder_id": str(folder), "description": "I play baseball"}
     rules = call(
         name="create_note",
-        folder_id=str(folder),
-        path=".workspace/CLAUDE.md",
+        path="/Baseball/.workspace/CLAUDE.md",
         body="",
     )
     note = call(
         name="create_note",
-        folder_id=str(folder),
-        path="Games/2026/first",
+        path="/Baseball/Games/2026/first",
         body="Won.",
     )
     response = post(ichiro=ichiro, body=body, turns=[[rules, note]])
@@ -152,14 +148,12 @@ def test_path_with_dots_goes_back_as_an_error() -> None:
     body = {"folder_id": str(folder), "description": "I play baseball"}
     wrong = call(
         name="create_note",
-        folder_id=str(folder),
-        path="../Other/x",
+        path="/Baseball/../Other/x",
         body="",
     )
     rules = call(
         name="create_note",
-        folder_id=str(folder),
-        path=".workspace/CLAUDE.md",
+        path="/Baseball/.workspace/CLAUDE.md",
         body="",
     )
     response = post(ichiro=ichiro, body=body, turns=[[wrong], [rules]])
@@ -176,13 +170,11 @@ def test_taken_title_goes_back_as_an_error() -> None:
     body = {"folder_id": str(folder), "description": "I play baseball"}
     again = call(
         name="create_folder",
-        folder_id=str(folder),
-        path=".workspace/kb",
+        path="/Baseball/.workspace/kb",
     )
     rules = call(
         name="create_note",
-        folder_id=str(folder),
-        path=".workspace/CLAUDE.md",
+        path="/Baseball/.workspace/CLAUDE.md",
         body="",
     )
     response = post(ichiro=ichiro, body=body, turns=[[again, rules]])
@@ -199,20 +191,20 @@ def test_note_on_the_path_goes_back_as_an_error() -> None:
     body = {"folder_id": str(folder), "description": "I play baseball"}
     note = call(
         name="create_note",
-        folder_id=str(folder),
-        path="Games/2026/first",
+        path="/Baseball/Games/2026/first",
         body="Won.",
     )
     rules = call(
         name="create_note",
-        folder_id=str(folder),
-        path=".workspace/CLAUDE.md",
+        path="/Baseball/.workspace/CLAUDE.md",
         body="",
     )
     response = post(ichiro=ichiro, body=body, turns=[[note, rules]])
 
     assert response.status_code == 201
-    assert FakeRunner.results[0]["content"] == "Games is a note, not a folder"
+    assert FakeRunner.results[0]["content"] == (
+        "Baseball/Games is a note, not a folder"
+    )
 
 
 def test_workspace_needs_a_folder_id() -> None:
@@ -250,8 +242,7 @@ def test_workspace_reuses_the_folders_already_there() -> None:
     body = {"folder_id": str(folder), "description": "I play baseball"}
     rules = call(
         name="create_note",
-        folder_id=str(folder),
-        path=".workspace/CLAUDE.md",
+        path="/Baseball/.workspace/CLAUDE.md",
         body="",
     )
     response = post(ichiro=ichiro, body=body, turns=[[rules]])

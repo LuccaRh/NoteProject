@@ -58,7 +58,7 @@ Numa pasta `.workspace/` dentro de qualquer pasta do vault (a coleção de notas
 
 Um kit fixo ("Estudo": uma regra e duas skills) serve mal a assuntos diferentes: o que se repete entre os workspaces do Claude Code no PC (NoteProject, Disciplinas e as matérias, baseball) é a forma do `CLAUDE.md`, não as skills. Então o app guarda um `CLAUDE.md` base, e a IA o preenche a partir do que a pessoa quer, criando skills, scripts e hooks só quando o texto pede. (2026-11-02) Nenhuma skill entra pronta: nenhuma das que existem nos projetos é básica.
 
-| Seção do `CLAUDE.md` base (`apps/lonzo/src/lonzo/base_rules.md`) | Para quê | No Claude Code do PC |
+| Seção do `CLAUDE.md` | Para quê | No Claude Code do PC |
 |---|---|---|
 | Goal | o assunto, quem é a pessoa e o que ela quer dele | "Quem", "Papel do Claude aqui" |
 | How to answer | os gostos, ditos uma vez | regras de resposta |

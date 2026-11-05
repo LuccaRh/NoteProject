@@ -16,6 +16,7 @@ Ideia central: **o app funciona inteiro sem IA**. A IA é mais um cliente das no
 | [[MCP — a IA como cliente do daemon]] | o Claude Code chama funções do [[O daemon notesd\|daemon]] em vez de ler arquivos |
 | [[Edição por âncora]] | a IA nunca reescreve a nota; propõe uma operação presa a um trecho |
 | [[Chat com o workspace]] | workspace e laço da IA no servidor: a mesma pergunta, com o mesmo contexto, de qualquer aparelho |
+| [[Harness do lonzo]] | as peças em volta do modelo: base fixa, pasta atual, caminho inteiro, skills, histórico e cache |
 | [[Caminho de uma pergunta]] | passo a passo de uma pergunta, do navegador às notas mudadas, lado a lado com o Claude Code de hoje |
 
 ## O que a IA faz

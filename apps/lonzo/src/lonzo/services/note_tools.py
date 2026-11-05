@@ -13,8 +13,8 @@ from lonzo.schemas.notes import Note, NoteMatch, TitleMatch
 class NoteTools:
     """
     The tools the model uses to find, read, write, edit and delete notes,
-    in any folder; new ones go by paths of titles from a folder (or the
-    root), as a coding agent does with files
+    in any folder; new ones go by their whole paths of titles from the
+    root, as a coding agent does with files
     """
 
     created: list[Note]
@@ -98,32 +98,33 @@ class NoteTools:
         async def create_note(
             path: str,
             body: str,
-            folder_id: UUID | None = None,
         ) -> str:
             """
-            Creates a note at a path of titles from folder_id (the root
-            without one). Folders missing on the way are created, e.g.
-            `.workspace/skills/review-report`.
+            Creates a note at its whole path of titles from the root,
+            starting with /, e.g. `/Physics/Waves/Summary`. Folders missing
+            on the way are created, except the first one. Answers its id.
             """
 
             *folders, title = self.split(path=path)
-            parent_id = await self.folder(names=folders, folder_id=folder_id)
-            await self.create(title=title, parent_id=parent_id, body=body)
+            parent_id = await self.folder(names=folders)
+            note = await self.create(
+                title=title,
+                parent_id=parent_id,
+                body=body,
+            )
 
-            return f"created {path}"
+            return f"created {note.id} {path}"
 
         @beta_async_tool(strict=True)
-        async def create_folder(
-            path: str,
-            folder_id: UUID | None = None,
-        ) -> str:
+        async def create_folder(path: str) -> str:
             """
-            Creates a folder at a path of titles from folder_id (the root
-            without one). Folders missing on the way are created too.
+            Creates a folder at its whole path of titles from the root,
+            starting with /. Folders missing on the way are created too,
+            except the first one.
             """
 
             *folders, title = self.split(path=path)
-            parent_id = await self.folder(names=folders, folder_id=folder_id)
+            parent_id = await self.folder(names=folders)
             await self.create(title=title, parent_id=parent_id, is_folder=True)
 
             return f"created {path}/"
@@ -199,9 +200,13 @@ class NoteTools:
 
     def split(self, path: str) -> list[str]:
         """
-        The names along a path; ValueError for an empty one or one with
-        . or .., which a path of titles doesn't have
+        The names along a whole path; ValueError for one that doesn't
+        start at the root, is empty or has . or .., which a path of titles
+        doesn't have
         """
+
+        if not path.startswith("/"):
+            raise ValueError(f"{path} must be a whole path, starting with /")
 
         names = [name for name in path.split("/") if name]
 
@@ -213,28 +218,27 @@ class NoteTools:
 
         return names
 
-    async def folder(
-        self,
-        names: list[str],
-        folder_id: UUID | None,
-    ) -> UUID | None:
+    async def folder(self, names: list[str]) -> UUID | None:
         """
-        The folder at the end of names, from folder_id, creating the ones
+        The folder at the end of names, from the root, creating the ones
         missing; one lookup when it already exists, which is the usual
-        case; ValueError when a name on the way is a note
+        case; ValueError when a name on the way is a note, or when the
+        first name is missing, which is a mistaken path more often than a
+        new folder
         """
 
         if not names:
-            return folder_id
+            return None
 
         path = "/".join(names)
-        note = await ichiro.get_note_by_path(parent_id=folder_id, path=path)
+        note = await ichiro.get_note_by_path(parent_id=None, path=path)
 
         if note is None:
-            parent_id = await self.folder(
-                names=names[:-1],
-                folder_id=folder_id,
-            )
+
+            if len(names) == 1:
+                raise ValueError(f"there is no folder /{path} at the root")
+
+            parent_id = await self.folder(names=names[:-1])
             note = await self.create(
                 title=names[-1],
                 parent_id=parent_id,

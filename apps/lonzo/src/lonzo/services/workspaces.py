@@ -11,11 +11,22 @@ from lonzo.services.note_tools import NoteTools
 
 # Global variables
 WORKSPACE = ".workspace"
-WORKSPACE_FOLDERS = ["kb", "skills", "scripts", "hooks"]
+SKILLS = "skills"
+WORKSPACE_FOLDERS = ["kb", SKILLS, "scripts", "hooks"]
 PROMPT_PATH = Path(__file__).parent.parent / "create_workspace.md"
+BASE_PATH = Path(__file__).parent.parent / "base_rules.md"
 
 
 # Code
+def base_rules() -> str:
+    """
+    The rules of every question, the same for every person, so they stay
+    in the cache
+    """
+
+    return BASE_PATH.read_text(encoding="utf-8")
+
+
 async def find_workspace(parent_id: UUID) -> UUID | None:
     """
     The .workspace folder right inside a folder, if it has one; titles are
@@ -30,11 +41,27 @@ async def find_workspace(parent_id: UUID) -> UUID | None:
     return notes[0].id
 
 
+async def skills_list(folder_id: UUID) -> list[str]:
+    """
+    The skills of a workspace, one line each with the id, the title and
+    the first line of the body, in one part; the bodies stay out and
+    nothing comes back with no skills
+    """
+
+    lines = [
+        f"- {note.id} {note.title}: {note.body.partition("\n")[0]}"
+        for note in await ichiro.list_notes(parent_id=folder_id)
+        if not note.is_folder
+    ]
+
+    return ["# Skills\n\n" + "\n".join(lines)] if lines else []
+
+
 async def workspace_rules(folder_id: UUID | None) -> str:
     """
     Rules for a question: notes of the folder's .workspace, as written
-    (the CLAUDE.md opens saying they win); empty with no folder or no
-    .workspace (the root never has one)
+    (the CLAUDE.md opens saying they win), and the list of its skills;
+    empty with no folder or no .workspace (the root never has one)
     """
 
     if folder_id is None:
@@ -45,13 +72,37 @@ async def workspace_rules(folder_id: UUID | None) -> str:
     if workspace is None:
         return ""
 
+    notes = await ichiro.list_notes(parent_id=workspace)
     parts = [
         f"# {note.title}\n\n{note.body}"
-        for note in await ichiro.list_notes(parent_id=workspace)
+        for note in notes
         if not note.is_folder
     ]
 
+    for note in notes:
+
+        if note.is_folder and note.title == SKILLS:
+            parts.extend(await skills_list(folder_id=note.id))
+
     return "\n\n".join(parts)
+
+
+async def question_context(folder_id: UUID | None) -> str:
+    """
+    What changes with the question: today's date, the folder of the
+    conversation by its path from the root, and the rules of its workspace
+    """
+
+    path = "/"
+
+    if folder_id is not None:
+        folder = await ichiro.get_note_path(note_id=folder_id)
+        path = "/" if folder is None else f"/{folder.path}"
+
+    place = f"Today is {date.today().isoformat()}. Current folder: {path}"
+    rules = await workspace_rules(folder_id=folder_id)
+
+    return f"{place}\n\n{rules}" if rules else place
 
 
 async def create_workspace_folders(parent_id: UUID) -> list[Note]:
@@ -100,7 +151,7 @@ async def create_workspace(folder_id: UUID, description: str) -> list[Note]:
     """
 
     claude.check_key()
-    folder = await ichiro.get_note(note_id=folder_id)
+    folder = await ichiro.get_note_path(note_id=folder_id)
 
     if folder is None:
         raise FolderNotFound("folder not found")
@@ -115,7 +166,7 @@ async def create_workspace(folder_id: UUID, description: str) -> list[Note]:
     system = PROMPT_PATH.read_text(encoding="utf-8")
     request = (
         f"Today is {date.today().isoformat()}. The workspace folder is"
-        f" {folder.id}.\n\n{description}"
+        f" /{folder.path}.\n\n{description}"
     )
     await claude.run_tools(system=system, request=request, tools=notes.tools())
 

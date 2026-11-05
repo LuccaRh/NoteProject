@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 # Global variables
 Role = Literal["user", "assistant"]
+Turn = tuple[Role, list[dict[str, Any]]]
 
 
 # Code

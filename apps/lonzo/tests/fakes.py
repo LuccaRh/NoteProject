@@ -86,6 +86,24 @@ class FakeIchiro:
 
             return httpx2.Response(200, json=rows)
 
+        if request.method == "GET" and path.endswith("/path"):
+            target = UUID(path.removeprefix("/notes/").removesuffix("/path"))
+            names = self.path(note_id=target)
+
+            if not names:
+                return httpx2.Response(404, json={"detail": "note not found"})
+
+            row = self.rows[target]
+
+            return httpx2.Response(
+                200,
+                json={
+                    "id": str(target),
+                    "path": "/".join(names),
+                    "is_folder": row["is_folder"],
+                },
+            )
+
         if request.method == "GET" and path.startswith("/notes/"):
             row = self.rows.get(UUID(path.removeprefix("/notes/")))
 
@@ -163,6 +181,18 @@ class FakeIchiro:
             if child["is_folder"]
             for row in self.inside(parent_id=str(child["id"]))
         ]
+
+    def path(self, note_id: UUID) -> list[str]:
+
+        row = self.rows.get(note_id)
+
+        if row is None:
+            return []
+
+        parent = row["parent_id"]
+        above = [] if parent is None else self.path(note_id=UUID(str(parent)))
+
+        return [*above, str(row["title"])]
 
     def walk(
         self,

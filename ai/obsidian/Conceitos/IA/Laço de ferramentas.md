@@ -54,6 +54,6 @@ O programa em volta do laço se chama *harness*: monta o pacote, executa as ferr
 - Um servidor [[MCP]] é outro jeito de dar ferramentas a um harness: as funções ficam num programa à parte, e qualquer cliente MCP as usa.
 
 > [!example] No NoteProject
-> O serviço de IA roda o laço no servidor, com ferramentas que leem e editam notas ([[Chat com o workspace]]).
+> O serviço de IA roda o laço no servidor, com ferramentas que leem e editam notas ([[Chat com o workspace]]); as peças estão em [[Harness do lonzo]].
 
 Doc: [Anthropic — tool use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use).
