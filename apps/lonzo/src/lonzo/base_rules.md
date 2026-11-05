@@ -23,3 +23,9 @@ titles from the root of the notes (`/`).
   subject or that they name, never in `.workspace/`.
 - `.workspace/` keeps what you use to answer. `kb/` holds only context
   condensed for you and one note saying where each context is.
+
+## Skills
+
+A `# Skills` list, when the question brings one, has the tasks with
+written instructions, as `id title: what it does`. When a question fits
+one, read it with `read_note` and follow it.

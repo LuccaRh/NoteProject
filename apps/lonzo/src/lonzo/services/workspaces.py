@@ -11,7 +11,8 @@ from lonzo.services.note_tools import NoteTools
 
 # Global variables
 WORKSPACE = ".workspace"
-WORKSPACE_FOLDERS = ["kb", "skills", "scripts", "hooks"]
+SKILLS = "skills"
+WORKSPACE_FOLDERS = ["kb", SKILLS, "scripts", "hooks"]
 PROMPT_PATH = Path(__file__).parent.parent / "create_workspace.md"
 BASE_PATH = Path(__file__).parent.parent / "base_rules.md"
 
@@ -40,11 +41,27 @@ async def find_workspace(parent_id: UUID) -> UUID | None:
     return notes[0].id
 
 
+async def skills_list(folder_id: UUID) -> list[str]:
+    """
+    The skills of a workspace, one line each with the id, the title and
+    the first line of the body, in one part; the bodies stay out and
+    nothing comes back with no skills
+    """
+
+    lines = [
+        f"- {note.id} {note.title}: {note.body.partition("\n")[0]}"
+        for note in await ichiro.list_notes(parent_id=folder_id)
+        if not note.is_folder
+    ]
+
+    return ["# Skills\n\n" + "\n".join(lines)] if lines else []
+
+
 async def workspace_rules(folder_id: UUID | None) -> str:
     """
     Rules for a question: notes of the folder's .workspace, as written
-    (the CLAUDE.md opens saying they win); empty with no folder or no
-    .workspace (the root never has one)
+    (the CLAUDE.md opens saying they win), and the list of its skills;
+    empty with no folder or no .workspace (the root never has one)
     """
 
     if folder_id is None:
@@ -55,11 +72,17 @@ async def workspace_rules(folder_id: UUID | None) -> str:
     if workspace is None:
         return ""
 
+    notes = await ichiro.list_notes(parent_id=workspace)
     parts = [
         f"# {note.title}\n\n{note.body}"
-        for note in await ichiro.list_notes(parent_id=workspace)
+        for note in notes
         if not note.is_folder
     ]
+
+    for note in notes:
+
+        if note.is_folder and note.title == SKILLS:
+            parts.extend(await skills_list(folder_id=note.id))
 
     return "\n\n".join(parts)
 
