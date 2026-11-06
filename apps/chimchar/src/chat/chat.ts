@@ -2,6 +2,7 @@
 import { ask, getConversation, listConversations, Refused } from './api.ts'
 import { renderMarkdown } from './markdown.ts'
 import { noteId } from '../notes/links.ts'
+import { SkillMenu } from './slash.ts'
 
 import type { Folder } from '../notes/tree.ts'
 import type { Block, Conversation } from './api.ts'
@@ -66,6 +67,7 @@ export class Chat {
     list: HTMLUListElement
     messages: HTMLElement
     question: HTMLTextAreaElement
+    menu: SkillMenu
     send: HTMLButtonElement
 
     /** Build the panel, wire its controls and load the conversations. */
@@ -78,6 +80,7 @@ export class Chat {
         this.list = element('ul', 'conversations')
         this.messages = element('div', 'messages')
         this.question = element('textarea', 'question')
+        this.menu = new SkillMenu(this.question, () => this.folderId)
         this.send = element('button', 'send')
         this.build()
         options.parent.append(this.panel)
@@ -92,6 +95,7 @@ export class Chat {
         this.workspace.addEventListener('focus', () => this.fillWorkspaces())
         this.workspace.addEventListener('change', () => {
             this.folderId = this.workspace.value || null
+            this.menu.forget()
             this.startConversation()
             void this.loadConversations()
         })
@@ -116,7 +120,9 @@ export class Chat {
         this.send.textContent = 'Send'
 
         const form = element('form', 'ask')
-        form.append(this.question, this.send)
+        const box = element('div', 'question-box')
+        box.append(this.menu.list, this.question)
+        form.append(box, this.send)
         form.addEventListener('submit', event => {
             event.preventDefault()
 
@@ -126,6 +132,8 @@ export class Chat {
 
         // Enter sends, Shift+Enter breaks the line
         this.question.addEventListener('keydown', event => {
+
+            if (this.menu.key(event)) return
 
             if (event.key !== 'Enter' || event.shiftKey) return
 
@@ -262,6 +270,7 @@ export class Chat {
         this.busy = true
         this.send.textContent = 'Cancel'
         this.question.value = ''
+        this.menu.forget()
         this.messages.querySelector('.chat-empty')?.remove()
         this.bubble('user').textContent = question
         const answer = this.bubble('assistant')
