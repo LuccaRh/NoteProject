@@ -72,7 +72,16 @@
                                 M16.5 13v7M13 16.5h7" />
                         </svg>
                     </button>
+                </div>
 
+                <!-- Tree of notes, filled by notes/tree.ts -->
+                <ul id="tree" class="tree" role="tree" aria-label="Notes"></ul>
+
+                <!-- Whether the notes service answered -->
+                <p id="server-status" class="status" role="status">Loading</p>
+
+                <!-- The account, always at the bottom of the sidebar -->
+                <div class="sidebar-foot">
                     <button id="settings" class="icon" aria-label="Settings"
                         title="Settings">
                         <svg aria-hidden="true" width="16" height="16"
@@ -97,12 +106,6 @@
                         </svg>
                     </button>
                 </div>
-
-                <!-- Tree of notes, filled by notes/tree.ts -->
-                <ul id="tree" class="tree" role="tree" aria-label="Notes"></ul>
-
-                <!-- Whether the notes service answered -->
-                <p id="server-status" class="status" role="status">Loading</p>
 
             </aside>
 
