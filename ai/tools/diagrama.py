@@ -43,15 +43,19 @@ CORES = {   # (preenchimento, contorno): claros, para figura em tema claro
     "cinza": ("#f5f5f5", "#666666"),
 }
 
-CORES_TABELA = {   # cabeçalho de `tabela`: fortes, sobre o cartão escuro
-    "azul": "#1b8fd6", "verde": "#1f8a3b", "laranja": "#d9822b", "vermelho": "#c23b3b",
-    "roxo": "#7a2fb5", "amarelo": "#b8940f", "cinza": "#6b6b6b",
+CORES_TABELA = {   # cabeçalho de `tabela`: vivas, sobre o cartão escuro
+    "azul": "#2979ff", "verde": "#00b86b", "laranja": "#ff7a1a", "vermelho": "#f0304f",
+    "roxo": "#a033ff", "amarelo": "#e6a800", "cinza": "#6b7690",
 }
 TABELA_TOPO = 28        # altura do cabeçalho da `tabela`
 TABELA_LINHA = 20       # altura de cada linha da `tabela`
-ESCURO_FUNDO = "#2b2b2b"
-ESCURO_TEXTO = "#e6e6e6"
-ESCURO_LINHA = "#c8c8c8"
+ESCURO_FUNDO = "#0e1220"
+ESCURO_TEXTO = "#eef1f8"
+ESCURO_LINHA = "#c8cfe0"
+TABELA_FUNDO = "#1a2033"    # cartão da `tabela`
+TABELA_BORDA = "#39415c"
+TABELA_MARCAS = {"PK": "#ffd21f", "FK": "#35d0ff", "UQ": "#3dfc9c"}
+TABELA_EXTRA = "#ff9d2e"    # tag de índice, restrição e policy
 
 # --------------------------------------------------------------------------- #
 # símbolos: tipo -> (estilo draw.io, w, h, terminais em fração da caixa NÃO girada)
@@ -171,6 +175,7 @@ class Aresta:
     rotulo: str = ""
     tracejada: bool = False
     pontas: tuple[str, str] | None = None     # ponta draw.io (ERone, ERmany...): início, fim
+    cor: str = ""               # chave de CORES_TABELA; vazio = cor padrão da linha
 
 
 @dataclass
@@ -205,9 +210,8 @@ def _tabela_html(d: dict) -> str:
     """Cartão da `tabela`: cabeçalho colorido, colunas (chave, nome, tipo, NN), índices e nota."""
     e = html.escape
     cor = CORES_TABELA[d.get("cor", "cinza")]
-    borda = "border-top:1px solid #5a5a5a;"
+    borda = f"border-top:1px solid {TABELA_BORDA};"
     td = f"height:{TABELA_LINHA}px;padding:0 5px;white-space:nowrap;"
-    tags = {"PK": "#f2c230", "FK": "#6db8f2", "UQ": "#8fd19e"}
     linhas = [f'<tr><td colspan="4" style="height:{TABELA_TOPO}px;background:{cor};'
               f'color:#fff;font-weight:bold;font-size:13px;text-align:center">'
               f'{e(str(d["texto"]))}</td></tr>']
@@ -215,21 +219,21 @@ def _tabela_html(d: dict) -> str:
         marca = resto[0] if resto else ""
         nulo = len(resto) > 1 and resto[1] == "null"
         linhas.append(
-            f'<tr><td style="{td}width:22px;color:{tags.get(marca, "#fff")};font-size:10px;'
+            f'<tr><td style="{td}width:22px;color:{TABELA_MARCAS.get(marca, "#fff")};font-size:10px;'
             f'font-weight:bold">{e(marca)}</td><td style="{td}">{e(nome)}</td>'
-            f'<td style="{td}color:#b5b5b5;font-style:italic;text-align:right">{e(tipo)}</td>'
+            f'<td style="{td}color:#9fb0d6;font-style:italic;text-align:right">{e(tipo)}</td>'
             f'<td style="{td}width:20px;font-size:10px">{"" if nulo else "NN"}</td></tr>')
     for i, (tag, texto) in enumerate(d.get("extras") or []):
         topo = borda if i == 0 else ""
         linhas.append(
-            f'<tr><td style="{td}{topo}color:#f2a93b;font-size:10px;font-weight:bold">{e(tag)}'
-            f'</td><td colspan="3" style="{td}{topo}color:#d0d0d0;font-size:11px">{e(texto)}'
+            f'<tr><td style="{td}{topo}color:{TABELA_EXTRA};font-size:10px;font-weight:bold">{e(tag)}'
+            f'</td><td colspan="3" style="{td}{topo}color:#d5dcec;font-size:11px">{e(texto)}'
             '</td></tr>')
     if d.get("nota"):
         linhas.append(
-            f'<tr><td colspan="4" style="{borda}padding:3px 5px;color:#a8a8a8;font-size:11px;'
+            f'<tr><td colspan="4" style="{borda}padding:3px 5px;color:#a3aec8;font-size:11px;'
             f'white-space:normal;line-height:14px">{e(d["nota"])}</td></tr>')
-    return ('<table style="width:100%;border-collapse:collapse;background:#3a3a3a;'
+    return ('<table style="width:100%;border-collapse:collapse;background:' + TABELA_FUNDO + ';'
             'color:#ececec;font-size:12px;text-align:left">' + "".join(linhas) + "</table>")
 
 
@@ -308,7 +312,7 @@ def _rota(p0, lado0, p1, lado1, opc: dict, gx: float, gy: float) -> list[tuple[f
     if abs(y0 - y1) < 0.5 and h0 and h1 or abs(x0 - x1) < 0.5 and not h0 and not h1:
         return [p0, p1]
     if h0 and h1:
-        xm = _g((x0 + x1) / 2)
+        xm = MARGEM + opc["coluna"] * gx if "coluna" in opc else _g((x0 + x1) / 2)
         return _limpar([p0, (xm, y0), (xm, y1), p1])
     if not h0 and not h1:
         ym = _g((y0 + y1) / 2)
@@ -428,7 +432,7 @@ def montar(spec: dict) -> Desenho:
         ar = Aresta(i, de.partition(".")[0], para.partition(".")[0], pts,
                     opc.get("seta", padrao_seta), str(opc.get("rotulo", "")),
                     opc.get("tracejada", False),
-                    tuple(opc["pontas"]) if "pontas" in opc else None)
+                    tuple(opc["pontas"]) if "pontas" in opc else None, str(opc.get("cor", "")))
         d.arestas.append(ar)
         if ar.rotulo:
             d.textos.append(_texto_rotulo(ar, opc.get("lado_rotulo")))
@@ -605,7 +609,7 @@ def _membros(d: Desenho, g: No) -> set[str]:
 _BASE = "html=1;whiteSpace=wrap;fontSize=12;"
 _ESTILO = {
     "bloco": _BASE + "rounded=0;",
-    "tabela": "html=1;whiteSpace=wrap;overflow=fill;rounded=0;fillColor=#3a3a3a;strokeColor=#1e1e1e;",
+    "tabela": "html=1;whiteSpace=wrap;overflow=fill;rounded=0;fillColor=#1a2033;strokeColor=#39415c;",
     "banco": _BASE + "shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;",
     "somador": _BASE + "ellipse;aspect=fixed;",
     "ramo": "ellipse;aspect=fixed;fillColor=#000000;strokeColor=#000000;html=1;",
@@ -650,7 +654,7 @@ def _estilo_no(n: No) -> str:
     if n.tipo == "grupo" and n.cor in CORES_TABELA and n.cor != "cinza":
         cor = CORES_TABELA[n.cor]         # grupo colorido: mesma cor das `tabela` dentro dele
         if n.forte:
-            return _ESTILO["grupo"] + f"fillColor={cor};strokeColor={cor};fillOpacity=14;strokeWidth=2;"
+            return _ESTILO["grupo"] + f"fillColor={cor};strokeColor={cor};fillOpacity=16;strokeWidth=2.5;"
     if n.tipo in SIMBOLOS:
         s = SIMBOLOS[n.tipo][0]
     else:
@@ -691,7 +695,9 @@ def drawio(d: Desenho) -> str:
         if a.pontas:
             comeco, fim = f"{a.pontas[0]};startFill=0", f"{a.pontas[1]};endFill=0"
         estilo = f"html=1;rounded=0;endArrow={fim};startArrow={comeco};{'dashed=1;' if a.tracejada else ''}"
-        if d.escuro:
+        if a.cor:
+            estilo += f"strokeColor={CORES_TABELA[a.cor]};strokeWidth=1.5;"
+        elif d.escuro:
             estilo += f"strokeColor={ESCURO_LINHA};"
         (sx, sy), (tx, ty) = a.pontos[0], a.pontos[-1]
         meio = "".join(f'<mxPoint x="{x + dx:.0f}" y="{y + dy:.0f}"/>' for x, y in a.pontos[1:-1])

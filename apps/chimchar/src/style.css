@@ -746,14 +746,101 @@ button {
     padding: 12px max(24px, calc((100% - 700px) / 2)) 20px;
 }
 
-.question {
+.question-box {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.question,
+.question-backdrop {
     box-sizing: border-box;
+    width: 100%;
     padding: 8px 12px;
     border: 1px solid var(--line);
     border-radius: 8px;
     background: var(--panel);
-    flex: 1;
+    scrollbar-gutter: stable;
+}
+
+.question {
+    position: relative;
+    display: block;
     resize: none;
+}
+
+/* The text shows from the backdrop, with the skill colored */
+.question.calling {
+    background: transparent;
+    color: transparent;
+    caret-color: var(--text);
+}
+
+.question.calling::selection {
+    background: rgb(143 184 222 / 30%);
+    color: transparent;
+}
+
+.question-backdrop {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-color: transparent;
+    color: var(--text);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+.question-backdrop mark {
+    border-radius: 4px;
+    background: rgb(198 159 213 / 18%);
+    color: var(--code-keyword);
+}
+
+.skill-menu {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 4px);
+    left: 0;
+    z-index: 1;
+    max-height: 220px;
+    margin: 0;
+    padding: 4px;
+    overflow-y: auto;
+    list-style: none;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+}
+
+.skill-menu-row {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.skill-menu-row:hover,
+.skill-menu-row.active {
+    background: var(--hover);
+}
+
+.skill-menu-title {
+    flex: none;
+    max-width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.skill-menu-summary {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Create workspace dialog */

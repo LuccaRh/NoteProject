@@ -1,0 +1,140 @@
+titulo: "One Postgres container, three databases"
+tipo: blocos
+grade: [100, 10]
+escuro: true
+nos:
+  notes:
+    tipo: tabela
+    pos: [1.9, 19]
+    w: 380
+    texto: notes
+    cor: verde
+    colunas:
+      - [id, uuid, PK]
+      - [parent_id, uuid, FK, "null"]
+      - [is_folder, boolean]
+      - [title, text]
+      - [body, text]
+      - [created_at, timestamptz]
+      - [updated_at, timestamptz]
+      - [owner_id, uuid]
+    extras:
+      - [UQ, "(owner_id, parent_id, title) NULLS NOT DISTINCT"]
+      - [ix, "notes_owner_id_idx (owner_id)"]
+      - [ix, "notes_search_idx GIN to_tsvector(title, body)"]
+      - [RLS, "notes_owner: owner_id = app.user_id"]
+    nota: "Notes and folders (is_folder) in one tree; deleting a folder deletes what is inside."
+
+  users:
+    tipo: tabela
+    pos: [16.9, 45]
+    texto: users
+    cor: roxo
+    w: 270
+    colunas:
+      - [id, uuid, PK]
+      - [email, text, UQ]
+      - [password_hash, text]
+      - [created_at, timestamptz]
+    nota: "Who can log in; the password is stored as a hash (pgcrypto)."
+  sessions:
+    tipo: tabela
+    pos: [16.9, 22]
+    w: 270
+    texto: sessions
+    cor: roxo
+    colunas:
+      - [token_hash, bytea, PK]
+      - [user_id, uuid, FK]
+      - [created_at, timestamptz]
+      - [expires_at, timestamptz]
+    nota: "Only the hash of the token: a leaked table gives no login."
+
+  conversations:
+    tipo: tabela
+    pos: [7.9, 13]
+    w: 380
+    texto: conversations
+    cor: azul
+    colunas:
+      - [id, uuid, PK]
+      - [folder_id, uuid, "", "null"]
+      - [title, text]
+      - [created_at, timestamptz]
+      - [updated_at, timestamptz]
+      - [owner_id, uuid]
+    extras:
+      - [ix, "(owner_id, folder_id, updated_at)"]
+      - [RLS, "conversations_owner: owner_id = app.user_id"]
+    nota: "A chat conversation, tied to a workspace folder (NULL = root)."
+  messages:
+    tipo: tabela
+    pos: [12.5, 12.3]
+    w: 380
+    texto: messages
+    cor: azul
+    colunas:
+      - [id, uuid, PK]
+      - [conversation_id, uuid, FK]
+      - [role, text]
+      - [content, jsonb]
+      - [created_at, timestamptz]
+    extras:
+      - [ix, "(conversation_id, id)"]
+      - [CK, "role IN ('user', 'assistant')"]
+      - [RLS, "messages_owner: the conversation is visible"]
+    nota: "Content blocks of the Messages API, as they were sent."
+  settings:
+    tipo: tabela
+    pos: [7.9, 69]
+    w: 380
+    texto: settings
+    cor: azul
+    colunas:
+      - [user_id, uuid, PK]
+      - [api_key, bytea, "", "null"]
+      - [key_end, text, "", "null"]
+      - [model, text]
+      - [max_tokens, integer]
+      - [tools_max_turns, integer]
+      - [thinking, text]
+      - [show_workspace, boolean]
+    extras:
+      - [RLS, "settings_owner: user_id = app.user_id"]
+    nota: "One row per user; api_key encrypted (Fernet)."
+  skills:
+    tipo: tabela
+    pos: [7.9, 41]
+    w: 380
+    texto: skills
+    cor: azul
+    colunas:
+      - [id, uuid, PK]
+      - [user_id, uuid]
+      - [note_id, uuid]
+      - [title, text]
+      - [summary, text]
+      - [body, text]
+    extras:
+      - [UQ, "(user_id, note_id)"]
+      - [RLS, "skills_read: every logged-in user reads"]
+      - [RLS, "skills_owner: only the owner writes"]
+    nota: "A published skill: a copy of the source note taken when publishing."
+
+  ichiro_db: {tipo: grupo, contem: [notes], texto: "ichiro database (notes)", cor: verde, forte: true, folga: 40}
+  lonzo_db: {tipo: grupo, contem: [conversations, messages, skills, settings], texto: "lonzo database (AI chat)", cor: azul, forte: true}
+  nujabes_db: {tipo: grupo, contem: [users, sessions], texto: "nujabes database (login)", cor: roxo, forte: true, folga: 40}
+arestas:
+  - [sessions.d:user_id, users.d:id, {pontas: [ERmany, ERmandOne], cor: roxo, coluna: 18.6}]
+  - [messages.e:conversation_id, conversations.d:id, {pontas: [ERmany, ERmandOne], cor: azul}]
+  - [notes.e:parent_id, notes.e:id, {pontas: [ERmany, ERzeroToOne], cor: verde, coluna: -0.2}]
+  - [notes.d:id, conversations.e:folder_id, {pontas: [ERzeroToOne, ERmany], tracejada: true, cor: verde, coluna: 5.3}]
+  - [notes.d:id, skills.e:note_id, {pontas: [ERmandOne, ERmany], tracejada: true, cor: verde, coluna: 5.3}]
+  - [users.e:id, conversations.d:owner_id, {pontas: [ERmandOne, ERmany], tracejada: true, cor: roxo, coluna: 10.2}]
+  - [users.e:id, skills.d:user_id, {pontas: [ERmandOne, ERmany], tracejada: true, cor: roxo, coluna: 10.2}]
+  - [users.e:id, settings.d:user_id, {pontas: [ERmandOne, ERzeroToOne], tracejada: true, cor: roxo, coluna: 10.2}]
+  - [users.e:id, notes.d:owner_id, {pontas: [ERmandOne, ERmany], tracejada: true, cor: roxo, pontos: [[10.2, 86], [4.8, 86], [4.8, 21.6]]}]
+legenda:
+  "Solid line": "real foreign key inside a database, ON DELETE CASCADE"
+  "Dashed green": "logical reference only: keeps the id of an ichiro note, no foreign key"
+  "Dashed purple": "logical reference only: keeps the id of a nujabes user, no foreign key"

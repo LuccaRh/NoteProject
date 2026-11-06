@@ -44,6 +44,6 @@ legenda: {WS: "WebSocket com o token do dispositivo"}
 - ER: nó `tabela` com `colunas: [[nome, tipo, PK|FK|UQ, "null"]]`, `extras: [[ix, texto]]`, `nota`; porta `d:coluna`
   liga na linha da coluna; aresta com `pontas: [ERmany, ERmandOne]`. `escuro: true` no topo e `forte: true` no grupo
   (modelo: `esquema-do-postgres.yaml`).
-- Opções de aresta: `rotulo`, `seta`, `tracejada`, `sai`, `entra`, `por`, `nivel`, `pontos`, `lado_rotulo`.
+- Opções de aresta: `rotulo`, `seta`, `tracejada`, `sai`, `entra`, `por`, `nivel`, `pontos`, `lado_rotulo`, `coluna` (x da vertical entre duas portas laterais), `cor` (linha numa cor das `tabela`).
 - Cores: azul (front), verde (back), laranja (servidor), amarelo (dados), roxo (infra), vermelho
   (segurança), cinza (grupo). Mantenha essa convenção entre desenhos.
