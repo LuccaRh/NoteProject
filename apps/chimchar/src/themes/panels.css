@@ -1,0 +1,180 @@
+/* Light panels: rounded white cards on a pale ground, with a teal accent */
+:root[data-theme='panels'] {
+    --ground: #e9ecf2;
+    --panel: #fff;
+    --line: #dfe2e9;
+    --hover: #f1f3f7;
+    --active: #e6e9ef;
+    --selection: #bfe3e0;
+    --text: #1b1e24;
+    --body: #2c3038;
+    --soft: #3f4550;
+    --muted: #5d6472;
+    --faint: #6f7684;
+    --sans: Geist, system-ui, sans-serif;
+    --serif: Literata, Georgia, serif;
+    --mono: 'Geist Mono', ui-monospace, monospace;
+    --code-bg: #f1f3f7;
+    --code-keyword: #7044c9;
+    --code-string: #0b7a75;
+    --code-number: #a13a12;
+    --code-name: #2f5bd3;
+    --accent: #0b7a75;
+    --mark: #d99a1c;
+    --danger: #b3261e;
+    --shadow: rgb(27 30 36 / 0.08);
+    color-scheme: light;
+}
+
+[data-theme='panels'] .app {
+    box-sizing: border-box;
+    gap: 14px;
+    padding: 14px;
+}
+
+/* Sidebar */
+
+[data-theme='panels'] .sidebar {
+    --panel: #f5f6f9;
+    position: relative;
+    flex-basis: 270px;
+    gap: 14px;
+    padding: 16px 12px;
+    border-right: 0;
+    border-radius: 20px;
+    box-shadow: inset 0 0 0 1px var(--line);
+}
+
+[data-theme='panels'] .sidebar::before {
+    content: 'Notes';
+    padding: 2px 6px 0 44px;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 28px;
+    letter-spacing: -0.015em;
+}
+
+/* The accent square of the logo */
+[data-theme='panels'] .sidebar::after {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    background: var(--accent) url('./panels-logo.svg') center / 15px no-repeat;
+}
+
+[data-theme='panels'] .tool-group {
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px var(--line);
+    --hover: var(--active);
+}
+
+[data-theme='panels'] .node {
+    border-radius: 11px;
+}
+
+[data-theme='panels'] .node[aria-selected='true'] {
+    background: #fff;
+    box-shadow:
+        0 1px 2px var(--shadow),
+        0 6px 16px -8px var(--shadow),
+        inset 0 0 0 1px var(--line);
+}
+
+[data-theme='panels'] .sidebar .status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--hover);
+}
+
+[data-theme='panels'] .sidebar .status:empty {
+    visibility: hidden;
+}
+
+[data-theme='panels'] .sidebar .status::before {
+    content: '';
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: panels-breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes panels-breathe {
+    from,
+    to {
+        box-shadow: 0 0 0 0 rgb(11 122 117 / 0.35);
+    }
+
+    50% {
+        box-shadow: 0 0 0 6px rgb(11 122 117 / 0);
+    }
+}
+
+/* Work area */
+
+[data-theme='panels'] .work {
+    overflow: hidden;
+    border-radius: 22px;
+    background: var(--panel);
+    box-shadow:
+        0 1px 2px var(--shadow),
+        0 24px 48px -28px rgb(27 30 36 / 0.28),
+        inset 0 0 0 1px var(--line);
+}
+
+[data-theme='panels'] .tabs {
+    padding: 8px 12px 0;
+}
+
+[data-theme='panels'] .column {
+    max-width: 700px;
+}
+
+[data-theme='panels'] .title {
+    font-weight: 600;
+    font-size: 40px;
+    letter-spacing: -0.02em;
+}
+
+[data-theme='panels'] .cm-editor {
+    font-size: 17px;
+}
+
+:root[data-theme='panels'] .cm-content {
+    font-family: var(--serif);
+}
+
+[data-theme='panels'] .md-h1,
+[data-theme='panels'] .md-h2,
+[data-theme='panels'] .md-h3,
+[data-theme='panels'] .md-h4,
+[data-theme='panels'] .md-h5,
+[data-theme='panels'] .md-h6,
+[data-theme='panels'] .message.assistant h1,
+[data-theme='panels'] .message.assistant h2,
+[data-theme='panels'] .message.assistant h3 {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* Chat */
+
+[data-theme='panels'] .message.user {
+    border-radius: 14px;
+    background: var(--hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme='panels'] .sidebar .status::before {
+        animation: none;
+    }
+}
