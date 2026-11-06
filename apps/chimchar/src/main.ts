@@ -13,10 +13,13 @@ import {
 import { Page } from './notes/page.ts'
 import { Search } from './notes/search.ts'
 import { Tree } from './notes/tree.ts'
+import { getSettings } from './settings/api.ts'
+import { SettingsDialog } from './settings/settings-dialog.ts'
 import { Tabs } from './tabs.ts'
 
 import type { Note } from './notes/api.ts'
 import type { Found } from './notes/search.ts'
+import type { Settings } from './settings/api.ts'
 
 
 // Global variables
@@ -82,6 +85,23 @@ const loginDialog = new LoginDialog({
     status: byId('login-status'),
     submit: byId('login-submit'),
 })
+
+const settingsDialog = new SettingsDialog(
+    {
+        dialog: byId('settings-dialog'),
+        form: byId('settings-form'),
+        apiKey: byId('settings-api-key'),
+        keyState: byId('settings-key-state'),
+        removeKey: byId('settings-remove-key'),
+        model: byId('settings-model'),
+        maxTokens: byId('settings-max-tokens'),
+        showWorkspace: byId('settings-show-workspace'),
+        status: byId('settings-status'),
+        save: byId('settings-save'),
+        cancel: byId('settings-cancel'),
+    },
+    settings => applySettings(settings),
+)
 
 // The note panel doubles as the empty page when no tab is open
 const tabs = new Tabs(byId('tabs'), notePanel, () => void page.close())
@@ -204,6 +224,13 @@ async function notesChanged(): Promise<void> {
     await page.reload()
 }
 
+/** Show or hide the .workspace folders as the settings ask. */
+function applySettings(settings: Settings): void {
+
+    tree.showWorkspace(settings.show_workspace)
+    search.workspaceShown = settings.show_workspace
+}
+
 /** Send pending edits, end the session and start again at the login. */
 async function leave(): Promise<void> {
 
@@ -219,6 +246,9 @@ async function start(): Promise<void> {
 
     await tree.load(null)
     serverStatus.textContent = ''
+
+    // Notes work without lonzo: the folders just stay hidden
+    getSettings().then(applySettings).catch(console.error)
 }
 
 /** Create a note (and open it) or a folder (and rename it). */
@@ -270,6 +300,9 @@ byId('new-workspace').addEventListener('click', () => {
     workspaceDialog.open(tree.target())
 })
 
+byId('settings').addEventListener('click', () => {
+    void settingsDialog.open()
+})
 byId('log-out').addEventListener('click', () => void leave())
 
 void start()

@@ -73,6 +73,19 @@
                         </svg>
                     </button>
 
+                    <button id="settings" class="icon" aria-label="Settings"
+                        title="Settings">
+                        <svg aria-hidden="true" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
+                            <circle cx="15" cy="7" r="2" />
+                            <circle cx="9" cy="17" r="2" />
+                        </svg>
+                    </button>
+
                     <button id="log-out" class="icon" aria-label="Log out"
                         title="Log out">
                         <svg aria-hidden="true" width="16" height="16"
@@ -178,6 +191,47 @@
                     <button id="workspace-create" type="submit">
                         Create
                     </button>
+                </div>
+            </form>
+        </dialog>
+
+        <!-- Settings of the account, driven by settings/settings-dialog.ts -->
+        <dialog id="settings-dialog" class="dialog"
+            aria-labelledby="settings-heading">
+            <form id="settings-form" class="dialog-form">
+                <h2 id="settings-heading">Settings</h2>
+
+                <label for="settings-api-key">Anthropic API key</label>
+                <input id="settings-api-key" type="password"
+                    autocomplete="off" spellcheck="false"
+                    placeholder="Paste a new key" />
+                <div class="settings-key">
+                    <span id="settings-key-state"></span>
+                    <button id="settings-remove-key" type="button" hidden>
+                        Remove key
+                    </button>
+                </div>
+
+                <label for="settings-model">Model</label>
+                <select id="settings-model"></select>
+
+                <label for="settings-max-tokens">Max tokens</label>
+                <input id="settings-max-tokens" type="number" min="1" step="1"
+                    required />
+
+                <label class="settings-check">
+                    <input id="settings-show-workspace" type="checkbox" />
+                    Show .workspace folders
+                </label>
+
+                <!-- Saving the form, or what went wrong -->
+                <p id="settings-status" class="status" role="status"></p>
+
+                <div class="dialog-actions">
+                    <button id="settings-cancel" type="button">
+                        Cancel
+                    </button>
+                    <button id="settings-save" type="submit">Save</button>
                 </div>
             </form>
         </dialog>
