@@ -31,6 +31,12 @@ const SCHEME = 'note:'
 
 
 // Code
+/** Id of the note a link address points to; null for any other link. */
+export function noteId(url: string): string | null {
+
+    return url.startsWith(SCHEME) ? url.slice(SCHEME.length) : null
+}
+
 /** Keep the brackets of a title from ending the link text. */
 function escaped(title: string): string {
 
@@ -97,9 +103,7 @@ function linkedNote(view: EditorView, pos: number): string | null {
 
     if (!url || touches(view.state, node.from, node.to)) return null
 
-    const target = view.state.sliceDoc(url.from, url.to)
-
-    return target.startsWith(SCHEME) ? target.slice(SCHEME.length) : null
+    return noteId(view.state.sliceDoc(url.from, url.to))
 }
 
 /** Open the note under a left click, instead of placing the cursor. */

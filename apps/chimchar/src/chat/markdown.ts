@@ -3,6 +3,7 @@ import 'katex/dist/katex.min.css'
 import DOMPurify from 'dompurify'
 import katex from 'katex'
 import { Marked } from 'marked'
+import { noteId } from '../notes/links.ts'
 
 import type { Tokens } from 'marked'
 
@@ -23,6 +24,14 @@ const marked = new Marked({
         tokenizer: readMath,
         renderer: drawMath,
     }],
+})
+
+// Sanitizing drops the address of a note link, an unknown scheme
+DOMPurify.addHook('uponSanitizeAttribute', (_node, attribute) => {
+
+    if (attribute.attrName === 'href' && noteId(attribute.attrValue)) {
+        attribute.forceKeepAttr = true
+    }
 })
 
 
