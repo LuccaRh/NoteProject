@@ -90,12 +90,19 @@ export class Search {
         })
     }
 
+    /** The whole tree, without the .workspace notes unless shown. */
+    async visible(): Promise<NotePath[]> {
+
+        const entries = await listTree()
+
+        return entries.filter(entry =>
+            this.workspaceShown || !inWorkspace(entry.path))
+    }
+
     /** Open the pop-up, searching inside a folder (null = everywhere). */
     async open(folderId: string | null): Promise<void> {
 
-        const entries = await listTree()
-        this.entries = entries.filter(entry =>
-            this.workspaceShown || !inWorkspace(entry.path))
+        this.entries = await this.visible()
         const folder = this.entries.find(entry => entry.id === folderId)
         this.enter(folder ?? null)
         this.els.dialog.showModal()

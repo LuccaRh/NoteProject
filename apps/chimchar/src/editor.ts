@@ -6,6 +6,9 @@ import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { tags } from '@lezer/highlight'
 import { preview } from './decorations/preview.ts'
 import { found, showFound } from './decorations/found.ts'
+import { noteLinks } from './notes/links.ts'
+
+import type { Links } from './notes/links.ts'
 
 
 export type Editor = {
@@ -104,6 +107,7 @@ const theme = EditorView.theme({
 /** Markdown editor; onChange gets the text on every edit. */
 export function createEditor(
     parent: HTMLElement,
+    links: Links,
     onChange?: (text: string) => void,
 ): Editor {
     const extensions = [
@@ -114,6 +118,7 @@ export function createEditor(
         EditorView.lineWrapping,
         preview,
         found,
+        noteLinks(links),
         EditorView.updateListener.of(update => {
             if (update.docChanged) onChange?.(update.state.doc.toString())
         }),

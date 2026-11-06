@@ -35,7 +35,10 @@ const page = new Page(
         status: byId('save-status'),
         title: byId('title'),
         editor: byId('editor'),
-    }, 
+    },
+    {
+        entries: () => search.visible(),
+    },
     saved => showSaved(saved)
 )
 
