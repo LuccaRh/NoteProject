@@ -42,15 +42,26 @@ async def find_workspace(parent_id: UUID) -> UUID | None:
     return notes[0].id
 
 
+def split_skill(body: str) -> tuple[str, str]:
+    """
+    The summary of a skill, its first line with text and without heading
+    marks, and the rest of the body
+    """
+
+    first, _, rest = body.strip().partition("\n")
+
+    return first.lstrip("# ").strip(), rest.strip()
+
+
 async def skills_list(folder_id: UUID) -> list[str]:
     """
     The skills of a workspace, one line each with the id, the title and
-    the first line of the body, in one part; the bodies stay out and
-    nothing comes back with no skills
+    the summary, in one part; the bodies stay out and nothing comes back
+    with no skills
     """
 
     lines = [
-        f"- {note.id} {note.title}: {note.body.partition("\n")[0]}"
+        f"- {note.id} {note.title}: {split_skill(body=note.body)[0]}"
         for note in await ichiro.list_notes(parent_id=folder_id)
         if not note.is_folder
     ]
