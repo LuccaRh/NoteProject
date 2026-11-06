@@ -17,7 +17,7 @@ from lonzo.errors import (
 # Global variables
 STATUS: dict[type[Exception], int] = {
     APIError: 502,
-    MissingApiKey: 503,
+    MissingApiKey: 422,
     InvalidApiKey: 422,
     InvalidSettings: 422,
     FolderNotFound: 404,

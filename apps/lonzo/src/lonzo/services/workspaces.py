@@ -7,6 +7,7 @@ from lonzo.connections import claude, ichiro
 from lonzo.errors import FolderNotFound, NotAFolder
 from lonzo.schemas.notes import Note
 from lonzo.services.note_tools import NoteTools
+from lonzo.services.settings import get_model_settings
 
 
 # Global variables
@@ -150,7 +151,7 @@ async def create_workspace(folder_id: UUID, description: str) -> list[Note]:
     What was saved stays when it fails, and a retry reuses it
     """
 
-    claude.check_key()
+    settings = await get_model_settings()
     folder = await ichiro.get_note_path(note_id=folder_id)
 
     if folder is None:
@@ -168,6 +169,11 @@ async def create_workspace(folder_id: UUID, description: str) -> list[Note]:
         f"Today is {date.today().isoformat()}. The workspace folder is"
         f" /{folder.path}.\n\n{description}"
     )
-    await claude.run_tools(system=system, request=request, tools=notes.tools())
+    await claude.run_tools(
+        settings=settings,
+        system=system,
+        request=request,
+        tools=notes.tools(),
+    )
 
     return [*folders, *notes.created]

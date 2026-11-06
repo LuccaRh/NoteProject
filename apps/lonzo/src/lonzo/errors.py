@@ -1,8 +1,7 @@
 # Code
 class MissingApiKey(Exception):
     """
-    The user saved no key and ANTHROPIC_API_KEY is not set, so no call to
-    the model can go out
+    The user saved no key, so no call to the model can go out
     """
 
 

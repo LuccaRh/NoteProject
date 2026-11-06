@@ -5,6 +5,7 @@ from typing import Any, ClassVar
 from unittest.mock import patch
 from uuid import uuid4
 
+import pytest
 from fakes import USER, FakeIchiro
 from fastapi.testclient import TestClient
 from httpx2 import Response
@@ -15,6 +16,7 @@ from lonzo.main import app
 
 
 # Global variables
+pytestmark = pytest.mark.usefixtures("saved_key")
 client = TestClient(app, headers={"X-User-Id": str(USER)})
 
 
@@ -57,9 +59,12 @@ class FakeRunner:
 
 
 class FakeClient:
-    api_key: str = "test-key"
     messages: SimpleNamespace = SimpleNamespace(tool_runner=FakeRunner)
     beta: SimpleNamespace = SimpleNamespace(messages=messages)
+
+    def with_options(self, api_key: str) -> FakeClient:
+
+        return self
 
 
 def post(

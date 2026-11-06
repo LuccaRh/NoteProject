@@ -1,4 +1,5 @@
 # Imports
+import pytest
 from fakes import OTHER_USER
 from fastapi.testclient import TestClient
 from test_chat import conversation_of, post
@@ -7,6 +8,7 @@ from lonzo.main import app
 
 
 # Global variables
+pytestmark = pytest.mark.usefixtures("saved_key")
 other_client = TestClient(app, headers={"X-User-Id": str(OTHER_USER)})
 
 

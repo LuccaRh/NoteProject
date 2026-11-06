@@ -12,14 +12,12 @@ from anthropic.types.beta import (
     BetaTextBlockParam,
 )
 
-from lonzo.errors import InvalidApiKey, MissingApiKey
+from lonzo.errors import InvalidApiKey
 from lonzo.schemas.conversations import Message
-from lonzo.schemas.settings import ModelOption
+from lonzo.schemas.settings import ModelOption, ModelSettings
 
 
 # Global variables
-MODEL = "claude-haiku-5-5"
-CHAT_MAX_TOKENS = 64000
 TOOLS_MAX_TOKENS = 16000
 TOOLS_MAX_TURNS = 20
 CACHE: BetaCacheControlEphemeralParam = {"type": "ephemeral"}
@@ -29,15 +27,15 @@ CACHE: BetaCacheControlEphemeralParam = {"type": "ephemeral"}
 class AnthropicClient:
     """
     The Anthropic API: one method per kind of call lonzo makes, with the
-    model and limits fixed here
+    key, model and limit of the user
     """
 
     sdk: AsyncAnthropic
 
     def __init__(self) -> None:
         """
-        One SDK client for the whole service, with the key of the
-        environment, until there is a login
+        One SDK client for the whole service, without a key; each call
+        copies it with the key of the user
         """
 
         self.sdk = AsyncAnthropic()
@@ -48,14 +46,6 @@ class AnthropicClient:
         """
 
         await self.sdk.close()
-
-    def check_key(self) -> None:
-        """
-        MissingApiKey when the service has no key, before any call
-        """
-
-        if self.sdk.api_key is None:
-            raise MissingApiKey("ANTHROPIC_API_KEY is not set")
 
     async def list_models(self, api_key: str) -> list[ModelOption]:
         """
@@ -78,6 +68,7 @@ class AnthropicClient:
 
     def stream_answer(
         self,
+        settings: ModelSettings,
         system: list[str],
         history: list[Message],
         question: str,
@@ -90,7 +81,7 @@ class AnthropicClient:
         piece of system is the fixed one, marked for the cache
         """
 
-        self.check_key()
+        sdk = self.sdk.with_options(api_key=settings.api_key)
         # The blocks were saved in the shape the API takes them back
         messages = [
             cast(BetaMessageParam, {"role": m.role, "content": m.content})
@@ -102,9 +93,9 @@ class AnthropicClient:
         ]
         blocks[0]["cache_control"] = CACHE
 
-        return self.sdk.beta.messages.tool_runner(
-            model=MODEL,
-            max_tokens=CHAT_MAX_TOKENS,
+        return sdk.beta.messages.tool_runner(
+            model=settings.model,
+            max_tokens=settings.max_tokens,
             thinking={"type": "disabled"},
             system=blocks,
             messages=messages,
@@ -116,19 +107,21 @@ class AnthropicClient:
 
     async def run_tools(
         self,
+        settings: ModelSettings,
         system: str,
         request: str,
         tools: list[BetaAsyncFunctionTool[Any]],
     ) -> None:
         """
         The tool loop, run by the tool runner of the SDK: the model calls
-        the tools until it stops or reaches TOOLS_MAX_TURNS
+        the tools until it stops or reaches TOOLS_MAX_TURNS, in at most
+        TOOLS_MAX_TOKENS per turn, or the limit of the user when lower
         """
 
-        self.check_key()
-        runner = self.sdk.beta.messages.tool_runner(
-            model=MODEL,
-            max_tokens=TOOLS_MAX_TOKENS,
+        sdk = self.sdk.with_options(api_key=settings.api_key)
+        runner = sdk.beta.messages.tool_runner(
+            model=settings.model,
+            max_tokens=min(TOOLS_MAX_TOKENS, settings.max_tokens),
             thinking={"type": "disabled"},
             system=system,
             messages=[{"role": "user", "content": request}],
