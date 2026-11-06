@@ -16,6 +16,7 @@ import { Search } from './notes/search.ts'
 import { Tree } from './notes/tree.ts'
 import { getSettings } from './settings/api.ts'
 import { SettingsDialog } from './settings/settings-dialog.ts'
+import { SkillsTab } from './skills/skills-tab.ts'
 import { Tabs } from './tabs.ts'
 
 import type { Note } from './notes/api.ts'
@@ -112,6 +113,11 @@ const settingsDialog = new SettingsDialog(
 
 // The note panel doubles as the empty page when no tab is open
 const tabs = new Tabs(byId('tabs'), notePanel, () => void page.close())
+const skills = new SkillsTab({
+    parent: work,
+    openNote: id => openLink(id),
+    onNotesChanged: () => void notesChanged(),
+})
 
 
 // Code
@@ -184,6 +190,19 @@ function openChat(folderId: string | null): void {
         panel: chat.panel,
         show: () => chat.question.focus(),
         close: () => chat.panel.remove(),
+    })
+}
+
+/** Open the tab of the skills, or bring it back to the front. */
+function openSkills(): void {
+
+    void tabs.open({
+        id: 'skills',
+        kind: 'skills',
+        title: 'Skills',
+        panel: skills.panel,
+        show: () => skills.load(),
+        close: () => { skills.panel.hidden = true },
     })
 }
 
@@ -322,6 +341,7 @@ byId('new-chat').addEventListener('click', () => openChat(tree.target()))
 byId('new-workspace').addEventListener('click', () => {
     workspaceDialog.open(tree.target())
 })
+byId('open-skills').addEventListener('click', openSkills)
 
 byId('settings').addEventListener('click', () => {
     void settingsDialog.open()

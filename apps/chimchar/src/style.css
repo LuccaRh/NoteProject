@@ -1149,3 +1149,155 @@ button {
         animation: none;
     }
 }
+
+.skills-panel {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+.skills-panel[hidden] {
+    display: none;
+}
+
+.skills-side {
+    width: 220px;
+    flex: none;
+    padding: 12px 8px;
+    overflow-y: auto;
+    border-right: 1px solid var(--line);
+    color: var(--muted);
+}
+
+.skills-workspace {
+    display: block;
+    width: 100%;
+    padding: 6px 8px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    color: var(--soft);
+    font: inherit;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.skills-workspace:hover {
+    background: var(--hover);
+}
+
+.skills-workspace.active {
+    background: var(--active);
+    color: var(--text);
+}
+
+.skills-main {
+    flex: 1;
+    min-width: 0;
+    padding: 20px 32px;
+    overflow-y: auto;
+}
+
+.skills-heading {
+    margin: 0 0 10px;
+    font: 500 15px/1.4 var(--sans);
+    color: var(--text);
+}
+
+.skills-add-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 28px;
+}
+
+.skills-status {
+    min-height: 20px;
+    margin: 0 0 6px;
+    color: var(--muted);
+}
+
+.skills-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.skills-empty {
+    padding: 8px 0;
+    color: var(--faint);
+}
+
+.skill {
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+}
+
+.skill-title {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font: 500 14px/1.5 var(--sans);
+}
+
+button.skill-title {
+    cursor: pointer;
+}
+
+button.skill-title:hover {
+    text-decoration: underline;
+}
+
+.skill-summary {
+    margin: 2px 0 8px;
+    color: var(--soft);
+}
+
+.skill-body {
+    margin-bottom: 8px;
+    color: var(--muted);
+}
+
+.skill-body summary {
+    cursor: pointer;
+}
+
+.skill-body pre {
+    margin: 8px 0 0;
+    padding: 10px;
+    border-radius: 4px;
+    background: var(--code-bg);
+    color: var(--body);
+    font: 13px/1.5 var(--mono);
+    white-space: pre-wrap;
+}
+
+.skill-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skill-action,
+.skill-copy,
+.skills-filter {
+    padding: 3px 10px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--panel);
+    color: var(--soft);
+    font: 13px/1.5 var(--sans);
+}
+
+.skill-action:hover:enabled {
+    background: var(--hover);
+    color: var(--text);
+}
+
+.skill-action:disabled {
+    color: var(--faint);
+}

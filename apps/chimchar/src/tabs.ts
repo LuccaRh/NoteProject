@@ -2,7 +2,7 @@
 export type Tab = {
     // A note tab uses the note id, so the same note never opens twice
     id: string
-    kind: 'note' | 'chat'
+    kind: 'note' | 'chat' | 'skills'
     title: string
     panel: HTMLElement
     // Called each time the tab comes to the front

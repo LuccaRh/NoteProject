@@ -56,7 +56,7 @@ Numa pasta `.workspace/` dentro de qualquer pasta do vault (a coleção de notas
 
 ## Como nasce
 
-Um kit fixo ("Estudo": uma regra e duas skills) serve mal a assuntos diferentes: o que se repete entre os workspaces do Claude Code no PC (NoteProject, Disciplinas e as matérias, baseball) é a forma do `CLAUDE.md`, não as skills. Então o app guarda um `CLAUDE.md` base, e a IA o preenche a partir do que a pessoa quer, criando skills, scripts e hooks só quando o texto pede. (2026-11-02) Nenhuma skill entra pronta: nenhuma das que existem nos projetos é básica.
+Um kit fixo ("Estudo": uma regra e duas skills) serve mal a assuntos diferentes: o que se repete entre os workspaces do Claude Code no PC (NoteProject, Disciplinas e as matérias, baseball) é a forma do `CLAUDE.md`, não as skills. Então o app guarda um `CLAUDE.md` base, e a IA o preenche a partir do que a pessoa quer, criando skills, scripts e hooks só quando o texto pede. (2026-11-02) Nenhuma skill entra pronta na criação do workspace: nenhuma das que existem nos projetos é básica. (2026-11-06) A pessoa escolhe as prontas na aba Skills; ver [[Harness do lonzo#Inventário de skills]].
 
 | Seção do `CLAUDE.md` | Para quê | No Claude Code do PC |
 |---|---|---|
