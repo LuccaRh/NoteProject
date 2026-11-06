@@ -2,7 +2,7 @@
 import { ask, getConversation, listConversations, Refused } from './api.ts'
 import { renderMarkdown } from './markdown.ts'
 import { noteId } from '../notes/links.ts'
-import { SkillMenu } from './slash.ts'
+import { SkillMenu, written } from './slash.ts'
 
 import type { Folder } from '../notes/tree.ts'
 import type { Block, Conversation } from './api.ts'
@@ -239,7 +239,7 @@ export class Chat {
 
             const bubble = this.bubble(message.role)
 
-            if (message.role === 'user') bubble.textContent = content
+            if (message.role === 'user') bubble.textContent = written(content)
             else bubble.innerHTML = renderMarkdown(content)
         }
 

@@ -12,6 +12,12 @@ const SKILL_END = '\n</skill>'
 
 
 // Code
+/** What the person wrote in a message, without the text of its skill. */
+export function written(message: string): string {
+
+    return message.split(SKILL_START, 1)[0] ?? ''
+}
+
 /** Whether a question calls a skill: /title, then nothing or a space. */
 function calls(question: string, skill: WorkspaceSkill): boolean {
 
