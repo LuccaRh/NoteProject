@@ -40,7 +40,7 @@ Tags (2026-10-19), no começo do título dos commits fora do app:
 
 | Tag | O que entra | Regra |
 |---|---|---|
-| `[docs] ` | notas do vault, fontes das figuras (`ai/kb/diagramas/`) e o `README.md` | um por branch; na `master`, um por push |
+| `[docs] ` | notas do vault, fontes das figuras (`ai/kb/diagramas/`) e o `README.md` | um por branch; a `master` só recebe PR (2026-11-06, ruleset `Master Rules`) |
 | `[ai-workspace] ` | `CLAUDE.md`, `.claude/`, o resto de `ai/` | as normais |
 | sem tag | código do app, Makefile | as normais |
 

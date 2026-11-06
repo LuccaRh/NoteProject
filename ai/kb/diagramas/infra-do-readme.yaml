@@ -1,0 +1,24 @@
+titulo: NoteProject today, running with Docker Compose
+tipo: blocos
+grade: [230, 120]
+nos:
+  nav:     {tipo: bloco, pos: [0, 1], texto: "Browser", cor: azul}
+  caddy:   {tipo: bloco, pos: [1, 1], texto: "caddy<br>HTTPS, routing,<br>session check", cor: vermelho}
+  chim:    {tipo: bloco, pos: [2, 0], texto: "chimchar<br>/<br>web app (Vite)", cor: azul}
+  nuj:     {tipo: bloco, pos: [2, 1], texto: "nujabes<br>/api/auth<br>login and sessions", cor: verde}
+  ich:     {tipo: bloco, pos: [2, 2], texto: "ichiro<br>/api/notes<br>notes and search", cor: verde}
+  lon:     {tipo: bloco, pos: [2, 3], texto: "lonzo<br>/api/chat<br>chat, skills, settings", cor: verde}
+  pg:      {tipo: banco, pos: [3, 2], texto: "postgres<br>one database<br>per service", cor: amarelo}
+  anth:    {tipo: bloco, pos: [3, 3.85], texto: "Anthropic API", cor: roxo}
+  compose: {tipo: grupo, contem: [caddy, chim, nuj, ich, lon, pg], texto: "docker compose", cor: cinza}
+arestas:
+  - [nav, caddy, {rotulo: "HTTPS"}]
+  - [caddy.c, chim.e]
+  - [caddy, nuj]
+  - [caddy.b, ich.e]
+  - [caddy.b, lon.e]
+  - [nuj.d, pg.c]
+  - [ich, pg]
+  - [lon.d, pg.b]
+  - [lon.c, ich.b, {rotulo: "note tools"}]
+  - [lon.b, anth.e, {rotulo: "HTTPS"}]
