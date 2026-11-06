@@ -105,6 +105,7 @@ const settingsDialog = new SettingsDialog(
         maxTokens: byId('settings-max-tokens'),
         toolsMaxTurns: byId('settings-tools-max-turns'),
         showWorkspace: byId('settings-show-workspace'),
+        theme: byId('settings-theme'),
         status: byId('settings-status'),
         save: byId('settings-save'),
         cancel: byId('settings-cancel'),

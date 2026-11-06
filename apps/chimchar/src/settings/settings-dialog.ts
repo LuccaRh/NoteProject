@@ -5,6 +5,7 @@ import {
     removeKey,
     saveSettings,
 } from './api.ts'
+import { chooseTheme, currentTheme } from './theme.ts'
 
 import type {
     ModelOption,
@@ -32,6 +33,7 @@ type Elements = {
     maxTokens: HTMLInputElement
     toolsMaxTurns: HTMLInputElement
     showWorkspace: HTMLInputElement
+    theme: HTMLSelectElement
     status: HTMLElement
     save: HTMLButtonElement
     cancel: HTMLButtonElement
@@ -61,6 +63,9 @@ export class SettingsDialog {
         })
         els.apiKey.addEventListener('change', () => void this.saveKey())
         els.cancel.addEventListener('click', () => els.dialog.close())
+        els.theme.addEventListener('change', () => {
+            chooseTheme({ theme: els.theme.value })
+        })
         els.removeKey.addEventListener('click', () => void this.forgetKey())
         els.model.addEventListener('change', () => {
             this.limitTokens()
@@ -74,6 +79,7 @@ export class SettingsDialog {
         this.els.apiKey.value = ''
         this.els.status.textContent = 'Loading'
         this.els.save.disabled = true
+        this.els.theme.value = currentTheme()
         this.els.dialog.showModal()
 
         try {
