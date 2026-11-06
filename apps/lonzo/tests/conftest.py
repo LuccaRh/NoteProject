@@ -43,6 +43,7 @@ async def delete_since(start: datetime) -> None:
                 {"start": start},
             )
             await conn.execute(text("DELETE FROM settings"))
+            await conn.execute(text("DELETE FROM skills"))
 
 
 async def save_key() -> None:
