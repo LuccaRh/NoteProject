@@ -272,6 +272,7 @@ ai/                todo o resto do workspace de IA:
   `chimchar/add-the-account-settings`, nos PRs: `[[` lista as notas (`notes/links.ts`, `listTree`), grava
   `[Título](note:<uuid>)`, clique abre a nota; só front, o owner vem da policy do banco. chimchar 0.20.0.
 - Pasta `core/` do lonzo (2026-11-05, #151): `cipher` já nasce em `core/` na `lonzo/add-the-account-settings`; a branch `lonzo/move-the-shared-modules-of-lonzo-to-core`, em cima da `chimchar/link-notes-to-each-other`, nos PRs, leva `db`, `connections`, `user`, `lifespan`, `handlers` e `errors`. lonzo 0.13.0. `ichiro` e `nujabes` ainda na raiz.
+- Links da IA (2026-11-05, #149): branch `lonzo/link-notes-to-each-other`, em cima da `lonzo/move-the-shared-modules-of-lonzo-to-core`: o `base_rules.md` ensina `[palavra](note:<id>)` e lista os formatos que o editor mostra. lonzo 0.14.0. Falta: link clicável no chat (DOMPurify tira o `href` de `note:`), em tabela e para site.
 - #117 (milestone Editor) no PR da branch `chimchar/render-markdown-in-the-editor`: live
   preview no editor (`decorations/preview.ts`: títulos, tabela GFM, bloco de código com cor,
   marcas escondidas fora do cursor); chimchar 0.10.0. Callout `[!tipo]` fica para a #5.

@@ -24,6 +24,32 @@ titles from the root of the notes (`/`).
 - `.workspace/` keeps what you use to answer. `kb/` holds only context
   condensed for you and one note saying where each context is.
 
+## How notes are shown
+
+A note is Markdown, and the editor draws only these formats:
+
+- Headings: `#` to `######`.
+- Text: `**bold**`, `*italic*`, `~~struck~~`, `` `code` ``.
+- Lists: `- item` and `1. item`.
+- Quote: `> text`.
+- Line across the page: `---`.
+- Code block: three backticks with the language name, which gives it color.
+- Table: a header row, a `| --- |` row (`:--:` aligns a column) and the
+  other rows. Inside a cell only bold, italic and code are drawn, so a
+  link goes outside the table.
+- Link to a note: `[word](note:<id>)`, with the id of the linked note.
+  Inside the word, write `\[` and `\]` for brackets.
+
+Everything else shows as raw text, so do not use it in a note: `[[Title]]`,
+`[[Title|word]]`, formulas between `$`, images and `- [ ]` checkboxes. Write
+formulas as plain text, like `e = r − y`. A link to a website does not
+open, so write the address itself.
+
+An id always comes from a tool: `search_titles` and `list_folder` give
+the id of an existing note, and `create_note` gives the id of a new one.
+To link new notes to each other, create them all first, then add the links
+with `edit_note`. Never make up an id: without one, write the plain word.
+
 ## Skills
 
 A `# Skills` list, when the question brings one, has the tasks with
