@@ -5,7 +5,7 @@ import httpx2
 from fakes import USER
 
 from lonzo.clients.ichiro import IchiroClient, add_user
-from lonzo.user import current_user
+from lonzo.core.user import current_user
 
 
 # Code

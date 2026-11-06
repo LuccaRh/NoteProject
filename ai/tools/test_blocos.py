@@ -136,6 +136,13 @@ class TestCamadas(unittest.TestCase):
         )
         self.assertEqual(checar_camadas(texto, "lonzo"), [1, 2, 3])
 
+    def test_router_com_conexao_em_core(self) -> None:
+        texto = "from lonzo.core.db import engine\nfrom lonzo.core import connections\n"
+        self.assertEqual(checar_camadas(texto, "lonzo"), [1, 2])
+
+    def test_router_com_erro_em_core(self) -> None:
+        self.assertEqual(checar_camadas("from lonzo.core.errors import Oops\n", "lonzo"), [])
+
     def test_router_com_repository(self) -> None:
         texto = "from ichiro.repositories.notes import select_note\n"
         self.assertEqual(checar_camadas(texto, "ichiro"), [1])

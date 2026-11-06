@@ -4,7 +4,7 @@ from anthropic import APIError
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from lonzo.errors import (
+from lonzo.core.errors import (
     ConversationNotFound,
     FolderNotFound,
     InvalidApiKey,

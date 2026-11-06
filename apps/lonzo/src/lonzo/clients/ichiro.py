@@ -5,9 +5,9 @@ from uuid import UUID
 import httpx2
 from pydantic import TypeAdapter
 
-from lonzo.errors import TitleTaken
+from lonzo.core.errors import TitleTaken
+from lonzo.core.user import current_user
 from lonzo.schemas.notes import Note, NoteMatch, NotePath, TitleMatch
-from lonzo.user import current_user
 
 
 # Global variables

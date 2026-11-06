@@ -5,7 +5,7 @@ from uuid import UUID
 
 from anthropic import APIError
 
-from lonzo.connections import claude
+from lonzo.core.connections import claude
 from lonzo.schemas.conversations import Conversation, Message, Turn
 from lonzo.schemas.settings import ModelSettings
 from lonzo.services.conversations import (

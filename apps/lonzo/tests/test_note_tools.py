@@ -7,7 +7,7 @@ from uuid import UUID, uuid4
 import pytest
 from fakes import FakeIchiro
 
-from lonzo import connections
+from lonzo.core import connections
 from lonzo.services.note_tools import NoteTools
 
 

@@ -14,7 +14,7 @@ from anthropic.types.beta import (
     BetaThinkingConfigParam,
 )
 
-from lonzo.errors import InvalidApiKey
+from lonzo.core.errors import InvalidApiKey
 from lonzo.schemas.conversations import Message
 from lonzo.schemas.settings import ModelOption, ModelSettings, Thinking
 

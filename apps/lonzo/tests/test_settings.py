@@ -16,10 +16,10 @@ from test_chat import post as ask
 from test_workspaces import FakeRunner
 from test_workspaces import post as create_workspace
 
-from lonzo import connections, db
+from lonzo.core import connections, db
 from lonzo.core.cipher import decrypt
+from lonzo.core.user import current_user
 from lonzo.main import app
-from lonzo.user import current_user
 
 
 # Global variables

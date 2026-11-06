@@ -4,8 +4,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from lonzo.connections import claude, ichiro
-from lonzo.db import engine
+from lonzo.core.connections import claude, ichiro
+from lonzo.core.db import engine
 
 
 # Code

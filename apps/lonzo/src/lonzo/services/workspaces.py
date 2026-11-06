@@ -3,8 +3,8 @@ from datetime import date
 from pathlib import Path
 from uuid import UUID
 
-from lonzo.connections import claude, ichiro
-from lonzo.errors import FolderNotFound, NotAFolder
+from lonzo.core.connections import claude, ichiro
+from lonzo.core.errors import FolderNotFound, NotAFolder
 from lonzo.schemas.notes import Note
 from lonzo.services.note_tools import NoteTools
 from lonzo.services.settings import get_model_settings

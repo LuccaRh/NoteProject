@@ -479,7 +479,7 @@ def checar_camadas(texto: str, pacote: str) -> list[int]:
         if isinstance(no, ast.ImportFrom)
         and (no.module or "").split(".")[0] == pacote
         and (
-            (no.module or "").split(".")[1:2] and (no.module or "").split(".")[1] in _CAMADA_BAIXA
+            set((no.module or "").split(".")[1:]) & set(_CAMADA_BAIXA)
             or any(a.name in _CAMADA_BAIXA for a in no.names)
         )
     )

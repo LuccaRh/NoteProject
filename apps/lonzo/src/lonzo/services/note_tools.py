@@ -5,7 +5,7 @@ from uuid import UUID
 
 from anthropic.lib.tools import BetaAsyncFunctionTool, beta_async_tool
 
-from lonzo.connections import ichiro
+from lonzo.core.connections import ichiro
 from lonzo.schemas.notes import Note, NoteMatch, TitleMatch
 
 
