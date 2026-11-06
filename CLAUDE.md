@@ -259,6 +259,11 @@ ai/                todo o resto do workspace de IA:
   `lonzo/complete-the-agent-behind-the-chat`: clicar no vazio limpa a seleção (criar vai para a raiz). chimchar 0.17.0.
 - Atualizar depois da resposta (2026-11-05, #144): branch `chimchar/refresh-the-tree-and-the-open-note-after-a-chat-answer`, em cima da
   `chimchar/clear-the-tree-selection-on-an-empty-click`: só no front; se a IA escreveu, no fim da resposta recarrega árvore e nota aberta (`notesChanged` no `main.ts`). chimchar 0.18.0.
+- Configurações da conta (2026-11-05, #146, #145): pilha `ichiro/pass-ichiro-only-its-own-variables`
+  → `lonzo/add-the-account-settings` → `chimchar/add-the-account-settings`, sem push, em cima da
+  #144. Tabela `settings` no banco `lonzo`, chave cifrada (Fernet, `LONZO_SECRET_KEY`), cada
+  usuário com a sua, sem chave do serviço; pop-up em `settings/`, `.workspace` escondida por padrão. lonzo 0.12.0,
+  chimchar 0.19.0.
 - #117 (milestone Editor) no PR da branch `chimchar/render-markdown-in-the-editor`: live
   preview no editor (`decorations/preview.ts`: títulos, tabela GFM, bloco de código com cor,
   marcas escondidas fora do cursor); chimchar 0.10.0. Callout `[!tipo]` fica para a #5.

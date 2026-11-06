@@ -72,6 +72,28 @@
                                 M16.5 13v7M13 16.5h7" />
                         </svg>
                     </button>
+                </div>
+
+                <!-- Tree of notes, filled by notes/tree.ts -->
+                <ul id="tree" class="tree" role="tree" aria-label="Notes"></ul>
+
+                <!-- Whether the notes service answered -->
+                <p id="server-status" class="status" role="status">Loading</p>
+
+                <!-- The account, always at the bottom of the sidebar -->
+                <div class="sidebar-foot">
+                    <button id="settings" class="icon" aria-label="Settings"
+                        title="Settings">
+                        <svg aria-hidden="true" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
+                            <circle cx="15" cy="7" r="2" />
+                            <circle cx="9" cy="17" r="2" />
+                        </svg>
+                    </button>
 
                     <button id="log-out" class="icon" aria-label="Log out"
                         title="Log out">
@@ -84,12 +106,6 @@
                         </svg>
                     </button>
                 </div>
-
-                <!-- Tree of notes, filled by notes/tree.ts -->
-                <ul id="tree" class="tree" role="tree" aria-label="Notes"></ul>
-
-                <!-- Whether the notes service answered -->
-                <p id="server-status" class="status" role="status">Loading</p>
 
             </aside>
 
@@ -178,6 +194,109 @@
                     <button id="workspace-create" type="submit">
                         Create
                     </button>
+                </div>
+            </form>
+        </dialog>
+
+        <!-- Settings of the account, driven by settings/settings-dialog.ts -->
+        <dialog id="settings-dialog" class="dialog"
+            aria-labelledby="settings-heading">
+            <form id="settings-form" class="dialog-form">
+                <h2 id="settings-heading">Settings</h2>
+
+                <label for="settings-api-key">Anthropic API key</label>
+                <input id="settings-api-key" type="password"
+                    autocomplete="off" spellcheck="false"
+                    placeholder="Paste a new key" />
+                <div class="settings-key">
+                    <span id="settings-key-state"></span>
+                    <button id="settings-remove-key" type="button" hidden>
+                        Remove key
+                    </button>
+                </div>
+
+                <label for="settings-model">Model</label>
+                <select id="settings-model"></select>
+
+                <label for="settings-thinking">Thinking</label>
+                <select id="settings-thinking"></select>
+
+                <label for="settings-max-tokens">Max tokens</label>
+                <input id="settings-max-tokens" type="number" min="1" step="1"
+                    required />
+
+                <label for="settings-tools-max-turns">Tool max turns</label>
+                <input id="settings-tools-max-turns" type="number" min="1"
+                    step="1" required />
+
+                <label class="settings-check">
+                    <input id="settings-show-workspace" type="checkbox" />
+                    Show .workspace folders
+                </label>
+
+                <!-- How to write each thing in a note -->
+                <details class="settings-sheet">
+                    <summary>How to write in a note</summary>
+                    <table>
+                        <tr>
+                            <td>Title</td>
+                            <td><code># Title</code></td>
+                        </tr>
+                        <tr>
+                            <td>Subtitle</td>
+                            <td><code>## Subtitle</code></td>
+                        </tr>
+                        <tr>
+                            <td>Bold</td>
+                            <td><code>**text**</code></td>
+                        </tr>
+                        <tr>
+                            <td>Italic</td>
+                            <td><code>*text*</code></td>
+                        </tr>
+                        <tr>
+                            <td>Code</td>
+                            <td><code>`text`</code></td>
+                        </tr>
+                        <tr>
+                            <td>Code block</td>
+                            <td><code>```python</code></td>
+                        </tr>
+                        <tr>
+                            <td>List</td>
+                            <td><code>- item</code></td>
+                        </tr>
+                        <tr>
+                            <td>Numbered list</td>
+                            <td><code>1. item</code></td>
+                        </tr>
+                        <tr>
+                            <td>Quote</td>
+                            <td><code>&gt; text</code></td>
+                        </tr>
+                        <tr>
+                            <td>Link</td>
+                            <td><code>[text](url)</code></td>
+                        </tr>
+                        <tr>
+                            <td>Table</td>
+                            <td>
+                                <code>| a | b |</code><br>
+                                <code>| - | - |</code><br>
+                                <code>| 1 | 2 |</code>
+                            </td>
+                        </tr>
+                    </table>
+                </details>
+
+                <!-- Saving the form, or what went wrong -->
+                <p id="settings-status" class="status" role="status"></p>
+
+                <div class="dialog-actions">
+                    <button id="settings-cancel" type="button">
+                        Cancel
+                    </button>
+                    <button id="settings-save" type="submit">Save</button>
                 </div>
             </form>
         </dialog>

@@ -1,5 +1,5 @@
 // Imports
-import { ask, getConversation, listConversations } from './api.ts'
+import { ask, getConversation, listConversations, Refused } from './api.ts'
 import { renderMarkdown } from './markdown.ts'
 
 import type { Folder } from '../notes/tree.ts'
@@ -282,7 +282,9 @@ export class Chat {
         } catch (error) {
 
             if (!signal.aborted) {
-                this.fail(answer, 'The chat service did not answer')
+                const refused = error instanceof Refused
+                const text = 'The chat service did not answer'
+                this.fail(answer, refused ? error.message : text)
                 console.error(error)
             }
         } finally {

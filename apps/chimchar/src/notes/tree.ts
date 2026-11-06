@@ -52,6 +52,8 @@ export class Tree {
     expanded: Set<string> = new Set()
     selected: Note | null = null
     editing: string | null = null
+    // The .workspace folders stay out of the way until asked for
+    workspaceShown: boolean = false
     list: HTMLUListElement
     handlers: Handlers
 
@@ -228,6 +230,13 @@ export class Tree {
         this.render()
     }
 
+    /** Show or hide the .workspace folders. */
+    showWorkspace(shown: boolean): void {
+
+        this.workspaceShown = shown
+        this.render()
+    }
+
     /** Redraw the whole list from the loaded folders. */
     render(): void {
 
@@ -240,6 +249,9 @@ export class Tree {
         const items: HTMLLIElement[] = []
 
         for (const note of this.children.get(parentId ?? ROOT) ?? []) {
+
+            if (note.title === WORKSPACE && !this.workspaceShown) continue
+
             items.push(this.row(note, depth))
 
             if (note.is_folder && this.expanded.has(note.id)) {
@@ -364,6 +376,12 @@ export class Tree {
 
         return input
     }
+}
+
+/** True when a path of titles is inside a .workspace folder. */
+export function inWorkspace(path: string): boolean {
+
+    return path.split('/').includes(WORKSPACE)
 }
 
 /** Sort like the server: folders first, then by title. */

@@ -1,5 +1,5 @@
 // Imports
-import { createWorkspace } from './api.ts'
+import { createWorkspace, Refused } from './api.ts'
 
 import type { Folder } from '../notes/tree.ts'
 
@@ -106,7 +106,9 @@ export class WorkspaceDialog {
         try {
             await createWorkspace(folderId, description)
         } catch (error) {
-            this.els.status.textContent = 'Not created, try again'
+            const refused = error instanceof Refused
+            const text = 'Not created, try again'
+            this.els.status.textContent = refused ? error.message : text
             console.error(error)
 
             return
