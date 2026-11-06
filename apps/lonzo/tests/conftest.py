@@ -56,6 +56,7 @@ async def save_key() -> None:
             key_end="-key",
             model="claude-haiku-5-5",
             max_tokens=64000,
+            tools_max_turns=20,
             show_workspace=False,
         )
 

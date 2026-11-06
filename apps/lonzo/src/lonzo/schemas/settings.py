@@ -19,6 +19,7 @@ class StoredSettings(BaseModel):
     key_end: str | None = None
     model: str = "claude-haiku-5-5"
     max_tokens: int = 64000
+    tools_max_turns: int = 20
     show_workspace: bool = False
 
 
@@ -31,6 +32,7 @@ class Settings(BaseModel):
     key_end: str | None
     model: str
     max_tokens: int
+    tools_max_turns: int
     show_workspace: bool
 
 
@@ -41,6 +43,7 @@ class SettingsUpdate(BaseModel):
 
     model: str = Field(min_length=1)
     max_tokens: int = Field(gt=0)
+    tools_max_turns: int = Field(gt=0)
     show_workspace: bool
     api_key: ApiKey | None = None
 
@@ -53,6 +56,7 @@ class ModelSettings(BaseModel):
     api_key: str
     model: str
     max_tokens: int
+    tools_max_turns: int
 
 
 class ModelOption(BaseModel):

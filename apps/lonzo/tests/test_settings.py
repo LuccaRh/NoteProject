@@ -83,6 +83,7 @@ def put(
             json={
                 "model": "claude-haiku-5-5",
                 "max_tokens": 64000,
+                "tools_max_turns": 20,
                 "show_workspace": False,
                 **body,
             },
@@ -111,6 +112,7 @@ def test_settings_start_with_the_defaults() -> None:
         "key_end": None,
         "model": "claude-haiku-5-5",
         "max_tokens": 64000,
+        "tools_max_turns": 20,
         "show_workspace": False,
     }
 

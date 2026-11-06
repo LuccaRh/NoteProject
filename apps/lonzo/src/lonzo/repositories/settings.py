@@ -6,7 +6,10 @@ from lonzo.schemas.settings import StoredSettings
 
 
 # Global variables
-COLUMNS = "api_key, key_end, model, max_tokens, show_workspace"
+COLUMNS = (
+    "api_key, key_end, model, max_tokens,"
+    " tools_max_turns, show_workspace"
+)
 
 
 # Code
@@ -31,6 +34,7 @@ async def upsert_settings(
     key_end: str | None,
     model: str,
     max_tokens: int,
+    tools_max_turns: int,
     show_workspace: bool,
 ) -> StoredSettings:
     """
@@ -42,12 +46,13 @@ async def upsert_settings(
         text(
             f"INSERT INTO settings ({COLUMNS})"
             " VALUES (:api_key, :key_end, :model, :max_tokens,"
-            " :show_workspace)"
+            " :tools_max_turns, :show_workspace)"
             " ON CONFLICT (user_id) DO UPDATE SET"
             " api_key = COALESCE(EXCLUDED.api_key, settings.api_key),"
             " key_end = COALESCE(EXCLUDED.key_end, settings.key_end),"
             " model = EXCLUDED.model,"
             " max_tokens = EXCLUDED.max_tokens,"
+            " tools_max_turns = EXCLUDED.tools_max_turns,"
             " show_workspace = EXCLUDED.show_workspace"
             f" RETURNING {COLUMNS}"
         ),
@@ -56,6 +61,7 @@ async def upsert_settings(
             "key_end": key_end,
             "model": model,
             "max_tokens": max_tokens,
+            "tools_max_turns": tools_max_turns,
             "show_workspace": show_workspace,
         },
     )
