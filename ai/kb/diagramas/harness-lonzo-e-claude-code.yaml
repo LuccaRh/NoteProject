@@ -1,0 +1,40 @@
+titulo: "O mesmo laço, dois harnesses: lonzo e Claude Code"
+tipo: blocos
+grade: [235, 125]
+destino: IA no projeto/Figuras
+nos:
+  l_in:   {tipo: bloco, pos: [1, 0], texto: "<b>chimchar</b><br>POST /api/chat (SSE)", cor: azul}
+  l_pac:  {tipo: bloco, pos: [1, 1], texto: "<b>monta o pacote</b><br>base_rules.md, data, pasta,<br>.workspace, lista de skills", cor: verde}
+  l_run:  {tipo: bloco, pos: [1, 2], texto: "<b>laço</b><br>tool_runner do SDK,<br>até tools_max_turns", cor: verde}
+  l_tool: {tipo: bloco, pos: [1, 4], texto: "<b>8 ferramentas de nota</b><br>NoteTools: buscar, ler,<br>criar, editar, apagar", cor: verde}
+  l_hist: {tipo: banco, pos: [0, 2], texto: "banco lonzo<br>grava no fim,<br>sem resumo", cor: amarelo}
+  l_nada: {tipo: nota, pos: [0, 3], texto: "sem permissão<br>nem hook: a chamada<br>vai direto"}
+  l_dado: {tipo: banco, pos: [1, 5], texto: "ichiro + Postgres<br>só as notas", cor: amarelo}
+  lonzo:  {tipo: grupo, contem: [l_pac, l_run, l_tool, l_hist, l_nada], texto: "lonzo: no servidor", cor: cinza}
+  api:    {tipo: bloco, pos: [2, 2], texto: "<b>API da Anthropic</b><br>o modelo: devolve<br>texto ou tool_use", cor: laranja}
+  c_in:   {tipo: bloco, pos: [3, 0], texto: "<b>terminal</b><br>no computador da pessoa", cor: azul}
+  c_pac:  {tipo: bloco, pos: [3, 1], texto: "<b>monta o pacote</b><br>system do programa, pasta,<br>CLAUDE.md, memória, skills", cor: verde}
+  c_run:  {tipo: bloco, pos: [3, 2], texto: "<b>laço</b><br>próprio do programa", cor: verde}
+  c_chk:  {tipo: bloco, pos: [3, 3], texto: "<b>permissões e hooks</b><br>podem barrar a chamada", cor: vermelho}
+  c_tool: {tipo: bloco, pos: [3, 4], texto: "<b>ferramentas gerais</b><br>Read, Edit, Write,<br>Bash, MCP", cor: verde}
+  c_hist: {tipo: banco, pos: [4, 2], texto: "sessão em arquivo<br>resume o histórico<br>quando enche", cor: amarelo}
+  c_sub:  {tipo: bloco, pos: [4, 4], texto: "<b>subagentes</b><br>outro laço, contexto<br>próprio", cor: verde}
+  c_dado: {tipo: banco, pos: [3, 5], texto: "disco e shell<br>da máquina da pessoa", cor: amarelo}
+  cc:     {tipo: grupo, contem: [c_pac, c_run, c_chk, c_tool, c_hist, c_sub], texto: "Claude Code", cor: cinza}
+arestas:
+  - [l_in, l_pac]
+  - [l_pac, l_run]
+  - [l_hist.c, l_pac.e, {rotulo: "lê"}]
+  - [l_run.e, l_hist.d, {rotulo: "grava"}]
+  - [l_run, api, {pontas: [block, block]}]
+  - [l_run.b, l_tool.c, {rotulo: "tool_use /<br>tool_result", pontas: [block, block]}]
+  - [l_tool, l_dado]
+  - [c_in, c_pac]
+  - [c_pac, c_run]
+  - [c_hist.c, c_pac.d, {rotulo: "lê"}]
+  - [c_run.d, c_hist.e, {rotulo: "grava"}]
+  - [c_run, api, {pontas: [block, block]}]
+  - [c_run, c_chk, {pontas: [block, block]}]
+  - [c_chk, c_tool, {rotulo: "tool_use /<br>tool_result", pontas: [block, block]}]
+  - [c_tool.d, c_sub.e, {pontas: [block, block]}]
+  - [c_tool, c_dado]

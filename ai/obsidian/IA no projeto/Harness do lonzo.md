@@ -18,6 +18,13 @@ A raiz era o [[Laço de ferramentas|harness]]. O `lonzo` já tinha o laço e as 
 | histórico | guarda as chamadas de ferramenta | só o texto | texto, `tool_use` e `tool_result` |
 | cache | automático | sem marca nenhuma | duas marcas de [[Cache de prompt\|cache]] |
 
+## Lado a lado
+
+![[harness-lonzo-e-claude-code.drawio.svg]]
+*Os dois repetem o mesmo laço com a API da Anthropic; a diferença está em volta dele. O lado do Claude Code é uma visão geral, sem o código dele como fonte.*
+
+O `lonzo` só alcança as notas, e por isso roda no servidor sem permissão nem hook. O Claude Code alcança o disco e o shell da pessoa, então cada chamada pode ser barrada antes de rodar.
+
 ## O pacote
 
 ![[pacote-do-lonzo.drawio.svg]]
