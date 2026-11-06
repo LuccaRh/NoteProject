@@ -283,8 +283,8 @@ def test_workspace_without_a_key_is_refused() -> None:
     assert response.status_code == 422
 
 
-# A workspace stays under the fixed limit, or the saved one when lower
-def test_workspace_uses_the_lower_limit() -> None:
+# A workspace goes out with the saved model and limit
+def test_workspace_uses_the_saved_limit() -> None:
 
     body = {"api_key": KEY, "model": "claude-sonnet-5-5", "max_tokens": 1000}
     put(body=body)

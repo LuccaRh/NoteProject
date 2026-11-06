@@ -18,8 +18,6 @@ from lonzo.schemas.settings import ModelOption, ModelSettings
 
 
 # Global variables
-TOOLS_MAX_TOKENS = 16000
-TOOLS_MAX_TURNS = 20
 CACHE: BetaCacheControlEphemeralParam = {"type": "ephemeral"}
 
 
@@ -77,8 +75,8 @@ class AnthropicClient:
         """
         The answer to one question after the messages of the conversation,
         by the tool runner of the SDK: one stream per turn of the model,
-        until it stops calling tools or reaches TOOLS_MAX_TURNS; the first
-        piece of system is the fixed one, marked for the cache
+        until it stops calling tools or reaches the turns of the user; the
+        first piece of system is the fixed one, marked for the cache
         """
 
         sdk = self.sdk.with_options(api_key=settings.api_key)
@@ -100,7 +98,7 @@ class AnthropicClient:
             system=blocks,
             messages=messages,
             tools=tools,
-            max_iterations=TOOLS_MAX_TURNS,
+            max_iterations=settings.tools_max_turns,
             cache_control=CACHE,
             stream=True,
         )
@@ -114,19 +112,19 @@ class AnthropicClient:
     ) -> None:
         """
         The tool loop, run by the tool runner of the SDK: the model calls
-        the tools until it stops or reaches TOOLS_MAX_TURNS, in at most
-        TOOLS_MAX_TOKENS per turn, or the limit of the user when lower
+        the tools until it stops or reaches the turns of the user, in at
+        most their tokens per turn
         """
 
         sdk = self.sdk.with_options(api_key=settings.api_key)
         runner = sdk.beta.messages.tool_runner(
             model=settings.model,
-            max_tokens=min(TOOLS_MAX_TOKENS, settings.max_tokens),
+            max_tokens=settings.max_tokens,
             thinking={"type": "disabled"},
             system=system,
             messages=[{"role": "user", "content": request}],
             tools=tools,
-            max_iterations=TOOLS_MAX_TURNS,
+            max_iterations=settings.tools_max_turns,
             cache_control=CACHE,
         )
         await runner.until_done()
