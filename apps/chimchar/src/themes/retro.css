@@ -1,0 +1,163 @@
+/* Retrofuturism: black ground, magenta ink, hard edges and film grain */
+:root[data-theme='retro'] {
+    --ground: #0d0d0f;
+    --panel: #0d0d0f;
+    --line: #f2f2f2;
+    --hover: #26262b;
+    --active: #2f2f36;
+    --selection: #5a1f52;
+    --text: #f2f2f2;
+    --body: #e4e4e6;
+    --soft: #d0d0d4;
+    --muted: #a8a8b0;
+    --faint: #85858e;
+    --sans: 'Space Mono', ui-monospace, monospace;
+    --serif: Anton, Impact, sans-serif;
+    --mono: 'Space Mono', ui-monospace, monospace;
+    --code-bg: #18181c;
+    --code-keyword: #ff3bdc;
+    --code-string: #5fe3c0;
+    --code-number: #ffc24b;
+    --code-name: #7fb4ff;
+    --accent: #ff3bdc;
+    --mark: #ffc24b;
+    --danger: #ff7a6b;
+}
+
+[data-theme='retro'] * {
+    border-radius: 0 !important;
+}
+
+[data-theme='retro'] body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    background: url('./retro-grain.svg');
+    opacity: 0.07;
+    pointer-events: none;
+}
+
+/* Sidebar */
+
+[data-theme='retro'] .sidebar {
+    flex-basis: 280px;
+    gap: 14px;
+    padding: 20px 16px;
+}
+
+[data-theme='retro'] .sidebar::before {
+    content: 'Notes.';
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    font: 30px/1.3 var(--serif);
+    color: var(--accent);
+}
+
+[data-theme='retro'] .tree {
+    flex: none;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+}
+
+[data-theme='retro'] .tree::before {
+    content: 'Vault index';
+    margin-bottom: 6px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+[data-theme='retro'] .folder .node-open {
+    text-transform: uppercase;
+}
+
+[data-theme='retro'] .node[aria-selected='true'] {
+    background: var(--accent);
+    --text: var(--ground);
+    --soft: var(--ground);
+    --muted: var(--ground);
+}
+
+[data-theme='retro'] .sidebar .status {
+    padding: 0;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+[data-theme='retro'] .sidebar .status::before {
+    content: '';
+    display: block;
+    aspect-ratio: 5 / 2;
+    margin-bottom: 10px;
+    border: 1px solid var(--line);
+    background: url('./retro-horizon.svg') center / cover;
+}
+
+[data-theme='retro'] .sidebar-foot {
+    margin-right: -4px;
+}
+
+/* Note */
+
+[data-theme='retro'] .column {
+    max-width: 880px;
+    margin: 0;
+}
+
+[data-theme='retro'] .topbar {
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+[data-theme='retro'] .title {
+    margin-bottom: 24px;
+    font-family: Orbitron, var(--sans);
+    font-weight: 800;
+    font-size: 76px;
+    line-height: 1.05;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: transparent;
+    caret-color: var(--accent);
+    -webkit-text-stroke: 2px var(--accent);
+}
+
+[data-theme='retro'] .md-h1,
+[data-theme='retro'] .md-h2,
+[data-theme='retro'] .md-h3,
+[data-theme='retro'] .md-h4,
+[data-theme='retro'] .md-h5,
+[data-theme='retro'] .md-h6 {
+    font-weight: 400;
+    --text: var(--accent);
+}
+
+[data-theme='retro'] .md-bullet {
+    color: var(--accent);
+}
+
+[data-theme='retro'] .message.assistant h1,
+[data-theme='retro'] .message.assistant h2,
+[data-theme='retro'] .message.assistant h3 {
+    font-weight: 400;
+    color: var(--accent);
+}
+
+/* Chat */
+
+[data-theme='retro'] .message.user {
+    border: 1px solid var(--accent);
+    background: transparent;
+}
+
+[data-theme='retro'] .message.assistant strong,
+[data-theme='retro'] .chat-empty {
+    color: var(--accent);
+}
