@@ -115,6 +115,18 @@ def test_specs_das_materias_sem_colisao():
         assert not probs, f"{p.relative_to(RAIZ)}: {probs[:3]}"
 
 
+def test_aresta_com_cor_e_coluna():
+    spec = {"nos": {
+        "a": {"tipo": "tabela", "pos": [0, 0], "texto": "a", "cor": "verde",
+              "colunas": [["id", "uuid", "PK"]]},
+        "b": {"tipo": "tabela", "pos": [0, 20], "texto": "b", "cor": "azul",
+              "colunas": [["id", "uuid", "PK"]]},
+    }, "grade": [100, 10], "arestas": [["a.d:id", "b.d:id", {"cor": "roxo", "coluna": 4}]]}
+    d = dg.montar(spec)
+    assert d.arestas[0].cor == "roxo"
+    assert d.arestas[0].pontos[1][0] == dg.MARGEM + 400
+
+
 def main() -> int:
     falhas = 0
     for fn in TESTES:
