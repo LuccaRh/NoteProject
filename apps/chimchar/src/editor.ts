@@ -101,6 +101,33 @@ const theme = EditorView.theme({
     '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
         backgroundColor: 'var(--selection)',
     },
+    // The list of notes after [[
+    '.cm-tooltip.cm-tooltip-autocomplete': {
+        backgroundColor: 'var(--panel)',
+        border: '1px solid var(--line)',
+        borderRadius: '6px',
+        overflow: 'hidden',
+    },
+    '.cm-tooltip.cm-tooltip-autocomplete > ul': {
+        fontFamily: 'var(--sans)',
+        maxWidth: '420px',
+    },
+    '.cm-tooltip.cm-tooltip-autocomplete > ul > li': {
+        padding: '4px 10px',
+    },
+    '.cm-tooltip.cm-tooltip-autocomplete > ul > li[aria-selected]': {
+        backgroundColor: 'var(--active)',
+        color: 'var(--text)',
+    },
+    '.cm-completionDetail': {
+        color: 'var(--faint)',
+        fontStyle: 'normal',
+        marginLeft: '12px',
+    },
+    '.cm-completionMatchedText': {
+        color: 'var(--code-name)',
+        textDecoration: 'none',
+    },
 }, { dark: true })
 
 // export: makes the function available to other files
