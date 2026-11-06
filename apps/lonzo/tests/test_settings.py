@@ -16,7 +16,8 @@ from test_chat import post as ask
 from test_workspaces import FakeRunner
 from test_workspaces import post as create_workspace
 
-from lonzo import connections, db
+from lonzo import connections
+from lonzo.core import db
 from lonzo.core.cipher import decrypt
 from lonzo.core.user import current_user
 from lonzo.main import app
