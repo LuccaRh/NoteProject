@@ -25,6 +25,8 @@ family=Space+Mono:wght@400;700&display=swap");
     --code-string: #a8c98a;
     --code-number: #e0b07a;
     --code-name: #8fb8de;
+    --mark: #e2c06c;
+    --danger: #e08a7f;
     --accent: var(--soft);
     color-scheme: dark;
 }
@@ -377,8 +379,8 @@ button {
 /* Searched words: a flash, then a soft mark until the first edit */
 .cm-found {
     border-radius: 3px;
-    background: rgb(226 192 108 / 0.22);
-    box-shadow: 0 0 0 1px rgb(226 192 108 / 0.35);
+    background: color-mix(in srgb, var(--mark) 22%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--mark) 35%, transparent);
     color: var(--text);
     animation: found-flash 1.4s ease-out;
 }
@@ -386,8 +388,8 @@ button {
 @keyframes found-flash {
     0%,
     30% {
-        background: rgb(226 192 108 / 0.6);
-        box-shadow: 0 0 0 3px rgb(226 192 108 / 0.35);
+        background: color-mix(in srgb, var(--mark) 60%, transparent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--mark) 35%, transparent);
     }
 }
 
@@ -471,7 +473,8 @@ button {
 .md-link {
     color: var(--code-name);
     text-decoration: underline;
-    text-decoration-color: rgb(143 184 222 / 0.4);
+    text-decoration-color:
+        color-mix(in srgb, var(--code-name) 40%, transparent);
     text-underline-offset: 3px;
     cursor: pointer;
 }
@@ -767,7 +770,7 @@ button {
 .chat-error {
     margin: -6px 0 0;
     font-size: 13px;
-    color: #e08a7f;
+    color: var(--danger);
 }
 
 .ask {
@@ -809,7 +812,7 @@ button {
 }
 
 .question.calling::selection {
-    background: rgb(143 184 222 / 30%);
+    background: color-mix(in srgb, var(--code-name) 30%, transparent);
     color: transparent;
 }
 
@@ -825,7 +828,7 @@ button {
 
 .question-backdrop mark {
     border-radius: 4px;
-    background: rgb(198 159 213 / 18%);
+    background: color-mix(in srgb, var(--code-keyword) 18%, transparent);
     color: var(--code-keyword);
 }
 
