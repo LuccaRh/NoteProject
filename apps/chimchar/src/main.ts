@@ -143,11 +143,15 @@ function openNote(
     })
 }
 
-/** Open the note of a link. */
+/** Open the note of a link; it may be deleted or someone else's. */
 async function openLink(id: string): Promise<void> {
 
-    const note = await getNote(id)
-    await openNote(note, () => tree.path(note))
+    try {
+        const note = await getNote(id)
+        await openNote(note, () => tree.path(note))
+    } catch {
+        page.say('Could not find this note')
+    }
 }
 
 /** Open a note picked in the search, with its words marked. */

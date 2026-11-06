@@ -119,6 +119,12 @@ export class Page {
         this.editor.mark(words)
     }
 
+    /** Tell something about the open note where the saves show. */
+    say(text: string): void {
+
+        this.els.status.textContent = text
+    }
+
     /** Save pending edits, then hide the note and show the empty page. */
     async close(): Promise<void> {
 
