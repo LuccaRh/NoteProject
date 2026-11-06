@@ -1,0 +1,143 @@
+titulo: "Postgres do NoteProject: um container, três bancos, nove tabelas"
+tipo: blocos
+grade: [100, 10]
+escuro: true
+destino: Estrutura do projeto/Figuras
+nos:
+  # banco ichiro (verde)
+  notes:
+    tipo: tabela
+    pos: [1.7, 22]
+    texto: notes
+    cor: verde
+    colunas:
+      - [id, uuid, PK]
+      - [parent_id, uuid, FK, "null"]
+      - [is_folder, boolean]
+      - [title, text]
+      - [body, text]
+      - [created_at, timestamptz]
+      - [updated_at, timestamptz]
+      - [owner_id, uuid]
+    extras:
+      - [UQ, "(owner_id, parent_id, title) NULLS NOT DISTINCT"]
+      - [ix, "notes_owner_id_idx (owner_id)"]
+      - [ix, "notes_search_idx GIN to_tsvector(title, body)"]
+      - [RLS, "notes_owner: owner_id = app.user_id"]
+    nota: "Notas e pastas (is_folder) numa árvore; apagar a pasta apaga o que há dentro."
+  alembic_i:
+    tipo: tabela
+    pos: [1.7, 48]
+    texto: alembic_version
+    cor: verde
+    colunas:
+      - [version_num, "varchar(32)", PK]
+    nota: "Última migration aplicada."
+
+  # banco nujabes (roxo)
+  users:
+    tipo: tabela
+    pos: [6, 56]
+    texto: users
+    cor: roxo
+    w: 300
+    colunas:
+      - [id, uuid, PK]
+      - [email, text, UQ]
+      - [password_hash, text]
+      - [created_at, timestamptz]
+    nota: "Quem pode entrar; a senha fica em hash (pgcrypto)."
+  sessions:
+    tipo: tabela
+    pos: [9.7, 56]
+    texto: sessions
+    cor: roxo
+    colunas:
+      - [token_hash, bytea, PK]
+      - [user_id, uuid, FK]
+      - [created_at, timestamptz]
+      - [expires_at, timestamptz]
+    nota: "Só o hash do token: tabela vazada não dá login."
+  alembic_n:
+    tipo: tabela
+    pos: [6, 73]
+    texto: alembic_version
+    cor: roxo
+    w: 300
+    colunas:
+      - [version_num, "varchar(32)", PK]
+    nota: "Última migration aplicada."
+
+  # banco lonzo (azul)
+  conversations:
+    tipo: tabela
+    pos: [6.4, 15]
+    texto: conversations
+    cor: azul
+    colunas:
+      - [id, uuid, PK]
+      - [folder_id, uuid, "", "null"]
+      - [title, text]
+      - [created_at, timestamptz]
+      - [updated_at, timestamptz]
+      - [owner_id, uuid]
+    extras:
+      - [ix, "(owner_id, folder_id, updated_at)"]
+      - [RLS, "conversations_owner: owner_id = app.user_id"]
+    nota: "Uma conversa do chat, ligada à pasta do workspace (NULL = raiz)."
+  messages:
+    tipo: tabela
+    pos: [10.2, 15]
+    texto: messages
+    cor: azul
+    colunas:
+      - [id, uuid, PK]
+      - [conversation_id, uuid, FK]
+      - [role, text]
+      - [content, jsonb]
+      - [created_at, timestamptz]
+    extras:
+      - [ix, "(conversation_id, id)"]
+      - [CK, "role IN ('user', 'assistant')"]
+      - [RLS, "messages_owner: a conversa é visível"]
+    nota: "Blocos de conteúdo da Messages API, como foram enviados."
+  settings:
+    tipo: tabela
+    pos: [13.8, 13.3]
+    texto: settings
+    cor: azul
+    colunas:
+      - [user_id, uuid, PK]
+      - [api_key, bytea, "", "null"]
+      - [key_end, text, "", "null"]
+      - [model, text]
+      - [max_tokens, integer]
+      - [tools_max_turns, integer]
+      - [thinking, text]
+      - [show_workspace, boolean]
+    extras:
+      - [RLS, "settings_owner: user_id = app.user_id"]
+    nota: "Uma linha por usuário; api_key cifrada (Fernet)."
+  alembic_l:
+    tipo: tabela
+    pos: [13.8, 29.5]
+    texto: alembic_version
+    cor: azul
+    colunas:
+      - [version_num, "varchar(32)", PK]
+    nota: "Última migration aplicada."
+
+  ichiro_db: {tipo: grupo, contem: [notes, alembic_i], texto: "banco ichiro (notas)", cor: verde, forte: true, folga: 40}
+  lonzo_db: {tipo: grupo, contem: [conversations, messages, settings, alembic_l], texto: "banco lonzo (chat com IA)", cor: azul, forte: true}
+  nujabes_db: {tipo: grupo, contem: [users, sessions, alembic_n], texto: "banco nujabes (login)", cor: roxo, forte: true}
+arestas:
+  - [sessions.e:user_id, users.d:id, {pontas: [ERmany, ERmandOne]}]
+  - [messages.e:conversation_id, conversations.d:id, {pontas: [ERmany, ERmandOne]}]
+  - [conversations.e:folder_id, notes.d:id, {pontas: [ERmany, ERzeroToOne], tracejada: true}]
+  - [notes.d:owner_id, users.e:id, {pontas: [ERmany, ERmandOne], tracejada: true, pontos: [[4.2, 24.6], [4.2, 52.6]]}]
+  - [notes.e:parent_id, notes.e:id, {pontas: [ERmany, ERzeroToOne], pontos: [[-0.5, 12.6], [-0.5, 10.6]]}]
+  - [conversations.d:owner_id, users.c, {pontas: [ERmany, ERmandOne], tracejada: true, pontos: [[8.3, 29], [6, 29]]}]
+  - [settings.e:user_id, users.c, {pontas: [ERzeroToOne, ERmandOne], tracejada: true, pontos: [[12, 7.6], [12, 31], [6, 31]]}]
+legenda:
+  "Linha contínua": "FK de verdade, dentro do banco, ON DELETE CASCADE"
+  "Linha tracejada": "referência só lógica: guarda o id de outro banco, sem FK"
