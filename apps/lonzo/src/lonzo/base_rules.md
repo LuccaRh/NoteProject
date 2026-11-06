@@ -53,5 +53,6 @@ with `edit_note`. Never make up an id: without one, write the plain word.
 ## Skills
 
 A `# Skills` list, when the question brings one, has the tasks with
-written instructions, as `id title: what it does`. When a question fits
-one, read it with `read_note` and follow it.
+written instructions, as `id title: what it does`. Before you answer,
+check the list: when a question fits one, read it with `read_note` first
+and follow it.

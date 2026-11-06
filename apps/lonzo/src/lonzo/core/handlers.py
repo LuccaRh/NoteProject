@@ -11,6 +11,10 @@ from lonzo.core.errors import (
     InvalidSettings,
     MissingApiKey,
     NotAFolder,
+    NotASkill,
+    NotAWorkspace,
+    SkillNotFound,
+    TitleTaken,
 )
 
 
@@ -23,6 +27,10 @@ STATUS: dict[type[Exception], int] = {
     FolderNotFound: 404,
     NotAFolder: 422,
     ConversationNotFound: 404,
+    NotAWorkspace: 422,
+    NotASkill: 422,
+    SkillNotFound: 404,
+    TitleTaken: 409,
 }
 
 

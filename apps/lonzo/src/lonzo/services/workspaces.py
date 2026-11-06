@@ -42,15 +42,62 @@ async def find_workspace(parent_id: UUID) -> UUID | None:
     return notes[0].id
 
 
+async def find_skills_folder(workspace: UUID) -> UUID | None:
+    """
+    The skills folder of a .workspace, if it still has one
+    """
+
+    notes = await ichiro.list_notes(parent_id=workspace, title=SKILLS)
+
+    if not notes or not notes[0].is_folder:
+        return None
+
+    return notes[0].id
+
+
+async def create_skills_folder(workspace: UUID) -> UUID:
+    """
+    A new skills folder for a .workspace that lost it
+    """
+
+    folder = await ichiro.create_note(
+        title=SKILLS,
+        parent_id=workspace,
+        is_folder=True,
+    )
+
+    return folder.id
+
+
+def is_skill_path(path: str) -> bool:
+    """
+    Whether a path of titles ends right inside a skills folder of a
+    .workspace
+    """
+
+    return path.split("/")[-3:-1] == [WORKSPACE, SKILLS]
+
+
+def split_skill(body: str) -> tuple[str, str]:
+    """
+    The summary of a skill, its first line with text and without heading
+    marks, and the rest of the body
+    """
+
+    first, _, rest = body.strip().partition("\n")
+
+    return first.lstrip("# ").strip(), rest.strip()
+
+
 async def skills_list(folder_id: UUID) -> list[str]:
     """
     The skills of a workspace, one line each with the id, the title and
-    the first line of the body, in one part; the bodies stay out and
-    nothing comes back with no skills
+    the summary, in one part; the bodies stay out and nothing comes back
+    with no skills
     """
 
     lines = [
-        f"- {note.id} {note.title}: {note.body.partition("\n")[0]}"
+        f"- {note.id} {note.title}: {split_skill(body=note.body)[0]}"
         for note in await ichiro.list_notes(parent_id=folder_id)
         if not note.is_folder
     ]

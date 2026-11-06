@@ -39,3 +39,21 @@ class ConversationNotFound(Exception):
     """
     No conversation has the id asked for
     """
+
+
+class NotAWorkspace(Exception):
+    """
+    The folder asked for has no .workspace
+    """
+
+
+class NotASkill(Exception):
+    """
+    The note asked for is not a skill of the person, or it is empty
+    """
+
+
+class SkillNotFound(Exception):
+    """
+    No published skill has the id asked for
+    """
