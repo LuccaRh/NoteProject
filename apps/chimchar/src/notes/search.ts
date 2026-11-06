@@ -1,6 +1,7 @@
 // Imports
 import { fold } from '../fold.ts'
 import { listTree, searchNotes, searchTitles } from './api.ts'
+import { inWorkspace } from './tree.ts'
 
 import type { NotePath } from './api.ts'
 
@@ -53,6 +54,8 @@ const NOTE = '<svg aria-hidden="true" width="14" height="14"'
 export class Search {
     els: Elements
     onOpen: (found: Found) => void
+    // Off, the notes inside .workspace folders are not searched
+    workspaceShown: boolean = false
     // The whole tree, fetched each time the pop-up opens
     entries: NotePath[] = []
     // Folder the search stays inside; null = everywhere
@@ -90,7 +93,9 @@ export class Search {
     /** Open the pop-up, searching inside a folder (null = everywhere). */
     async open(folderId: string | null): Promise<void> {
 
-        this.entries = await listTree()
+        const entries = await listTree()
+        this.entries = entries.filter(entry =>
+            this.workspaceShown || !inWorkspace(entry.path))
         const folder = this.entries.find(entry => entry.id === folderId)
         this.enter(folder ?? null)
         this.els.dialog.showModal()
