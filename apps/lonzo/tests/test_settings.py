@@ -7,10 +7,14 @@ from unittest.mock import patch
 
 import httpx2
 from anthropic import AuthenticationError
-from fakes import OTHER_USER, USER
+from fakes import OTHER_USER, USER, FakeIchiro
 from fastapi.testclient import TestClient
 from httpx2 import Response
 from sqlalchemy import text
+from test_chat import FakeClient, FakeMessages
+from test_chat import post as ask
+from test_workspaces import FakeRunner
+from test_workspaces import post as create_workspace
 
 from lonzo import connections, db
 from lonzo.core.cipher import decrypt
@@ -240,3 +244,53 @@ def test_no_models_without_any_key() -> None:
         response = client.get("/chat/settings/models")
 
     assert response.json() == []
+
+
+# An answer goes out with the saved key, model and limit
+def test_answer_uses_the_saved_settings() -> None:
+
+    body = {"api_key": KEY, "model": "claude-sonnet-5-5", "max_tokens": 1000}
+    put(body=body)
+
+    ask(body={"question": "Hi"})
+
+    assert FakeClient.used_key == KEY
+    assert FakeMessages.params["model"] == "claude-sonnet-5-5"
+    assert FakeMessages.params["max_tokens"] == 1000
+
+
+# There is no key of the service to fall back on
+def test_answer_without_a_key_after_removing_it() -> None:
+
+    put(body={"api_key": KEY})
+    client.delete("/chat/settings/key")
+
+    response = ask(body={"question": "Hi"})
+
+    assert response.status_code == 422
+
+
+def test_workspace_without_a_key_is_refused() -> None:
+
+    ichiro = FakeIchiro()
+    folder = ichiro.add(title="Baseball", is_folder=True)
+    body = {"folder_id": str(folder), "description": "I play baseball"}
+
+    response = create_workspace(ichiro=ichiro, body=body)
+
+    assert response.status_code == 422
+
+
+# A workspace stays under the fixed limit, or the saved one when lower
+def test_workspace_uses_the_lower_limit() -> None:
+
+    body = {"api_key": KEY, "model": "claude-sonnet-5-5", "max_tokens": 1000}
+    put(body=body)
+    ichiro = FakeIchiro()
+    folder = ichiro.add(title="Baseball", is_folder=True)
+    body = {"folder_id": str(folder), "description": "I play baseball"}
+
+    create_workspace(ichiro=ichiro, body=body)
+
+    assert FakeRunner.params["model"] == "claude-sonnet-5-5"
+    assert FakeRunner.params["max_tokens"] == 1000
