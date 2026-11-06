@@ -1,11 +1,12 @@
 # Imports
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, StringConstraints
 
 
 # Global variables
 ApiKey = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+Thinking = Literal["adaptive", "between_tools", "disabled"]
 
 
 # Code
@@ -20,6 +21,7 @@ class StoredSettings(BaseModel):
     model: str = "claude-haiku-5-5"
     max_tokens: int = 64000
     tools_max_turns: int = 20
+    thinking: Thinking = "disabled"
     show_workspace: bool = False
 
 
@@ -33,6 +35,7 @@ class Settings(BaseModel):
     model: str
     max_tokens: int
     tools_max_turns: int
+    thinking: Thinking
     show_workspace: bool
 
 
@@ -44,6 +47,7 @@ class SettingsUpdate(BaseModel):
     model: str = Field(min_length=1)
     max_tokens: int = Field(gt=0)
     tools_max_turns: int = Field(gt=0)
+    thinking: Thinking
     show_workspace: bool
     api_key: ApiKey | None = None
 
@@ -57,6 +61,7 @@ class ModelSettings(BaseModel):
     model: str
     max_tokens: int
     tools_max_turns: int
+    thinking: Thinking
 
 
 class ModelOption(BaseModel):

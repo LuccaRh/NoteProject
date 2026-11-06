@@ -2,13 +2,13 @@
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncConnection
 
-from lonzo.schemas.settings import StoredSettings
+from lonzo.schemas.settings import StoredSettings, Thinking
 
 
 # Global variables
 COLUMNS = (
     "api_key, key_end, model, max_tokens,"
-    " tools_max_turns, show_workspace"
+    " tools_max_turns, thinking, show_workspace"
 )
 
 
@@ -35,6 +35,7 @@ async def upsert_settings(
     model: str,
     max_tokens: int,
     tools_max_turns: int,
+    thinking: Thinking,
     show_workspace: bool,
 ) -> StoredSettings:
     """
@@ -46,13 +47,14 @@ async def upsert_settings(
         text(
             f"INSERT INTO settings ({COLUMNS})"
             " VALUES (:api_key, :key_end, :model, :max_tokens,"
-            " :tools_max_turns, :show_workspace)"
+            " :tools_max_turns, :thinking, :show_workspace)"
             " ON CONFLICT (user_id) DO UPDATE SET"
             " api_key = COALESCE(EXCLUDED.api_key, settings.api_key),"
             " key_end = COALESCE(EXCLUDED.key_end, settings.key_end),"
             " model = EXCLUDED.model,"
             " max_tokens = EXCLUDED.max_tokens,"
             " tools_max_turns = EXCLUDED.tools_max_turns,"
+            " thinking = EXCLUDED.thinking,"
             " show_workspace = EXCLUDED.show_workspace"
             f" RETURNING {COLUMNS}"
         ),
@@ -62,6 +64,7 @@ async def upsert_settings(
             "model": model,
             "max_tokens": max_tokens,
             "tools_max_turns": tools_max_turns,
+            "thinking": thinking,
             "show_workspace": show_workspace,
         },
     )

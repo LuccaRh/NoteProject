@@ -51,6 +51,7 @@ def view_of(stored: StoredSettings) -> Settings:
         model=stored.model,
         max_tokens=stored.max_tokens,
         tools_max_turns=stored.tools_max_turns,
+        thinking=stored.thinking,
         show_workspace=stored.show_workspace,
     )
 
@@ -80,6 +81,7 @@ async def get_model_settings() -> ModelSettings:
         model=stored.model,
         max_tokens=stored.max_tokens,
         tools_max_turns=stored.tools_max_turns,
+        thinking=stored.thinking,
     )
 
 
@@ -147,6 +149,7 @@ async def save_settings(update: SettingsUpdate) -> Settings:
             model=update.model,
             max_tokens=update.max_tokens,
             tools_max_turns=update.tools_max_turns,
+            thinking=update.thinking,
             show_workspace=update.show_workspace,
         )
 
