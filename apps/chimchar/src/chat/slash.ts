@@ -1,10 +1,27 @@
 // Imports
+import { getNote } from '../notes/api.ts'
 import { listWorkspaceSkills } from '../skills/api.ts'
 
 import type { WorkspaceSkill } from '../skills/api.ts'
 
 
+// Global variables
+// Between what the person wrote and the text of the skill in a message
+const SKILL_START = '\n\n<skill>\n'
+const SKILL_END = '\n</skill>'
+
+
 // Code
+/** Whether a question calls a skill: /title, then nothing or a space. */
+function calls(question: string, skill: WorkspaceSkill): boolean {
+
+    const name = `/${skill.title}`
+
+    if (!question.startsWith(name)) return false
+
+    return /^(\s|$)/.test(question.slice(name.length))
+}
+
 /** List of the workspace's skills, opened by a / in the question. */
 export class SkillMenu {
     input: HTMLTextAreaElement
@@ -151,5 +168,26 @@ export class SkillMenu {
 
         this.closed = true
         this.show([])
+    }
+
+    /** The message to send: the question and the text of its skill. */
+    async expand(question: string): Promise<string> {
+
+        if (!question.startsWith('/')) return question
+
+        // The longest first: /a must not win over /a b
+        const skills = [...await this.load()]
+            .sort((a, b) => b.title.length - a.title.length)
+        const skill = skills.find(s => calls(question, s))
+        this.forget()
+
+        if (!skill) return question
+
+        // A skill just deleted goes as plain text: the question still counts
+        const note = await getNote(skill.id).catch(() => null)
+
+        if (!note) return question
+
+        return `${question}${SKILL_START}${note.body}${SKILL_END}`
     }
 }

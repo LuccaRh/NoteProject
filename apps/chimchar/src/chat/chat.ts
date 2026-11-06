@@ -270,7 +270,6 @@ export class Chat {
         this.busy = true
         this.send.textContent = 'Cancel'
         this.question.value = ''
-        this.menu.forget()
         this.messages.querySelector('.chat-empty')?.remove()
         this.bubble('user').textContent = question
         const answer = this.bubble('assistant')
@@ -286,7 +285,7 @@ export class Chat {
         try {
             await ask(
                 {
-                    question,
+                    question: await this.menu.expand(question),
                     folder_id: this.folderId,
                     conversation_id: this.conversationId,
                 },
