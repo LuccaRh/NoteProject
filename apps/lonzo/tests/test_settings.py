@@ -347,3 +347,56 @@ def test_workspace_uses_the_saved_turns() -> None:
     create_workspace(ichiro=ichiro, body=body)
 
     assert FakeRunner.params["max_iterations"] == 5
+
+
+# The kinds come from the API; a model that does not say has none
+def test_models_say_their_thinking() -> None:
+
+    put(body={"api_key": KEY})
+
+    with patch.object(connections.claude, "sdk", FakeSdk()):
+        response = client.get("/chat/settings/models")
+
+    assert response.json()[0]["thinking"] == ["adaptive", "disabled"]
+    assert response.json()[1]["thinking"] == []
+
+
+def test_thinking_the_model_refuses_is_not_saved() -> None:
+
+    response = put(body={"api_key": KEY, "thinking": "between_tools"})
+
+    assert response.status_code == 422
+    assert client.get("/chat/settings").json()["has_key"] is False
+
+
+def test_unknown_thinking_is_refused() -> None:
+
+    assert put(body={"thinking": "maybe"}).status_code == 422
+
+
+# Without the kinds of the model, the API has the last word
+def test_thinking_of_a_model_that_does_not_say_is_saved() -> None:
+
+    body = {
+        "api_key": KEY,
+        "model": "claude-sonnet-5-5",
+        "max_tokens": 1000,
+        "thinking": "between_tools",
+    }
+
+    assert put(body=body).status_code == 200
+
+
+# An answer and a workspace go out with the saved thinking
+def test_calls_use_the_saved_thinking() -> None:
+
+    put(body={"api_key": KEY, "thinking": "adaptive"})
+    ichiro = FakeIchiro()
+    folder = ichiro.add(title="Baseball", is_folder=True)
+    body = {"folder_id": str(folder), "description": "I play baseball"}
+
+    ask(body={"question": "Hi"})
+    create_workspace(ichiro=ichiro, body=body)
+
+    assert FakeMessages.params["thinking"] == {"type": "adaptive"}
+    assert FakeRunner.params["thinking"] == {"type": "adaptive"}
