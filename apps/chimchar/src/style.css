@@ -1,8 +1,9 @@
 /* The fonts of every theme; a browser only downloads the ones in use */
 @import url("https://fonts.googleapis.com/css2?\
 family=Anton&family=Cormorant+Garamond:wght@400;500&\
-family=IBM+Plex+Mono:wght@400;500&family=Jost:wght@400;500&\
-family=Orbitron:wght@800&family=Silkscreen:wght@400;700&\
+family=IBM+Plex+Mono:wght@400;500&family=Jost:wght@300;400;500&\
+family=Orbitron:wght@800&family=Playfair+Display:ital,wght@1,400&\
+family=Silkscreen:wght@400;700&\
 family=Space+Mono:wght@400;700&display=swap");
 
 /* Minimal dark: one ground, a lighter sidebar, serif headings */
