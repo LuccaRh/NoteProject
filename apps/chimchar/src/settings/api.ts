@@ -7,12 +7,14 @@ export type Settings = {
     key_end: string | null
     model: string
     max_tokens: number
+    tools_max_turns: number
     show_workspace: boolean
 }
 
 export type SettingsUpdate = {
     model: string
     max_tokens: number
+    tools_max_turns: number
     show_workspace: boolean
     api_key?: string
 }

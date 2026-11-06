@@ -18,6 +18,7 @@ type Elements = {
     removeKey: HTMLButtonElement
     model: HTMLSelectElement
     maxTokens: HTMLInputElement
+    toolsMaxTurns: HTMLInputElement
     showWorkspace: HTMLInputElement
     status: HTMLElement
     save: HTMLButtonElement
@@ -90,6 +91,7 @@ export class SettingsDialog {
         this.els.model.replaceChildren(...models)
         this.els.model.value = settings.model
         this.els.maxTokens.value = String(settings.max_tokens)
+        this.els.toolsMaxTurns.value = String(settings.tools_max_turns)
         this.els.showWorkspace.checked = settings.show_workspace
         this.showKey(settings)
         this.limitTokens()
@@ -123,6 +125,7 @@ export class SettingsDialog {
         const update: SettingsUpdate = {
             model: this.els.model.value,
             max_tokens: Number(this.els.maxTokens.value),
+            tools_max_turns: Number(this.els.toolsMaxTurns.value),
             show_workspace: this.els.showWorkspace.checked,
         }
         const apiKey = this.els.apiKey.value.trim()
