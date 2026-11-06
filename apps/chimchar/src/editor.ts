@@ -1,5 +1,5 @@
 import { EditorView, minimalSetup } from 'codemirror'
-import { EditorState } from '@codemirror/state'
+import { Compartment, EditorState } from '@codemirror/state'
 import { highlightActiveLineGutter, lineNumbers } from '@codemirror/view'
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
 import { languages } from '@codemirror/language-data'
@@ -9,6 +9,7 @@ import { preview } from './decorations/preview.ts'
 import { found, showFound } from './decorations/found.ts'
 import { noteLinks } from './notes/links.ts'
 
+import type { Extension } from '@codemirror/state'
 import type { Links } from './notes/links.ts'
 
 
@@ -18,7 +19,12 @@ export type Editor = {
     load: (text: string) => void
     // Marks the words in the text and scrolls to the first
     mark: (words: string[]) => void
+    // Switches between reading and writing, also for the texts to come
+    setReading: (args: { reading: boolean }) => void
 }
+
+// The part of the setup that the reading mode swaps
+const access = new Compartment()
 
 // Markdown colors on the dark page; the # and ** marks stay faint
 const highlight = HighlightStyle.define([
@@ -131,6 +137,15 @@ const theme = EditorView.theme({
     },
 }, { dark: true })
 
+/** What the editor needs to only show the text, or to edit it. */
+function accessFor({ reading }: { reading: boolean }): Extension {
+
+    return [
+        EditorState.readOnly.of(reading),
+        EditorView.editable.of(!reading),
+    ]
+}
+
 // export: makes the function available to other files
 /** Markdown editor; onChange gets the text on every edit. */
 export function createEditor(
@@ -153,9 +168,14 @@ export function createEditor(
             if (update.docChanged) onChange?.(update.state.doc.toString())
         }),
     ]
+    let reading = false
+    const setup = (): Extension => [
+        extensions,
+        access.of(accessFor({ reading })),
+    ]
     const view = new EditorView({
         parent,
-        extensions,
+        extensions: setup(),
     })
 
     return {
@@ -163,9 +183,15 @@ export function createEditor(
         load: text => view.setState(
             EditorState.create({
                 doc: text,
-                extensions,
+                extensions: setup(),
             }),
         ),
         mark: words => showFound(view, words),
+        setReading: args => {
+            reading = args.reading
+            view.dispatch({
+                effects: access.reconfigure(accessFor({ reading })),
+            })
+        },
     }
 }
