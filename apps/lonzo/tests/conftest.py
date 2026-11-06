@@ -40,6 +40,7 @@ async def delete_since(start: datetime) -> None:
                 text("DELETE FROM conversations WHERE created_at >= :start"),
                 {"start": start},
             )
+            await conn.execute(text("DELETE FROM settings"))
 
 
 # Runs the migrations once, before the first test (CI starts empty)
