@@ -876,6 +876,33 @@ button {
     padding: 0;
 }
 
+.settings-sheet {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.settings-sheet summary {
+    cursor: pointer;
+}
+
+.settings-sheet table {
+    width: 100%;
+    margin-top: 8px;
+    border-collapse: collapse;
+}
+
+.settings-sheet td {
+    padding: 4px 0;
+    border-top: 1px solid var(--line);
+    vertical-align: top;
+}
+
+.settings-sheet code {
+    font-family: var(--mono);
+    color: var(--body);
+}
+
 /* Search pop-up, near the top like a quick switcher */
 
 .search {
