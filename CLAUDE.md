@@ -129,7 +129,7 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 - **Valor fixo vira global, não parâmetro** (2026-11-02): o que não muda durante a vida do
   processo (cliente de outro serviço, URL, config) e seria passado de função em função vira
   global, e as funções usam direto; parâmetro fica para o que muda a cada chamada. Instância
-  de client fica em `<pacote>/connections.py` (`ichiro`, `claude`); recurso aberto fecha no
+  de client fica em `<pacote>/connections.py` (`ichiro`, `claude`; no lonzo, em `core/`, como `db`, `errors`, `handlers`, `user`, `lifespan` e `cipher`; 2026-11-05); recurso aberto fecha no
   `lifespan` do app.
 - **Backend em camadas** (2026-11-02): `routers/` → `services/` → `clients/` ou `repositories/`, cada uma só
   chama a de baixo. **Client** (`clients/<api>.py`): uma classe por API externa (ichiro,
@@ -264,13 +264,14 @@ ai/                todo o resto do workspace de IA:
 - Atualizar depois da resposta (2026-11-05, #144): branch `chimchar/refresh-the-tree-and-the-open-note-after-a-chat-answer`, em cima da
   `chimchar/clear-the-tree-selection-on-an-empty-click`: só no front; se a IA escreveu, no fim da resposta recarrega árvore e nota aberta (`notesChanged` no `main.ts`). chimchar 0.18.0.
 - Configurações da conta (2026-11-05, #146, #145): pilha `ichiro/pass-ichiro-only-its-own-variables`
-  → `lonzo/add-the-account-settings` → `chimchar/add-the-account-settings`, sem push, em cima da
+  → `lonzo/add-the-account-settings` → `chimchar/add-the-account-settings`, nos PRs, em cima da
   #144. Tabela `settings` no banco `lonzo`, chave cifrada (Fernet, `LONZO_SECRET_KEY`), cada
-  usuário com a sua, sem chave do serviço; pop-up em `settings/`, `.workspace` escondida por padrão. lonzo 0.12.0,
+  usuário com a sua, sem chave do serviço; pop-up em `settings/` (a chave salva ao colar), `.workspace` escondida por padrão; `tools_max_turns` e `thinking` por usuário (o que cada modelo aceita vem de `capabilities` da API; #152 entrou aqui). lonzo 0.12.0,
   chimchar 0.19.0.
 - Links entre notas (2026-11-05, #149): branch `chimchar/link-notes-to-each-other`, em cima da
-  `chimchar/add-the-account-settings`, sem push: `[[` lista as notas (`notes/links.ts`, `listTree`), grava
+  `chimchar/add-the-account-settings`, nos PRs: `[[` lista as notas (`notes/links.ts`, `listTree`), grava
   `[Título](note:<uuid>)`, clique abre a nota; só front, o owner vem da policy do banco. chimchar 0.20.0.
+- Pasta `core/` do lonzo (2026-11-05, #151): `cipher` já nasce em `core/` na `lonzo/add-the-account-settings`; a branch `lonzo/move-the-shared-modules-of-lonzo-to-core`, em cima da `chimchar/link-notes-to-each-other`, nos PRs, leva `db`, `connections`, `user`, `lifespan`, `handlers` e `errors`. lonzo 0.13.0. `ichiro` e `nujabes` ainda na raiz.
 - #117 (milestone Editor) no PR da branch `chimchar/render-markdown-in-the-editor`: live
   preview no editor (`decorations/preview.ts`: títulos, tabela GFM, bloco de código com cor,
   marcas escondidas fora do cursor); chimchar 0.10.0. Callout `[!tipo]` fica para a #5.
