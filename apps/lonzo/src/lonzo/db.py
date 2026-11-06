@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncConnection, create_async_engine
 
-from lonzo.user import current_user
+from lonzo.core.user import current_user
 
 
 # Global variables

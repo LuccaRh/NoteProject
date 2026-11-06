@@ -14,10 +14,10 @@ from fastapi.testclient import TestClient
 from httpx2 import Response
 
 from lonzo import connections
+from lonzo.core.user import current_user
 from lonzo.main import app
 from lonzo.services.conversations import get_conversation
 from lonzo.services.workspaces import base_rules
-from lonzo.user import current_user
 
 
 # Global variables

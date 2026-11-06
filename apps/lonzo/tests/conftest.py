@@ -13,8 +13,8 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from lonzo import db
 from lonzo.core.cipher import encrypt
+from lonzo.core.user import current_user
 from lonzo.repositories.settings import upsert_settings
-from lonzo.user import current_user
 
 
 # Global variables
