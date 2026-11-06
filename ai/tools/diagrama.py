@@ -43,6 +43,16 @@ CORES = {   # (preenchimento, contorno): claros, para figura em tema claro
     "cinza": ("#f5f5f5", "#666666"),
 }
 
+CORES_TABELA = {   # cabeçalho de `tabela`: fortes, sobre o cartão escuro
+    "azul": "#1b8fd6", "verde": "#1f8a3b", "laranja": "#d9822b", "vermelho": "#c23b3b",
+    "roxo": "#7a2fb5", "amarelo": "#b8940f", "cinza": "#6b6b6b",
+}
+TABELA_TOPO = 28        # altura do cabeçalho da `tabela`
+TABELA_LINHA = 20       # altura de cada linha da `tabela`
+ESCURO_FUNDO = "#2b2b2b"
+ESCURO_TEXTO = "#e6e6e6"
+ESCURO_LINHA = "#c8c8c8"
+
 # --------------------------------------------------------------------------- #
 # símbolos: tipo -> (estilo draw.io, w, h, terminais em fração da caixa NÃO girada)
 # --------------------------------------------------------------------------- #
@@ -109,6 +119,8 @@ class No:
     cor: str | None = None
     contem: list[str] = field(default_factory=list)
     rotulo: str = ""            # símbolo de circuito: texto ao lado (R = 1 Ω)
+    colunas: list[str] = field(default_factory=list)   # `tabela`: nomes, em ordem
+    forte: bool = False         # grupo: contorno e fundo na cor forte das `tabela`
 
     @property
     def vw(self) -> float:      # caixa visível (girada)
@@ -122,7 +134,15 @@ class No:
         return (self.cx - self.vw / 2, self.cy - self.vh / 2, self.vw, self.vh)
 
     def porta(self, nome: str) -> tuple[float, float, str]:
-        """(x, y, lado de saída). Lado: e/d/c/b; terminal de símbolo: o que ele aponta."""
+        """(x, y, lado de saída). Lado: e/d/c/b; `d:coluna` é a linha da coluna na `tabela`;
+        terminal de símbolo: o que ele aponta."""
+        if ":" in nome:
+            lado, _, coluna = nome.partition(":")
+            if coluna not in self.colunas:
+                raise ValueError(f"{self.id}: coluna '{coluna}' não existe")
+            x, y, w, _ = self.ret()
+            yc = y + TABELA_TOPO + TABELA_LINHA * (self.colunas.index(coluna) + 0.5)
+            return x + LADOS[lado][0] * w, yc, lado
         if nome in LADOS:
             fx, fy = LADOS[nome]
             x, y, w, h = self.ret()
@@ -150,6 +170,7 @@ class Aresta:
     seta: bool
     rotulo: str = ""
     tracejada: bool = False
+    pontas: tuple[str, str] | None = None     # ponta draw.io (ERone, ERmany...): início, fim
 
 
 @dataclass
@@ -174,12 +195,59 @@ class Desenho:
     arestas: list[Aresta] = field(default_factory=list)
     textos: list[Texto] = field(default_factory=list)
     math: bool = False
+    escuro: bool = False
 
 
 # --------------------------------------------------------------------------- #
 # spec -> desenho
 # --------------------------------------------------------------------------- #
+def _tabela_html(d: dict) -> str:
+    """Cartão da `tabela`: cabeçalho colorido, colunas (chave, nome, tipo, NN), índices e nota."""
+    e = html.escape
+    cor = CORES_TABELA[d.get("cor", "cinza")]
+    borda = "border-top:1px solid #5a5a5a;"
+    td = f"height:{TABELA_LINHA}px;padding:0 5px;white-space:nowrap;"
+    tags = {"PK": "#f2c230", "FK": "#6db8f2", "UQ": "#8fd19e"}
+    linhas = [f'<tr><td colspan="4" style="height:{TABELA_TOPO}px;background:{cor};'
+              f'color:#fff;font-weight:bold;font-size:13px;text-align:center">'
+              f'{e(str(d["texto"]))}</td></tr>']
+    for nome, tipo, *resto in d["colunas"]:
+        marca = resto[0] if resto else ""
+        nulo = len(resto) > 1 and resto[1] == "null"
+        linhas.append(
+            f'<tr><td style="{td}width:22px;color:{tags.get(marca, "#fff")};font-size:10px;'
+            f'font-weight:bold">{e(marca)}</td><td style="{td}">{e(nome)}</td>'
+            f'<td style="{td}color:#b5b5b5;font-style:italic;text-align:right">{e(tipo)}</td>'
+            f'<td style="{td}width:20px;font-size:10px">{"" if nulo else "NN"}</td></tr>')
+    for i, (tag, texto) in enumerate(d.get("extras") or []):
+        topo = borda if i == 0 else ""
+        linhas.append(
+            f'<tr><td style="{td}{topo}color:#f2a93b;font-size:10px;font-weight:bold">{e(tag)}'
+            f'</td><td colspan="3" style="{td}{topo}color:#d0d0d0;font-size:11px">{e(texto)}'
+            '</td></tr>')
+    if d.get("nota"):
+        linhas.append(
+            f'<tr><td colspan="4" style="{borda}padding:3px 5px;color:#a8a8a8;font-size:11px;'
+            f'white-space:normal;line-height:14px">{e(d["nota"])}</td></tr>')
+    return ('<table style="width:100%;border-collapse:collapse;background:#3a3a3a;'
+            'color:#ececec;font-size:12px;text-align:left">' + "".join(linhas) + "</table>")
+
+
+def _tabela_tamanho(d: dict) -> tuple[float, float]:
+    colunas = d["colunas"]
+    largura = max([(len(c[0]) + len(c[1])) * CHAR + 90 for c in colunas]
+                  + [len(str(d["texto"])) * CHAR * 1.2 + 30]
+                  + [len(t) * CHAR + 50 for _, t in d.get("extras") or []])
+    w = d.get("w", _g(largura))
+    h = TABELA_TOPO + TABELA_LINHA * (len(colunas) + len(d.get("extras") or []))
+    if d.get("nota"):
+        h += 14 * max(1, int(len(d["nota"]) * 6 / (w - 10)) + 1) + 8
+    return w, h
+
+
 def _tamanho(tipo: str, d: dict) -> tuple[float, float]:
+    if tipo == "tabela":
+        return _tabela_tamanho(d)
     if tipo in SIMBOLOS:
         return SIMBOLOS[tipo][1], SIMBOLOS[tipo][2]
     txt = d.get("texto", "")
@@ -284,7 +352,7 @@ def _limpar(pts):
 def montar(spec: dict) -> Desenho:
     tipo = spec.get("tipo", "blocos")
     gx, gy = spec.get("grade", [160, 100])
-    d = Desenho(spec.get("titulo", "diagrama"), tipo)
+    d = Desenho(spec.get("titulo", "diagrama"), tipo, escuro=bool(spec.get("escuro")))
     grupos = {}
     for nid, nd in (spec.get("nos") or {}).items():
         nd = nd or {}
@@ -295,12 +363,13 @@ def montar(spec: dict) -> Desenho:
         col, lin = nd["pos"]
         w, h = _tamanho(t, nd)
         w, h = nd.get("w", w), nd.get("h", h)
-        texto = str(nd.get("texto", ""))
+        texto = _tabela_html(nd) if t == "tabela" else str(nd.get("texto", ""))
         if "$$" in texto:
             d.math = True
         d.nos[nid] = No(nid, t, MARGEM + col * gx, MARGEM + lin * gy, w, h, texto,
                         int(nd.get("rot", 0)) % 360, nd.get("cor"),
-                        rotulo=str(nd.get("rotulo", "")))
+                        rotulo=str(nd.get("rotulo", "")),
+                        colunas=[c[0] for c in nd.get("colunas") or []])
     # grupos: caixa em volta do que contêm (grupo dentro de grupo também)
     feitos: set[str] = set()
 
@@ -327,7 +396,8 @@ def montar(spec: dict) -> Desenho:
         texto = str(gd.get("texto", gid))
         x1 = max(x1, x0 + _largura(texto) + 12)
         n = No(gid, "grupo", (x0 + x1) / 2, (y0 + y1) / 2, x1 - x0, y1 - y0, texto,
-               cor=gd.get("cor", "cinza"), contem=list(gd.get("contem", [])))
+               cor=gd.get("cor", "cinza"), contem=list(gd.get("contem", [])),
+               forte=bool(gd.get("forte")))
         d.nos[gid] = n
         feitos.add(gid)
         d.textos.append(Texto(f"{gid}__titulo", x0 + 6, y0 + 3, _largura(texto), 18,
@@ -357,7 +427,8 @@ def montar(spec: dict) -> Desenho:
         pts = _rota((x0, y0), l0, (x1, y1), l1, opc, gx, gy)
         ar = Aresta(i, de.partition(".")[0], para.partition(".")[0], pts,
                     opc.get("seta", padrao_seta), str(opc.get("rotulo", "")),
-                    opc.get("tracejada", False))
+                    opc.get("tracejada", False),
+                    tuple(opc["pontas"]) if "pontas" in opc else None)
         d.arestas.append(ar)
         if ar.rotulo:
             d.textos.append(_texto_rotulo(ar, opc.get("lado_rotulo")))
@@ -534,6 +605,7 @@ def _membros(d: Desenho, g: No) -> set[str]:
 _BASE = "html=1;whiteSpace=wrap;fontSize=12;"
 _ESTILO = {
     "bloco": _BASE + "rounded=0;",
+    "tabela": "html=1;whiteSpace=wrap;overflow=fill;rounded=0;fillColor=#3a3a3a;strokeColor=#1e1e1e;",
     "banco": _BASE + "shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;",
     "somador": _BASE + "ellipse;aspect=fixed;",
     "ramo": "ellipse;aspect=fixed;fillColor=#000000;strokeColor=#000000;html=1;",
@@ -560,13 +632,13 @@ def vertice(cid: str, valor: str, estilo: str, x: float, y: float, w: float, h: 
             f'as="geometry"/></mxCell>')
 
 
-def mxfile(paginas, host: str = "NoteProject/tools/diagrama.py") -> str:
+def mxfile(paginas, host: str = "NoteProject/tools/diagrama.py", fundo: str = "#ffffff") -> str:
     """paginas: [(nome, [células xml], math)] -> arquivo .drawio."""
     out = [f'<mxfile host="{_attr(host)}" type="device">']
     for n, (nome, celulas, math) in enumerate(paginas):
         out.append(f'<diagram name="{_attr(nome)}" id="p{n}"><mxGraphModel grid="1" '
                    f'gridSize="10" guides="1" connect="1" arrows="1" page="1" pageWidth="1654" '
-                   f'pageHeight="1169" math="{1 if math else 0}" background="#ffffff"><root>'
+                   f'pageHeight="1169" math="{1 if math else 0}" background="{fundo}"><root>'
                    '<mxCell id="0"/><mxCell id="1" parent="0"/>')
         out += celulas
         out.append("</root></mxGraphModel></diagram>")
@@ -575,6 +647,10 @@ def mxfile(paginas, host: str = "NoteProject/tools/diagrama.py") -> str:
 
 
 def _estilo_no(n: No) -> str:
+    if n.tipo == "grupo" and n.cor in CORES_TABELA and n.cor != "cinza":
+        cor = CORES_TABELA[n.cor]         # grupo colorido: mesma cor das `tabela` dentro dele
+        if n.forte:
+            return _ESTILO["grupo"] + f"fillColor={cor};strokeColor={cor};fillOpacity=14;strokeWidth=2;"
     if n.tipo in SIMBOLOS:
         s = SIMBOLOS[n.tipo][0]
     else:
@@ -597,6 +673,8 @@ def drawio(d: Desenho) -> str:
     cel = []
 
     def v(cid, valor, estilo, x, y, w, h):
+        if d.escuro and estilo.startswith("text;"):
+            estilo += f"fontColor={ESCURO_TEXTO};"
         cel.append(vertice(cid, valor, estilo, x + dx, y + dy, w, h))
 
     v("titulo", html.escape(d.titulo), _ESTILO["titulo"], x0, y0 - 45, _largura(d.titulo) * 1.3, 26)
@@ -609,7 +687,12 @@ def drawio(d: Desenho) -> str:
               n.cx - n.w / 2, n.cy - n.h / 2, n.w, n.h)
     for a in d.arestas:
         fim = "block;endFill=1" if a.seta else "none"
-        estilo = f"html=1;rounded=0;endArrow={fim};startArrow=none;{'dashed=1;' if a.tracejada else ''}"
+        comeco = "none"
+        if a.pontas:
+            comeco, fim = f"{a.pontas[0]};startFill=0", f"{a.pontas[1]};endFill=0"
+        estilo = f"html=1;rounded=0;endArrow={fim};startArrow={comeco};{'dashed=1;' if a.tracejada else ''}"
+        if d.escuro:
+            estilo += f"strokeColor={ESCURO_LINHA};"
         (sx, sy), (tx, ty) = a.pontos[0], a.pontos[-1]
         meio = "".join(f'<mxPoint x="{x + dx:.0f}" y="{y + dy:.0f}"/>' for x, y in a.pontos[1:-1])
         arr = f'<Array as="points">{meio}</Array>' if meio else ""
@@ -620,7 +703,7 @@ def drawio(d: Desenho) -> str:
                    f'{arr}</mxGeometry></mxCell>')
     for t in d.textos:
         v(t.id, t.texto, _ESTILO[t.estilo], t.x, t.y, t.w, t.h)
-    return mxfile([(d.titulo, cel, d.math)])
+    return mxfile([(d.titulo, cel, d.math)], fundo=ESCURO_FUNDO if d.escuro else "#ffffff")
 
 
 # --------------------------------------------------------------------------- #

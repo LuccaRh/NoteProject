@@ -7,12 +7,14 @@ from anthropic import APIError
 
 from lonzo.connections import claude
 from lonzo.schemas.conversations import Conversation, Message, Turn
+from lonzo.schemas.settings import ModelSettings
 from lonzo.services.conversations import (
     get_conversation,
     save_exchange,
     start_conversation,
 )
 from lonzo.services.note_tools import NoteTools
+from lonzo.services.settings import get_model_settings
 from lonzo.services.workspaces import base_rules, question_context
 
 
@@ -47,6 +49,7 @@ def blocks_of(content: Sequence[Any]) -> list[dict[str, Any]]:
 
 
 async def events(
+    settings: ModelSettings,
     conversation: Conversation,
     history: list[Message],
     question: str,
@@ -66,6 +69,7 @@ async def events(
     end: dict[str, object] = {"usage": usage}
     tools = NoteTools()
     runner = claude.stream_answer(
+        settings=settings,
         system=system,
         history=history,
         question=question,
@@ -141,7 +145,7 @@ async def answer(
     code
     """
 
-    claude.check_key()
+    settings = await get_model_settings()
     conversation: Conversation | None = None
     history: list[Message] = []
 
@@ -159,6 +163,7 @@ async def answer(
     system = [base_rules(), await question_context(folder_id=folder_id)]
 
     return events(
+        settings=settings,
         conversation=conversation,
         history=history,
         question=question,

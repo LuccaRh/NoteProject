@@ -12,6 +12,8 @@ from sqlalchemy import NullPool, text
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from lonzo import db
+from lonzo.core.cipher import encrypt
+from lonzo.repositories.settings import upsert_settings
 from lonzo.user import current_user
 
 
@@ -40,6 +42,24 @@ async def delete_since(start: datetime) -> None:
                 text("DELETE FROM conversations WHERE created_at >= :start"),
                 {"start": start},
             )
+            await conn.execute(text("DELETE FROM settings"))
+
+
+async def save_key() -> None:
+
+    current_user.set(USER)
+
+    async with db.transaction() as conn:
+        await upsert_settings(
+            conn=conn,
+            api_key=encrypt(text="test-key"),
+            key_end="-key",
+            model="claude-haiku-5-5",
+            max_tokens=64000,
+            tools_max_turns=20,
+            thinking="disabled",
+            show_workspace=False,
+        )
 
 
 # Runs the migrations once, before the first test (CI starts empty)
@@ -60,3 +80,10 @@ def database(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     yield
 
     asyncio.run(delete_since(start=start))
+
+
+# The user with a key of their own, for the tests that reach the model
+@pytest.fixture
+def saved_key(database: None) -> None:
+
+    asyncio.run(save_key())

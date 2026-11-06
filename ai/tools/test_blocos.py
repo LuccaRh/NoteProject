@@ -152,6 +152,10 @@ class TestCamadas(unittest.TestCase):
         texto = "def f():\n    # first\n    # second\n    return 1\n"
         self.assertEqual(checar_comentarios(texto), [3])
 
+    def test_colunas_em_global_nao_e_prompt(self) -> None:
+        texto = 'COLUMNS = "api_key, key_end, model, a, b, c, d, show_workspace"\n'
+        self.assertEqual(checar_prompts(texto), [])
+
     def test_prompt_em_global(self) -> None:
         texto = (
             '# Global variables\nHINT = (\n    "Search the folder first and then"\n'

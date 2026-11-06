@@ -1,7 +1,19 @@
 # Code
 class MissingApiKey(Exception):
     """
-    ANTHROPIC_API_KEY is not set, so no call to the model can go out
+    The user saved no key, so no call to the model can go out
+    """
+
+
+class InvalidApiKey(Exception):
+    """
+    The Anthropic API refused the key
+    """
+
+
+class InvalidSettings(Exception):
+    """
+    The model does not exist for the key, or allows fewer tokens
     """
 
 

@@ -44,6 +44,21 @@ def test_xml_valido():
 
 
 @teste
+def test_tabela_liga_na_linha_da_coluna():
+    spec = {"nos": {
+        "a": {"tipo": "tabela", "pos": [0, 0], "texto": "a", "cor": "verde",
+              "colunas": [["id", "uuid", "PK"], ["b_id", "uuid", "FK"]]},
+        "b": {"tipo": "tabela", "pos": [3, 0], "texto": "b", "cor": "azul",
+              "colunas": [["id", "uuid", "PK"]]},
+    }, "arestas": [["a.d:b_id", "b.e:id", {"pontas": ["ERmany", "ERmandOne"]}]]}
+    d = dg.montar(spec)
+    x, y, w, _ = d.nos["a"].ret()
+    assert d.nos["a"].porta("d:b_id") == (x + w, y + 28 + 30, "d")
+    assert "ERmany" in dg.drawio(d)
+    ET.fromstring(dg.drawio(d))
+
+
+@teste
 def test_realimentacao_em_u():
     d = dg.montar(MINI)
     pts = d.arestas[3].pontos

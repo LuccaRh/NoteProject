@@ -11,6 +11,9 @@ Cada serviço tem um banco próprio no mesmo [[Postgres]], com dois usuários, s
 | lonzo | `lonzo` | `lonzo_migrator` | `lonzo` |
 | nujabes | `nujabes` | `nujabes_migrator` | `nujabes` |
 
+![[esquema-do-postgres.drawio.svg]]
+*Uma cor por banco; linha tracejada guarda o id de outro banco sem FK, porque o Postgres não liga bancos diferentes.*
+
 O admin (`POSTGRES_USER`) é o quarto papel, com um por servidor: a imagem o cria, e `POSTGRES_DB=postgres` só diz onde os scripts conectam.
 
 ## Primeira subida

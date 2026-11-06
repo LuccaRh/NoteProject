@@ -8,6 +8,7 @@ from unittest.mock import patch
 from uuid import UUID, uuid4
 
 import httpx2
+import pytest
 from fakes import USER, FakeIchiro, unreachable
 from fastapi.testclient import TestClient
 from httpx2 import Response
@@ -20,6 +21,7 @@ from lonzo.user import current_user
 
 
 # Global variables
+pytestmark = pytest.mark.usefixtures("saved_key")
 client = TestClient(app, headers={"X-User-Id": str(USER)})
 
 
@@ -82,8 +84,14 @@ class FakeMessages:
 
 
 class FakeClient:
-    api_key: str = "test-key"
+    used_key: ClassVar[str] = ""
     beta: SimpleNamespace = SimpleNamespace(messages=FakeMessages())
+
+    def with_options(self, api_key: str) -> FakeClient:
+
+        FakeClient.used_key = api_key
+
+        return self
 
 
 # Parses a server-sent events body into (name, data) pairs
@@ -137,12 +145,12 @@ def test_chat_needs_a_question() -> None:
 
 def test_chat_without_key() -> None:
 
-    no_key = SimpleNamespace(api_key=None)
+    client.delete("/chat/settings/key")
 
-    with patch.object(connections.claude, "sdk", no_key):
-        response = client.post("/chat", json={"question": "Hi"})
+    response = post(body={"question": "Hi"})
 
-    assert response.status_code == 503
+    assert response.status_code == 422
+    assert "settings" in response.json()["detail"]
 
 
 def test_chat_with_notes_service_down() -> None:

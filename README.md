@@ -55,8 +55,8 @@ cp .env.example .env    # then replace every value
 ```
 
 `.env.example` lists the variables the project uses, each with a comment and a placeholder
-value. Docker Compose loads `.env` into the `postgres` and `ichiro` containers (`env_file` in
-`docker-compose-dev.yml`); `lonzo` gets only `ANTHROPIC_API_KEY` (`environment`):
+value. Docker Compose loads `.env` into the `postgres` container (`env_file` in
+`docker-compose-dev.yml`); each service gets only its own variables (`environment`):
 
 | Variable | Read by | Meaning |
 |---|---|---|
@@ -65,7 +65,7 @@ value. Docker Compose loads `.env` into the `postgres` and `ichiro` containers (
 | `ICHIRO_DATABASE_URL` | notes API | `postgresql+psycopg://ichiro:<password>@postgres:5432/ichiro` |
 | `ICHIRO_MIGRATION_URL` | notes Alembic | the same database, as `ichiro_migrator`, which owns the tables |
 | `LONZO_*`, `NUJABES_*` | `lonzo`, `nujabes`, `postgres/init` | the same four variables for each service |
-| `ANTHROPIC_API_KEY` | chat service | one Anthropic API key for every chat, until there is a login |
+| `LONZO_SECRET_KEY` | chat service | encrypts the Anthropic key each user saves in the settings; make it with `Fernet.generate_key()` from `cryptography` |
 
 The host in these URLs is `postgres`, the service name in the compose file, which only
 resolves inside the containers. `make check` runs the tests on the host, so it swaps the host
