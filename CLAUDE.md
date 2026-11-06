@@ -225,7 +225,7 @@ ai/                todo o resto do workspace de IA:
   build/           gerado (estado dos hooks, png de diagrama), fora do git
 ```
 
-## Estado (2026-11-05)
+## Estado (2026-11-06)
 
 - Mergeados até o PR #148 (2026-11-05); lista antiga até o PR #116: M0, #46, #62, #64, #65, #69, #16, #80, #82, #74, #73, #98, #100,
   #75 (PRs #103, #104), #76 (#105, #106), #56 (#110), #107 (#111), #108 (#112), #109 (#113),
@@ -273,6 +273,7 @@ ai/                todo o resto do workspace de IA:
   `[Título](note:<uuid>)`, clique abre a nota; só front, o owner vem da policy do banco. chimchar 0.20.0.
 - Pasta `core/` do lonzo (2026-11-05, #151): `cipher` já nasce em `core/` na `lonzo/add-the-account-settings`; a branch `lonzo/move-the-shared-modules-of-lonzo-to-core`, em cima da `chimchar/link-notes-to-each-other`, nos PRs, leva `db`, `connections`, `user`, `lifespan`, `handlers` e `errors`. lonzo 0.13.0. `ichiro` e `nujabes` ainda na raiz.
 - Links da IA (2026-11-05, #149): branch `lonzo/link-notes-to-each-other`, em cima da `lonzo/move-the-shared-modules-of-lonzo-to-core`: o `base_rules.md` ensina `[palavra](note:<id>)` e lista os formatos que o editor mostra. lonzo 0.14.0. Branch `chimchar/open-note-links-from-the-chat`, em cima dela: link de nota abre no clique na resposta do chat. chimchar 0.21.0. Falta: link em tabela e para site.
+- Inventário de skills (2026-11-06, #161): branches `lonzo/add-the-skill-inventory` → `chimchar/add-the-skill-inventory`, nos PRs. Skill privada = nota em `.workspace/skills/`; publicada = linha na tabela `skills` do banco `lonzo`, foto do momento (`note_id` sem FK; todo logado lê, só o dono escreve). Adicionar sempre copia. Aba Skills em `skills/`. As 3 skills locais do Lucca estão publicadas. Falta despublicar. lonzo 0.15.0, chimchar 0.22.0.
 - #117 (milestone Editor) no PR da branch `chimchar/render-markdown-in-the-editor`: live
   preview no editor (`decorations/preview.ts`: títulos, tabela GFM, bloco de código com cor,
   marcas escondidas fora do cursor); chimchar 0.10.0. Callout `[!tipo]` fica para a #5.
