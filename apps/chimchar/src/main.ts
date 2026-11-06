@@ -1,5 +1,6 @@
 // Imports
 import './style.css'
+import './themes/glass.css'
 import './themes/grid.css'
 import './themes/liquid.css'
 import './themes/panels.css'
