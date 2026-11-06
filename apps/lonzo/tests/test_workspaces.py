@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 from httpx2 import Response
 
 from lonzo import connections
-from lonzo.errors import TitleTaken
+from lonzo.core.errors import TitleTaken
 from lonzo.main import app
 
 

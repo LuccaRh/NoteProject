@@ -1,8 +1,8 @@
 # Imports
 from uuid import UUID
 
+from lonzo.core.errors import ConversationNotFound
 from lonzo.db import transaction
-from lonzo.errors import ConversationNotFound
 from lonzo.repositories.conversations import (
     insert_conversation,
     insert_message,
