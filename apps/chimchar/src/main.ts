@@ -144,13 +144,17 @@ function openNote(
 }
 
 /** Open the note of a link; it may be deleted or someone else's. */
-async function openLink(id: string): Promise<void> {
+async function openLink(id: string): Promise<boolean> {
 
     try {
         const note = await getNote(id)
         await openNote(note, () => tree.path(note))
+
+        return true
     } catch {
         page.say('Could not find this note')
+
+        return false
     }
 }
 
@@ -171,6 +175,7 @@ function openChat(folderId: string | null): void {
         folders: () => tree.folders(),
         onTitle: title => tabs.rename(id, title),
         onNotesChanged: () => void notesChanged(),
+        openNote: id => openLink(id),
     })
     void tabs.open({
         id,

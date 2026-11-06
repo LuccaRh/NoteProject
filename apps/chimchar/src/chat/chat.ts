@@ -1,6 +1,7 @@
 // Imports
 import { ask, getConversation, listConversations, Refused } from './api.ts'
 import { renderMarkdown } from './markdown.ts'
+import { noteId } from '../notes/links.ts'
 
 import type { Folder } from '../notes/tree.ts'
 import type { Block, Conversation } from './api.ts'
@@ -17,6 +18,8 @@ type Options = {
     onTitle: (title: string) => void
     // Called after an answer in which the AI wrote to the notes
     onNotesChanged: () => void
+    // Opens the note of a link; false when it does not exist
+    openNote: (id: string) => Promise<boolean>
 }
 
 // Option of the workspace list that asks with no workspace
@@ -105,6 +108,7 @@ export class Chat {
         side.append(this.list)
 
         this.messages.ariaLive = 'polite'
+        this.messages.addEventListener('click', event => this.click(event))
         this.question.rows = 3
         this.question.placeholder = 'Ask something'
         this.question.ariaLabel = 'Question'
@@ -139,6 +143,26 @@ export class Chat {
         body.append(side, main)
         this.panel.append(head, body)
         this.showEmpty()
+    }
+
+    /** Open the note of a clicked link, instead of following the address. */
+    click(event: MouseEvent): void {
+
+        const link = (event.target as HTMLElement).closest('a')
+        const id = noteId(link?.getAttribute('href') ?? '')
+
+        if (!link || !id) return
+
+        event.preventDefault()
+        void this.openLink(link, id)
+    }
+
+    /** Open a linked note; a link to nothing turns into plain text. */
+    async openLink(link: HTMLAnchorElement, id: string): Promise<void> {
+
+        if (await this.options.openNote(id)) return
+
+        link.replaceWith(`${link.textContent} (note not found)`)
     }
 
     /** Name of the workspace, for the tab when no conversation is open. */
