@@ -1,7 +1,7 @@
 # Imports
 from typing import Any, cast
 
-from anthropic import AsyncAnthropic
+from anthropic import AsyncAnthropic, AuthenticationError
 from anthropic.lib.tools import (
     BetaAsyncFunctionTool,
     BetaAsyncStreamingToolRunner,
@@ -12,8 +12,9 @@ from anthropic.types.beta import (
     BetaTextBlockParam,
 )
 
-from lonzo.errors import MissingApiKey
+from lonzo.errors import InvalidApiKey, MissingApiKey
 from lonzo.schemas.conversations import Message
+from lonzo.schemas.settings import ModelOption
 
 
 # Global variables
@@ -55,6 +56,25 @@ class AnthropicClient:
 
         if self.sdk.api_key is None:
             raise MissingApiKey("ANTHROPIC_API_KEY is not set")
+
+    async def list_models(self, api_key: str) -> list[ModelOption]:
+        """
+        The models that key can use; InvalidApiKey when the API refuses it
+        """
+
+        sdk = self.sdk.with_options(api_key=api_key)
+
+        try:
+            return [
+                ModelOption(
+                    id=model.id,
+                    name=model.display_name,
+                    max_tokens=model.max_tokens,
+                )
+                async for model in sdk.models.list()
+            ]
+        except AuthenticationError as error:
+            raise InvalidApiKey("the Anthropic key was refused") from error
 
     def stream_answer(
         self,

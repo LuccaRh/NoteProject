@@ -7,6 +7,8 @@ from fastapi.responses import JSONResponse
 from lonzo.errors import (
     ConversationNotFound,
     FolderNotFound,
+    InvalidApiKey,
+    InvalidSettings,
     MissingApiKey,
     NotAFolder,
 )
@@ -16,6 +18,8 @@ from lonzo.errors import (
 STATUS: dict[type[Exception], int] = {
     APIError: 502,
     MissingApiKey: 503,
+    InvalidApiKey: 422,
+    InvalidSettings: 422,
     FolderNotFound: 404,
     NotAFolder: 422,
     ConversationNotFound: 404,
