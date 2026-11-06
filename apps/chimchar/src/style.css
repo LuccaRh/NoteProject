@@ -75,8 +75,9 @@ button {
     height: 100vh;
 }
 
-/* Only the themes with a cube show it */
-.cube-scene {
+/* Only the themes with a cube or a globe show them */
+.cube-scene,
+.globe {
     display: none;
 }
 
