@@ -35,8 +35,7 @@ type Elements = {
     showWorkspace: HTMLInputElement
     theme: HTMLSelectElement
     status: HTMLElement
-    save: HTMLButtonElement
-    cancel: HTMLButtonElement
+    close: HTMLButtonElement
 }
 
 
@@ -46,15 +45,15 @@ export class SettingsDialog {
     els: Elements
     onSaved: (settings: Settings) => void
     models: ModelOption[] = []
+    loaded = false
 
     /** Wire the form; each open reads the settings again. */
     constructor(els: Elements, onSaved: (settings: Settings) => void) {
 
         this.els = els
         this.onSaved = onSaved
-        els.form.addEventListener('submit', event => {
-            event.preventDefault()
-            void this.save()
+        els.form.addEventListener('change', event => {
+            if (event.target !== els.apiKey) void this.save()
         })
         els.apiKey.addEventListener('input', event => {
             const { inputType } = event as InputEvent
@@ -62,10 +61,7 @@ export class SettingsDialog {
             if (inputType === 'insertFromPaste') void this.saveKey()
         })
         els.apiKey.addEventListener('change', () => void this.saveKey())
-        els.cancel.addEventListener('click', () => els.dialog.close())
-        els.theme.addEventListener('change', () => {
-            chooseTheme({ theme: els.theme.value })
-        })
+        els.close.addEventListener('click', () => els.dialog.close())
         els.removeKey.addEventListener('click', () => void this.forgetKey())
         els.model.addEventListener('change', () => {
             this.limitTokens()
@@ -73,12 +69,12 @@ export class SettingsDialog {
         })
     }
 
-    /** Show the pop-up, ready to save once the settings arrive. */
+    /** Show the pop-up; changes save once the settings arrive. */
     async open(): Promise<void> {
 
         this.els.apiKey.value = ''
         this.els.status.textContent = 'Loading'
-        this.els.save.disabled = true
+        this.loaded = false
         this.els.theme.value = currentTheme()
         this.els.dialog.showModal()
 
@@ -91,7 +87,7 @@ export class SettingsDialog {
             this.models = models
             this.fill(settings)
             this.els.status.textContent = ''
-            this.els.save.disabled = false
+            this.loaded = true
         } catch (error) {
             this.els.status.textContent = 'Server unreachable, try again'
             console.error(error)
@@ -178,7 +174,6 @@ export class SettingsDialog {
         if (!update.api_key || this.els.apiKey.disabled) return
 
         this.els.apiKey.disabled = true
-        this.els.save.disabled = true
         this.els.status.textContent = 'Checking the key'
 
         try {
@@ -192,28 +187,25 @@ export class SettingsDialog {
             this.els.status.textContent = String((error as Error).message)
         } finally {
             this.els.apiKey.disabled = false
-            this.els.save.disabled = false
         }
     }
 
-    /** Save the form; close on success, say why if not. */
+    /** Save the form as it changes, and say how it went. */
     async save(): Promise<void> {
 
-        const update = this.values()
-        const apiKey = update.api_key
+        if (!this.loaded || this.els.apiKey.disabled) return
 
-        this.els.save.disabled = true
-        this.els.status.textContent = apiKey ? 'Checking the key' : ''
+        chooseTheme({ theme: this.els.theme.value })
+
+        if (!this.els.form.reportValidity()) return
+
+        this.els.status.textContent = 'Saving'
 
         try {
-            const settings = await saveSettings(update)
-            this.els.apiKey.value = ''
-            this.els.dialog.close()
-            this.onSaved(settings)
+            this.onSaved(await saveSettings(this.values()))
+            this.els.status.textContent = 'Saved'
         } catch (error) {
             this.els.status.textContent = String((error as Error).message)
-        } finally {
-            this.els.save.disabled = false
         }
     }
 
