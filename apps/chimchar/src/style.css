@@ -82,9 +82,18 @@ button {
 
 .toolbar {
     display: flex;
-    justify-content: flex-end;
-    gap: 2px;
+    justify-content: space-between;
     padding: 0 4px;
+}
+
+/* Each group of buttons sits on its own grey tray */
+.tool-group {
+    display: flex;
+    gap: 1px;
+    border-radius: 8px;
+    background: var(--active);
+    --muted: var(--soft);
+    --hover: var(--selection);
 }
 
 .icon,
