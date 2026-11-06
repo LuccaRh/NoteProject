@@ -1,0 +1,224 @@
+/* Grid 3D: light cells with hard lines, pixel titles and an orange cube */
+:root[data-theme='grid'] {
+    --ground: #e6e6e3;
+    --panel: #e6e6e3;
+    --line: #b9b9b5;
+    --hover: #d9d9d5;
+    --active: #cfcfca;
+    --selection: #f5c9a8;
+    --text: #1a1a1a;
+    --body: #2a2a2a;
+    --soft: #3a3a3a;
+    --muted: #5c5c58;
+    --faint: #6f6f69;
+    --sans: 'IBM Plex Mono', ui-monospace, monospace;
+    --serif: Silkscreen, ui-monospace, monospace;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --code-bg: #f0f0ee;
+    --code-keyword: #b8430a;
+    --code-string: #2f6b3a;
+    --code-number: #8a5a00;
+    --code-name: #1f5fa8;
+    --accent: #e85a0c;
+    --mark: #e8a317;
+    --danger: #b3261e;
+    color-scheme: light;
+}
+
+[data-theme='grid'] :not(.cube-face) {
+    border-radius: 0 !important;
+}
+
+/* Sidebar */
+
+[data-theme='grid'] .sidebar {
+    position: relative;
+    flex-basis: 260px;
+    padding: 14px 10px;
+}
+
+[data-theme='grid'] .sidebar::before {
+    content: 'Notes';
+    margin: -14px -10px 0;
+    padding: 14px 18px 14px 54px;
+    border-bottom: 1px solid var(--line);
+    font: 18px/26px var(--serif);
+}
+
+/* The orange square of the logo */
+[data-theme='grid'] .sidebar::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 18px;
+    width: 26px;
+    height: 26px;
+    box-sizing: border-box;
+    border: 3px solid var(--accent);
+}
+
+[data-theme='grid'] .icon[aria-label='New note'] {
+    background: var(--accent);
+    color: #fff;
+}
+
+[data-theme='grid'] .node[aria-selected='true'] {
+    background: #1a1a1a;
+    --text: var(--ground);
+    --soft: var(--ground);
+    --muted: var(--ground);
+}
+
+/* Note */
+
+[data-theme='grid'] .column {
+    max-width: 760px;
+}
+
+[data-theme='grid'] .title {
+    font-weight: 700;
+    font-size: 72px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+}
+
+[data-theme='grid'] .md-h1,
+[data-theme='grid'] .md-h2,
+[data-theme='grid'] .md-h3,
+[data-theme='grid'] .md-h4,
+[data-theme='grid'] .md-h5,
+[data-theme='grid'] .md-h6,
+[data-theme='grid'] .message.assistant h1,
+[data-theme='grid'] .message.assistant h2,
+[data-theme='grid'] .message.assistant h3 {
+    font-weight: 400;
+}
+
+/* Chat */
+
+[data-theme='grid'] .message.user {
+    background: var(--text);
+    color: var(--ground);
+}
+
+/* Cube */
+
+[data-theme='grid'] .cube-scene {
+    position: relative;
+    flex: 0 0 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1a1a1a;
+    perspective: 800px;
+}
+
+[data-theme='grid'] .cube-scene::before,
+[data-theme='grid'] .cube-scene::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: solid #f0f0ee;
+}
+
+[data-theme='grid'] .cube-scene::before {
+    top: 12px;
+    left: 12px;
+    border-width: 2px 0 0 2px;
+}
+
+[data-theme='grid'] .cube-scene::after {
+    right: 12px;
+    bottom: 12px;
+    border-width: 0 2px 2px 0;
+}
+
+.cube-float {
+    animation: cube-float 4s ease-in-out infinite;
+    transform-style: preserve-3d;
+}
+
+.cube {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    transform-style: preserve-3d;
+    animation: cube-spin 14s linear infinite;
+}
+
+.cube-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+}
+
+.cube-face:nth-child(1) {
+    transform: translateZ(70px);
+    background:
+        radial-gradient(circle at 36% 50%, #fff 7px, transparent 8px),
+        radial-gradient(circle at 64% 50%, #fff 7px, transparent 8px),
+        #ff7a1a;
+    box-shadow:
+        inset 0 0 0 10px #ffb02e,
+        0 0 50px rgb(255 122 26 / 0.55);
+}
+
+.cube-face:nth-child(2) {
+    transform: rotateY(180deg) translateZ(70px);
+    background: #f2f2ef;
+}
+
+.cube-face:nth-child(3) {
+    transform: rotateY(90deg) translateZ(70px);
+    background: #d6d6d2;
+}
+
+.cube-face:nth-child(4) {
+    transform: rotateY(-90deg) translateZ(70px);
+    background: #e9e9e6;
+}
+
+.cube-face:nth-child(5) {
+    transform: rotateX(90deg) translateZ(70px);
+    background: #fafaf8;
+}
+
+.cube-face:nth-child(6) {
+    transform: rotateX(-90deg) translateZ(70px);
+    background: #a9a9a4;
+}
+
+@keyframes cube-spin {
+    from {
+        transform: rotateX(-18deg) rotateY(0);
+    }
+
+    to {
+        transform: rotateX(-18deg) rotateY(360deg);
+    }
+}
+
+@keyframes cube-float {
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@media (max-width: 1000px) {
+    [data-theme='grid'] .cube-scene {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cube,
+    .cube-float {
+        animation: none;
+    }
+
+    .cube {
+        transform: rotateX(-18deg) rotateY(-30deg);
+    }
+}

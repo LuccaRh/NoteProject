@@ -74,6 +74,11 @@ button {
     height: 100vh;
 }
 
+/* Only the themes with a cube show it */
+.cube-scene {
+    display: none;
+}
+
 /* Sidebar */
 
 .sidebar {
