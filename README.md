@@ -22,6 +22,85 @@ The Skills tab lists the skills of each workspace and the ones other people publ
 
 ![The Skills tab](docs/images/skills.png)
 
+These screenshots use Minimal dark, the default theme. The settings have seven others, and the browser remembers the choice.
+
+<details>
+<summary>Minimal</summary>
+
+![A note in the Minimal theme](docs/images/themes/minimal-note.png)
+
+![The chat in the Minimal theme](docs/images/themes/minimal-chat.png)
+
+![The Skills tab in the Minimal theme](docs/images/themes/minimal-skills.png)
+
+</details>
+
+<details>
+<summary>Glass</summary>
+
+![A note in the Glass theme](docs/images/themes/glass-note.png)
+
+![The chat in the Glass theme](docs/images/themes/glass-chat.png)
+
+![The Skills tab in the Glass theme](docs/images/themes/glass-skills.png)
+
+</details>
+
+<details>
+<summary>Grid 3D</summary>
+
+![A note in the Grid 3D theme](docs/images/themes/grid-note.png)
+
+![The chat in the Grid 3D theme](docs/images/themes/grid-chat.png)
+
+![The Skills tab in the Grid 3D theme](docs/images/themes/grid-skills.png)
+
+</details>
+
+<details>
+<summary>Liquid</summary>
+
+![A note in the Liquid theme](docs/images/themes/liquid-note.png)
+
+![The chat in the Liquid theme](docs/images/themes/liquid-chat.png)
+
+![The Skills tab in the Liquid theme](docs/images/themes/liquid-skills.png)
+
+</details>
+
+<details>
+<summary>Nvim</summary>
+
+![A note in the Nvim theme](docs/images/themes/nvim-note.png)
+
+![The chat in the Nvim theme](docs/images/themes/nvim-chat.png)
+
+![The Skills tab in the Nvim theme](docs/images/themes/nvim-skills.png)
+
+</details>
+
+<details>
+<summary>Light panels</summary>
+
+![A note in the Light panels theme](docs/images/themes/panels-note.png)
+
+![The chat in the Light panels theme](docs/images/themes/panels-chat.png)
+
+![The Skills tab in the Light panels theme](docs/images/themes/panels-skills.png)
+
+</details>
+
+<details>
+<summary>Retrofuturism</summary>
+
+![A note in the Retrofuturism theme](docs/images/themes/retro-note.png)
+
+![The chat in the Retrofuturism theme](docs/images/themes/retro-chat.png)
+
+![The Skills tab in the Retrofuturism theme](docs/images/themes/retro-skills.png)
+
+</details>
+
 ## Infrastructure
 
 The drawing shows what is built today. Each service runs in its own container, and the only way in is Caddy.
