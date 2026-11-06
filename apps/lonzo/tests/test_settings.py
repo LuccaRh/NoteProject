@@ -296,3 +296,40 @@ def test_workspace_uses_the_saved_limit() -> None:
 
     assert FakeRunner.params["model"] == "claude-sonnet-5-5"
     assert FakeRunner.params["max_tokens"] == 1000
+
+
+# The turns come back as they were saved
+def test_tool_turns_are_saved() -> None:
+
+    response = put(body={"tools_max_turns": 5})
+
+    assert response.json()["tools_max_turns"] == 5
+    assert client.get("/chat/settings").json()["tools_max_turns"] == 5
+
+
+def test_tool_turns_must_be_positive() -> None:
+
+    assert put(body={"tools_max_turns": 0}).status_code == 422
+
+
+# An answer stops at the turns of the user
+def test_answer_uses_the_saved_turns() -> None:
+
+    put(body={"api_key": KEY, "tools_max_turns": 5})
+
+    ask(body={"question": "Hi"})
+
+    assert FakeMessages.params["max_iterations"] == 5
+
+
+# A workspace stops at the turns of the user
+def test_workspace_uses_the_saved_turns() -> None:
+
+    put(body={"api_key": KEY, "tools_max_turns": 5})
+    ichiro = FakeIchiro()
+    folder = ichiro.add(title="Baseball", is_folder=True)
+    body = {"folder_id": str(folder), "description": "I play baseball"}
+
+    create_workspace(ichiro=ichiro, body=body)
+
+    assert FakeRunner.params["max_iterations"] == 5
