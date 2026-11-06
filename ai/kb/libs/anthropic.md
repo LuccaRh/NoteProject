@@ -60,3 +60,10 @@ avisa; reconfira as linhas antes de confiar no card. Escolhida em 2026-11-01 no 
 - `system` pode ser lista de `BetaTextBlockParam` com `cache_control` em um bloco (`:1459`).
 - Lido do cache: `usage.cache_read_input_tokens` (`types/beta/beta_usage.py:21`); não entra em `input_tokens`.
 - `await runner.generate_tool_call_response()` guarda o resultado e o laço segue com ele (`lib/tools/_beta_runner.py:776`, `:1288`).
+
+## Chave por pedido e modelos (`_client.py`, `resources/models.py`, `types/model_info.py`)
+- `client.with_options(api_key=...)` = `copy` (896): cópia do client que usa as mesmas conexões
+  (`http_client = http_client or self._client`, 942).
+- `client.models.list()` (`models.py:245`): `async for` pagina sozinho. Chave recusada levanta
+  `AuthenticationError` (`_exceptions.py:139`).
+- `ModelInfo`: `id` (13), `display_name` (35), `max_tokens: Optional[int]` (60).
