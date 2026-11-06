@@ -1,3 +1,9 @@
+/* The fonts of every theme; a browser only downloads the ones in use */
+@import url("https://fonts.googleapis.com/css2?\
+family=Anton&family=Cormorant+Garamond:wght@400;500&\
+family=Jost:wght@400;500&family=Orbitron:wght@800&\
+family=Space+Mono:wght@400;700&display=swap");
+
 /* Minimal dark: one ground, a lighter sidebar, serif headings */
 :root {
     --ground: #1c1f22;
