@@ -447,6 +447,7 @@ button {
     text-decoration: underline;
     text-decoration-color: rgb(143 184 222 / 0.4);
     text-underline-offset: 3px;
+    cursor: pointer;
 }
 
 .md-bullet {

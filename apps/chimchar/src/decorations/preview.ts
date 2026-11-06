@@ -178,7 +178,7 @@ function renderInline(text: string, parent: HTMLElement): void {
 /**
  * Whether a cursor or selection touches from..to
  */
-function touches(state: EditorState, from: number, to: number): boolean {
+export function touches(state: EditorState, from: number, to: number): boolean {
     return state.selection.ranges.some(r => r.from <= to && r.to >= from)
 }
 

@@ -4,6 +4,9 @@ import {
     insertCompletionText,
     pickedCompletion,
 } from '@codemirror/autocomplete'
+import { syntaxTree } from '@codemirror/language'
+import { EditorView } from '@codemirror/view'
+import { touches } from '../decorations/preview.ts'
 
 import type {
     Completion,
@@ -18,6 +21,8 @@ import type { NotePath } from './api.ts'
 export type Links = {
     // Everything the person can link to, read when [[ is typed
     entries: () => Promise<NotePath[]>
+    // Open the note of a clicked link
+    open: (id: string) => void
 }
 
 const OPENER = '[['
@@ -73,11 +78,59 @@ async function suggest(
     }
 }
 
-/** Links between notes: [[ lists the notes and writes the link. */
+/**
+ * Id of the note linked at pos; null outside a note link, or when the
+ * cursor is on it: the raw text shows, so a click there edits it.
+ */
+function linkedNote(view: EditorView, pos: number): string | null {
+
+    let node = syntaxTree(view.state).resolveInner(pos, 1)
+
+    while (node.name !== 'Link') {
+
+        if (!node.parent) return null
+
+        node = node.parent
+    }
+
+    const url = node.getChild('URL')
+
+    if (!url || touches(view.state, node.from, node.to)) return null
+
+    const target = view.state.sliceDoc(url.from, url.to)
+
+    return target.startsWith(SCHEME) ? target.slice(SCHEME.length) : null
+}
+
+/** Open the note under a left click, instead of placing the cursor. */
+function click(event: MouseEvent, view: EditorView, links: Links): boolean {
+
+    const onLink = (event.target as HTMLElement).closest('.md-link')
+    const pos = view.posAtCoords(event)
+
+    if (event.button !== 0 || !onLink || pos === null) return false
+
+    const id = linkedNote(view, pos)
+
+    if (!id) return false
+
+    event.preventDefault()
+    links.open(id)
+
+    return true
+}
+
+/** Links between notes: [[ lists the notes, a click follows a link. */
 export function noteLinks(links: Links): Extension {
 
-    return autocompletion({
-        override: [context => suggest(context, links)],
-        icons: false,
-    })
+    return [
+        autocompletion({
+            override: [context => suggest(context, links)],
+            icons: false,
+        }),
+        EditorView.domEventHandlers({
+            mousedown: (event, view) => click(event, view, links),
+        }),
+    ]
 }
+
