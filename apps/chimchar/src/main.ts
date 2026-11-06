@@ -7,6 +7,7 @@ import { WorkspaceDialog } from './chat/workspace-dialog.ts'
 import {
     createNote,
     deleteNote,
+    getNote,
     listTree,
     updateNote,
 } from './notes/api.ts'
@@ -35,7 +36,11 @@ const page = new Page(
         status: byId('save-status'),
         title: byId('title'),
         editor: byId('editor'),
-    }, 
+    },
+    {
+        entries: () => search.visible(),
+        open: id => void openLink(id),
+    },
     saved => showSaved(saved)
 )
 
@@ -136,6 +141,17 @@ function openNote(
         panel: notePanel,
         show: () => page.open(note.id, folders()),
     })
+}
+
+/** Open the note of a link; it may be deleted or someone else's. */
+async function openLink(id: string): Promise<void> {
+
+    try {
+        const note = await getNote(id)
+        await openNote(note, () => tree.path(note))
+    } catch {
+        page.say('Could not find this note')
+    }
 }
 
 /** Open a note picked in the search, with its words marked. */

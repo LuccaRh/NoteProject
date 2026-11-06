@@ -6,6 +6,9 @@ import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { tags } from '@lezer/highlight'
 import { preview } from './decorations/preview.ts'
 import { found, showFound } from './decorations/found.ts'
+import { noteLinks } from './notes/links.ts'
+
+import type { Links } from './notes/links.ts'
 
 
 export type Editor = {
@@ -98,12 +101,40 @@ const theme = EditorView.theme({
     '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
         backgroundColor: 'var(--selection)',
     },
+    // The list of notes after [[
+    '.cm-tooltip.cm-tooltip-autocomplete': {
+        backgroundColor: 'var(--panel)',
+        border: '1px solid var(--line)',
+        borderRadius: '6px',
+        overflow: 'hidden',
+    },
+    '.cm-tooltip.cm-tooltip-autocomplete > ul': {
+        fontFamily: 'var(--sans)',
+        maxWidth: '420px',
+    },
+    '.cm-tooltip.cm-tooltip-autocomplete > ul > li': {
+        padding: '4px 10px',
+    },
+    '.cm-tooltip.cm-tooltip-autocomplete > ul > li[aria-selected]': {
+        backgroundColor: 'var(--active)',
+        color: 'var(--text)',
+    },
+    '.cm-completionDetail': {
+        color: 'var(--faint)',
+        fontStyle: 'normal',
+        marginLeft: '12px',
+    },
+    '.cm-completionMatchedText': {
+        color: 'var(--code-name)',
+        textDecoration: 'none',
+    },
 }, { dark: true })
 
 // export: makes the function available to other files
 /** Markdown editor; onChange gets the text on every edit. */
 export function createEditor(
     parent: HTMLElement,
+    links: Links,
     onChange?: (text: string) => void,
 ): Editor {
     const extensions = [
@@ -114,6 +145,7 @@ export function createEditor(
         EditorView.lineWrapping,
         preview,
         found,
+        noteLinks(links),
         EditorView.updateListener.of(update => {
             if (update.docChanged) onChange?.(update.state.doc.toString())
         }),

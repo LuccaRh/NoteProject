@@ -10,7 +10,8 @@ O histórico serve para alguém (inclusive o próprio autor, meses depois) enten
 - **Branch = uma funcionalidade = uma issue** ([[Tarefas no GitHub]]). Inglês, kebab-case, sem prefixo de tipo (`feat/`), nomeia o propósito.
 - (2026-10-25) **Prefixo = o serviço**: `<serviço>/<kebab>`, como `notes/expose-the-notes-api-on-the-server`. Serviço = pasta de `apps/` (`ichiro`, `chimchar`), ou `postgres` (o container do compose; a config dele vai numa pasta própria). Branch sem serviço usa o lado do projeto: `infra/` para issue `infrastructure` sem container (CI, Terraform, AWS: #17–#21, #23) e `workspace/` para issue `ai-workspace`; container novo (Caddy) ganha o próprio nome. Colchete não serve: o git não aceita `[` em nome de branch.
 - (2026-10-25) **Um serviço por branch**: issue que mexe em vários serviços vira um PR por serviço, todos com a mesma issue. Alembic e migrations são código do `ichiro`. Commits `[docs]` e `[ai-workspace]` entram em qualquer branch. O lint W13 confere.
-- Sai da `master` atualizada: `git fetch && git switch master && git pull --ff-only`.
+- Sai da `master` atualizada: `git fetch && git switch master && git pull --ff-only`. Com branch em aberto, sai da ponta da pilha.
+- (2026-11-05) **Branches empilhadas**: com branch ou PR em aberto, a branch nova sai da ponta da última e todas formam uma fila só sobre a `master`, para dar stack. Mudou uma branch de baixo → `git rebase --update-refs` na ponta leva as de cima junto; depois de merge, a pilha é rebaseada na `master`.
 - Nada de várias branches mudando a mesma coisa de jeitos diferentes. Na dúvida entre dois jeitos: uma branch para cada, mergeia a escolhida e apaga a outra.
 - (2026-10-23) **Branch que mexe num serviço sobe a versão dele**: `apps/<serviço>/` mexido → a minor do `pyproject.toml` (ou `package.json`) sobe um em relação à `master` (`0.1.0` → `0.2.0`), e o lockfile vai junto (`uv lock`, `npm install`). A versão diz em qual issue o serviço está. O lint W11 confere.
 - (2026-10-25) **Versão num commit só dela**: um por serviço, depois dos commits do app da branch, com o manifesto e o lockfile e nada mais: `Update notes version to 0.2.0`. O `revert` de uma mudança não mexe na versão, e o histórico mostra quando cada serviço subiu.
@@ -64,6 +65,7 @@ Checklist da mensagem de commit:
 ## PR e merge
 
 - Título em inglês, passa pela `/escrita` (texto público). (2026-10-26) Corpo só `Issue #N`, nada mais.
+- (2026-11-05) **Base do PR = a branch de baixo da pilha**; a primeira aponta para a `master`.
 - Antes do push: `git log --oneline master..HEAD` revisado. Push e PR só com ok; force só quando pedido, sempre `--force-with-lease`.
 - Merge com **merge commit** (não squash): os commits atômicos ficam, e `git log --first-parent master` lê como uma linha por funcionalidade.
 - Nada de Claude/Anthropic/IA em mensagem, branch, issue ou PR; sem `Co-Authored-By` nem "Generated with".

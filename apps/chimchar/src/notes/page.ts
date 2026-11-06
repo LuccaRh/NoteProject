@@ -4,6 +4,7 @@ import { getNote, updateNote } from './api.ts'
 
 import type { Editor } from '../editor.ts'
 import type { Note, NoteUpdate } from './api.ts'
+import type { Links } from './links.ts'
 
 
 // Global variables
@@ -38,11 +39,19 @@ export class Page {
     onSaved: (note: Note) => void
 
     /** Wire the editor and the title input to the autosave. */
-    constructor(els: Elements, onSaved: (note: Note) => void) {
+    constructor(
+        els: Elements,
+        links: Links,
+        onSaved: (note: Note) => void,
+    ) {
 
         this.els = els
         this.onSaved = onSaved
-        this.editor = createEditor(els.editor, body => this.change({ body }))
+        this.editor = createEditor(
+            els.editor,
+            links,
+            body => this.change({ body }),
+        )
         els.title.addEventListener('input', () => {
             this.change({ title: els.title.value })
             this.showPath()
@@ -108,6 +117,12 @@ export class Page {
     mark(words: string[]): void {
 
         this.editor.mark(words)
+    }
+
+    /** Tell something about the open note where the saves show. */
+    say(text: string): void {
+
+        this.els.status.textContent = text
     }
 
     /** Save pending edits, then hide the note and show the empty page. */
