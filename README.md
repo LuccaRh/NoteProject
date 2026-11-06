@@ -107,6 +107,26 @@ For example, with a `Research` folder:
 3. The AI searches, reads the notes, and creates a summary note, with a link you can click to open it.
 4. A task you repeat becomes a skill. You run it with `/summarize-paper`, or publish it for other people.
 
+## The harness
+
+A harness is the program around a model: it builds the request, runs the tools the model asks for, and repeats until the model answers. `lonzo` is a small harness of its own, inspired by Claude Code. The drawing compares the two; the Claude Code side is a general view, not taken from its code.
+
+![lonzo and Claude Code, each with a loop around the Anthropic API](docs/images/harness.png)
+
+Both run the same loop against the Anthropic API: the model returns text or a `tool_use`, the harness runs the tool, and sends back a `tool_result`. The differences are around that loop:
+
+| Part | `lonzo` | Claude Code |
+|---|---|---|
+| Runs | on the server | on the person's computer |
+| Request | `base_rules.md`, date, current folder, `.workspace` notes, list of skills | its system prompt, folder, `CLAUDE.md`, memory, skills |
+| Loop | `tool_runner` of the Anthropic SDK, up to `tools_max_turns` | its own |
+| Tools | 8 note tools | general tools: files, shell, MCP |
+| Checks before a tool runs | none | permissions and hooks can block the call |
+| History | in the `lonzo` database, never summarized | in a session file, summarized when it fills up |
+| Subagents | none | yes, each with its own loop and context |
+
+`lonzo` can skip permissions because its tools only reach the person's notes. Claude Code reaches the disk and the shell, so each call may need a check first.
+
 ## Run
 
 Docker Compose starts everything. It needs the `.env` below. `make check` also needs [uv](https://docs.astral.sh/uv/).

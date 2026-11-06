@@ -1,0 +1,39 @@
+titulo: "One loop, two harnesses: lonzo and Claude Code"
+tipo: blocos
+grade: [235, 125]
+nos:
+  l_in:   {tipo: bloco, pos: [1, 0], texto: "<b>chimchar</b><br>POST /api/chat (SSE)", cor: azul}
+  l_pac:  {tipo: bloco, pos: [1, 1], texto: "<b>builds the request</b><br>base_rules.md, date, folder,<br>.workspace, list of skills", cor: verde}
+  l_run:  {tipo: bloco, pos: [1, 2], texto: "<b>loop</b><br>tool_runner of the SDK,<br>up to tools_max_turns", cor: verde}
+  l_tool: {tipo: bloco, pos: [1, 4], texto: "<b>8 note tools</b><br>NoteTools: search, read,<br>create, edit, delete", cor: verde}
+  l_hist: {tipo: banco, pos: [0, 2], texto: "lonzo database<br>saved at the end,<br>no summary", cor: amarelo}
+  l_nada: {tipo: nota, pos: [0, 3], texto: "no permissions<br>or hooks: the call<br>goes straight through"}
+  l_dado: {tipo: banco, pos: [1, 5], texto: "ichiro + Postgres<br>notes only", cor: amarelo}
+  lonzo:  {tipo: grupo, contem: [l_pac, l_run, l_tool, l_hist, l_nada], texto: "lonzo: on the server", cor: cinza}
+  api:    {tipo: bloco, pos: [2, 2], texto: "<b>Anthropic API</b><br>the model: returns<br>text or tool_use", cor: laranja}
+  c_in:   {tipo: bloco, pos: [3, 0], texto: "<b>terminal</b><br>on the person's computer", cor: azul}
+  c_pac:  {tipo: bloco, pos: [3, 1], texto: "<b>builds the request</b><br>its system prompt, folder,<br>CLAUDE.md, memory, skills", cor: verde}
+  c_run:  {tipo: bloco, pos: [3, 2], texto: "<b>loop</b><br>its own", cor: verde}
+  c_chk:  {tipo: bloco, pos: [3, 3], texto: "<b>permissions and hooks</b><br>can block the call", cor: vermelho}
+  c_tool: {tipo: bloco, pos: [3, 4], texto: "<b>general tools</b><br>Read, Edit, Write,<br>Bash, MCP", cor: verde}
+  c_hist: {tipo: banco, pos: [4, 2], texto: "session in a file<br>summarizes history<br>when it fills up", cor: amarelo}
+  c_sub:  {tipo: bloco, pos: [4, 4], texto: "<b>subagents</b><br>another loop, its<br>own context", cor: verde}
+  c_dado: {tipo: banco, pos: [3, 5], texto: "disk and shell<br>of the person's machine", cor: amarelo}
+  cc:     {tipo: grupo, contem: [c_pac, c_run, c_chk, c_tool, c_hist, c_sub], texto: "Claude Code", cor: cinza}
+arestas:
+  - [l_in, l_pac]
+  - [l_pac, l_run]
+  - [l_hist.c, l_pac.e, {rotulo: "reads"}]
+  - [l_run.e, l_hist.d, {rotulo: "saves"}]
+  - [l_run, api, {pontas: [block, block]}]
+  - [l_run.b, l_tool.c, {rotulo: "tool_use /<br>tool_result", pontas: [block, block]}]
+  - [l_tool, l_dado]
+  - [c_in, c_pac]
+  - [c_pac, c_run]
+  - [c_hist.c, c_pac.d, {rotulo: "reads"}]
+  - [c_run.d, c_hist.e, {rotulo: "saves"}]
+  - [c_run, api, {pontas: [block, block]}]
+  - [c_run, c_chk, {pontas: [block, block]}]
+  - [c_chk, c_tool, {rotulo: "tool_use /<br>tool_result", pontas: [block, block]}]
+  - [c_tool.d, c_sub.e, {pontas: [block, block]}]
+  - [c_tool, c_dado]
