@@ -1,0 +1,198 @@
+/* Liquid: night sky, a dotted globe behind the note, italic titles */
+:root[data-theme='liquid'] {
+    --ground: #05070f;
+    --panel: #0b1022;
+    --line: #232b45;
+    --hover: #141b33;
+    --active: #1d2644;
+    --selection: #27427c;
+    --text: #fff;
+    --body: #dce3ee;
+    --soft: #c6cfdd;
+    --muted: #aeb8c8;
+    --faint: #8691a5;
+    --sans: Jost, system-ui, sans-serif;
+    --serif: 'Playfair Display', Georgia, serif;
+    --code-bg: #0e1530;
+    --code-keyword: #8cb8ff;
+    --code-string: #9fe0c0;
+    --code-number: #f3c98b;
+    --code-name: #bfe3ff;
+    --accent: #3d8bff;
+    --mark: #f3c98b;
+    --danger: #ff7a7a;
+    color-scheme: dark;
+}
+
+/* Two blurred lights on the night sky */
+[data-theme='liquid'] body {
+    background:
+        radial-gradient(circle 560px at 100% 100%, #1c3d8a99, transparent),
+        radial-gradient(circle 340px at 44% 34%, #0e1e4acc, transparent),
+        var(--ground);
+    background-attachment: fixed;
+    font-weight: 300;
+}
+
+/* The stars, in two groups that blink in turns */
+[data-theme='liquid'] body::before,
+[data-theme='liquid'] body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    animation: liquid-twinkle 4s ease-in-out infinite;
+}
+
+[data-theme='liquid'] body::before {
+    background:
+        radial-gradient(circle at 8% 20%, #fff 1px, transparent 2px),
+        radial-gradient(circle at 35% 12%, #fff 1px, transparent 2px),
+        radial-gradient(circle at 55% 45%, #fff 1.5px, transparent 2.5px),
+        radial-gradient(circle at 70% 64%, #fff 1px, transparent 2px),
+        radial-gradient(circle at 92% 18%, #fff 1px, transparent 2px),
+        radial-gradient(circle at 15% 90%, #fff 1px, transparent 2px),
+        radial-gradient(circle at 66% 88%, #fff 1.5px, transparent 2.5px);
+}
+
+[data-theme='liquid'] body::after {
+    background:
+        radial-gradient(circle at 22% 70%, #fff 1.5px, transparent 2.5px),
+        radial-gradient(circle at 48% 82%, #fff 1px, transparent 2px),
+        radial-gradient(circle at 62% 10%, #fff 1px, transparent 2px),
+        radial-gradient(circle at 78% 30%, #fff 1.5px, transparent 2.5px),
+        radial-gradient(circle at 86% 76%, #fff 1px, transparent 2px),
+        radial-gradient(circle at 42% 58%, #fff 1px, transparent 2px),
+        radial-gradient(circle at 96% 52%, #fff 1px, transparent 2px);
+    animation-delay: -2s;
+}
+
+[data-theme='liquid'] .globe {
+    display: block;
+    position: fixed;
+    top: 50%;
+    right: -270px;
+    width: 900px;
+    height: 900px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    transition: opacity 0.4s;
+}
+
+/* The chat and the skills fill the page, so the globe steps back */
+[data-theme='liquid'] body:has(#note-panel[hidden]) .globe {
+    opacity: 0.3;
+}
+
+[data-theme='liquid'] .app {
+    position: relative;
+    z-index: 1;
+}
+
+/* Sidebar */
+
+[data-theme='liquid'] .sidebar,
+[data-theme='liquid'] .sidebar-foot {
+    background: transparent;
+    border-color: transparent;
+}
+
+[data-theme='liquid'] .sidebar::before {
+    content: 'notes';
+    padding: 0 8px;
+    color: var(--text);
+    font: italic 26px/1.3 var(--serif);
+}
+
+[data-theme='liquid'] .node {
+    transition: padding-left 0.25s;
+}
+
+[data-theme='liquid'] .node:hover {
+    padding-left: 6px;
+    background: transparent;
+}
+
+[data-theme='liquid'] .node[aria-selected='true'] {
+    background: transparent;
+    font-weight: 500;
+}
+
+[data-theme='liquid'] .tool-group {
+    border-radius: 999px;
+}
+
+[data-theme='liquid'] .icon {
+    border-radius: 50%;
+}
+
+[data-theme='liquid'] .icon[aria-label='New note'] {
+    background: #f4eee6;
+    color: #2a1214;
+}
+
+/* Note */
+
+/* Left of the middle, to keep the text off the globe */
+[data-theme='liquid'] .column {
+    max-width: 560px;
+    margin-left: 4%;
+}
+
+[data-theme='liquid'] .title {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 56px;
+    line-height: 1.25;
+}
+
+[data-theme='liquid'] .md-h1,
+[data-theme='liquid'] .md-h2,
+[data-theme='liquid'] .md-h3,
+[data-theme='liquid'] .md-h4,
+[data-theme='liquid'] .md-h5,
+[data-theme='liquid'] .md-h6,
+[data-theme='liquid'] .message.assistant h1,
+[data-theme='liquid'] .message.assistant h2,
+[data-theme='liquid'] .message.assistant h3 {
+    font-style: italic;
+    font-weight: 400;
+}
+
+/* Chat */
+
+[data-theme='liquid'] .message.user {
+    border-radius: 14px;
+    background: #f4eee614;
+    box-shadow: inset 0 0 0 1px #f4eee62e;
+}
+
+[data-theme='liquid'] .send,
+[data-theme='liquid'] .dialog-actions button {
+    border-radius: 999px;
+}
+
+@keyframes liquid-twinkle {
+    0%,
+    100% {
+        opacity: 0.15;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+@media (max-width: 1200px) {
+    [data-theme='liquid'] .globe {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme='liquid'] body::before,
+    [data-theme='liquid'] body::after {
+        animation: none;
+        opacity: 0.4;
+    }
+}
