@@ -11,6 +11,7 @@ from anthropic.types.beta import (
     BetaCacheControlEphemeralParam,
     BetaMessageParam,
     BetaTextBlockParam,
+    BetaThinkingConfigParam,
 )
 
 from lonzo.errors import InvalidApiKey
@@ -38,6 +39,14 @@ def thinking_of(model: ModelInfo) -> list[Thinking]:
         kind for kind in get_args(Thinking)
         if getattr(types, kind).supported
     ]
+
+
+def thinking_config(kind: Thinking) -> BetaThinkingConfigParam:
+    """
+    The thinking of a call, in the shape the API takes it
+    """
+
+    return cast(BetaThinkingConfigParam, {"type": kind})
 
 
 class AnthropicClient:
@@ -113,7 +122,7 @@ class AnthropicClient:
         return sdk.beta.messages.tool_runner(
             model=settings.model,
             max_tokens=settings.max_tokens,
-            thinking={"type": "disabled"},
+            thinking=thinking_config(kind=settings.thinking),
             system=blocks,
             messages=messages,
             tools=tools,
@@ -139,7 +148,7 @@ class AnthropicClient:
         runner = sdk.beta.messages.tool_runner(
             model=settings.model,
             max_tokens=settings.max_tokens,
-            thinking={"type": "disabled"},
+            thinking=thinking_config(kind=settings.thinking),
             system=system,
             messages=[{"role": "user", "content": request}],
             tools=tools,
