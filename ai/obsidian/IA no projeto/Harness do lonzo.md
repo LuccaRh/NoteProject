@@ -47,6 +47,22 @@ Com pasta no caminho, o primeiro nome precisa existir. Pastas faltando no meio s
 
 O `lonzo` lista `.workspace/skills/` a cada pergunta, sem depender do `CLAUDE.md`. Só a primeira linha de cada skill entra no pacote, e por isso o `create_workspace.md` exige que ela diga o que a skill faz. O modelo lê a skill inteira com `read_note` quando a pergunta pede. A lista garante que o modelo saiba da skill, não que a use; para garantir o uso, falta o comando `/` previsto em [[Workspace no app]]. ⏳
 
+## Inventário de skills
+
+(2026-11-06, issue #161) A aba Skills mostra as skills de cada workspace e as publicadas.
+
+| Skill | Onde mora | Quem vê | Editar |
+|---|---|---|---|
+| privada | nota em `.workspace/skills/` | só o dono | no editor ou pelo chat |
+| publicada | linha na tabela `skills` do banco `lonzo` | todo mundo logado | só publicando de novo |
+
+- A tabela guarda só as publicadas: uma cópia privada lá ficaria desatualizada, porque o navegador salva a nota direto no `ichiro`, sem passar pelo `lonzo`.
+- Publicar é uma foto do momento. `note_id` diz de qual nota veio, e publicar de novo atualiza a mesma linha. Não é FK, porque as notas ficam em outro banco.
+- A seção "Add" separa "Everyone" (as dos outros) de "Mine" (as suas), e esconde o que o workspace já tem.
+- Adicionar sempre copia, de uma skill publicada ou de outro workspace da pessoa. As cópias são independentes: editar uma não muda as outras.
+- O chat continua lendo só as notas, então nada muda no pacote da pergunta.
+- ⏳ Falta despublicar e moderar antes de abrir para outras pessoas: skill pública é texto de outro virando instrução para a IA.
+
 ## Histórico
 
 Cada turno do modelo vira uma mensagem no banco, e o resultado das ferramentas vira a mensagem seguinte. Assim a próxima pergunta sabe o que foi criado e onde. O custo é levar o texto das notas lidas nas perguntas seguintes; o cache alivia, e cortar resultados grandes fica para quando pesar. O `chimchar` pula os turnos sem texto ao reabrir uma conversa.
