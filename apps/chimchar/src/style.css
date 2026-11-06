@@ -19,7 +19,17 @@
     --code-string: #a8c98a;
     --code-number: #e0b07a;
     --code-name: #8fb8de;
+    --accent: var(--soft);
     color-scheme: dark;
+}
+
+/* The AI side of the app has its own accent */
+.tab.chat,
+.tab.skills,
+.chat-panel,
+.skills-panel,
+#workspace-dialog {
+    --accent: var(--code-keyword);
 }
 
 body {
@@ -249,6 +259,7 @@ button {
 
 .tab[aria-selected='true'] {
     background: var(--panel);
+    box-shadow: inset 0 2px 0 var(--accent);
     color: var(--text);
 }
 
@@ -273,7 +284,7 @@ button {
     height: 6px;
     margin: 0 8px 1px 0;
     border-radius: 50%;
-    background: var(--muted);
+    background: var(--accent);
 }
 
 .tab-close {
@@ -646,6 +657,10 @@ button {
     color: var(--text);
 }
 
+.message.assistant :is(h2, h3, h4, h5, h6) {
+    color: var(--accent);
+}
+
 .message.assistant h1 {
     font-size: 26px;
 }
@@ -664,6 +679,7 @@ button {
     font-family: var(--mono);
     font-size: 0.88em;
     background: var(--code-bg);
+    color: var(--code-number);
 }
 
 .message.assistant pre {
@@ -677,6 +693,7 @@ button {
 .message.assistant pre code {
     padding: 0;
     background: none;
+    color: inherit;
 }
 
 .message.assistant blockquote {
@@ -1336,7 +1353,7 @@ button {
     padding: 0;
     border: 0;
     background: none;
-    color: var(--text);
+    color: var(--accent);
     font: 500 14px/1.5 var(--sans);
 }
 
