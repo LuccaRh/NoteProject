@@ -46,6 +46,20 @@ export type AnswerHandlers = {
 
 
 // Code
+/** The server refused a request and said why, in words for the person. */
+export class Refused extends Error {}
+
+/** The error of a failed request, with the reason when the server gave one. */
+async function failure(res: Response, what: string): Promise<Error> {
+
+    const body = await res.json().catch(() => null) as { detail?: unknown }
+    const detail = body?.detail
+
+    if (typeof detail === 'string') return new Refused(detail)
+
+    return new Error(`${what}: ${res.status}`)
+}
+
 /** Call the chat API through the /api proxy; throw on error. */
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
@@ -55,7 +69,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     })
 
     if (!res.ok) {
-        throw new Error(`${init?.method ?? 'GET'} ${path}: ${res.status}`)
+        throw await failure(res, `${init?.method ?? 'GET'} ${path}`)
     }
 
     return await res.json() as T
@@ -109,7 +123,7 @@ export async function ask(
         signal,
     })
 
-    if (!res.ok || !res.body) throw new Error(`POST ${BASE}: ${res.status}`)
+    if (!res.ok || !res.body) throw await failure(res, `POST ${BASE}`)
 
     const reader = res.body.pipeThrough(new TextDecoderStream()).getReader()
     let buffer = ''
