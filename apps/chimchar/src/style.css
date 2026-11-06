@@ -838,6 +838,44 @@ button {
     cursor: default;
 }
 
+/* Settings pop-up: the saved key and the check box */
+
+.settings-key {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 28px;
+    font-size: 13px;
+    color: var(--faint);
+}
+
+.settings-key button {
+    height: 28px;
+    padding: 0 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--panel);
+}
+
+.settings-key button:hover {
+    background: var(--hover);
+}
+
+.dialog .settings-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    color: var(--text);
+    font-size: 14px;
+}
+
+.dialog .settings-check input {
+    height: auto;
+    padding: 0;
+}
+
 /* Search pop-up, near the top like a quick switcher */
 
 .search {
