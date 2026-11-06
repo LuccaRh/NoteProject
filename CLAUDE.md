@@ -54,13 +54,17 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 - **Tarefa = issue no GitHub**, na milestone da etapa (M0–M4, Editor, AI in the app, Desktop, Mobile); label = lado (`backend`, `frontend`,
   `infrastructure`, `ai-workspace`); `infrastructure` o usuário escreve; `backend` (2026-11-02) e `frontend` (2026-10-29) a sessão escreve direto, menos as áreas `aprender` (`sync`, `auth`) e o "front-back" (área `cliente-api`: chamadas à API, comunicação com o servidor, proxy do Vite), que é do usuário. Próxima tarefa: `gh issue list -m "<milestone>"`.
 - **Branch = uma issue**, em inglês, kebab-case, saindo da `master`
-  atualizada. (2026-10-25) Nome `<serviço>/<kebab>` (`ichiro/search-notes-with-full-text-search`):
+  atualizada ou, com branch em aberto, da ponta da pilha (abaixo). (2026-10-25) Nome `<serviço>/<kebab>` (`ichiro/search-notes-with-full-text-search`):
   serviço = pasta de `apps/`, `postgres` ou `caddy` (2026-10-30) (container do compose; config em pasta
   própria); sem serviço, `infra/` (label `infrastructure` sem container: CI, Terraform,
   AWS) ou `workspace/` (label `ai-workspace`). **Um serviço por branch**: issue que mexe em vários →
   um PR por serviço, na mesma issue. Alembic e migrations: cada serviço tem as suas, no banco dele (2026-11-01: `ichiro` e `lonzo` no mesmo Postgres, bancos separados). O lint W13 confere. Cada branch tem `ai/kb/escopos/<branch>.md`
   (Pedido / Contexto / Fora + número da issue, criado pela `/tarefa`); as áreas dele dizem
   o que ler (`ai/np contexto`).
+- **Branches empilhadas** (2026-11-05): com branch ou PR em aberto, a branch nova sai da ponta da
+  última e todas formam uma fila só sobre a `master`, para dar stack. Base do PR = a branch de baixo
+  (a primeira aponta para a `master`). Mudou uma branch de baixo → `git rebase --update-refs` na ponta
+  leva as de cima junto; depois de merge, a pilha é rebaseada na `master`.
 - **Versão do serviço** (2026-10-23): branch que mexe em `apps/<serviço>/` sobe a minor dele
   (`0.1.0` → `0.2.0`) com o lockfile; o lint W11 confere. (2026-10-25) A subida vai num
   commit só dela, um por serviço, depois dos commits do app: `Update ichiro version to 0.2.0`
@@ -223,7 +227,7 @@ ai/                todo o resto do workspace de IA:
 
 ## Estado (2026-11-05)
 
-- Mergeados até o PR #137 (2026-11-05); lista antiga até o PR #116: M0, #46, #62, #64, #65, #69, #16, #80, #82, #74, #73, #98, #100,
+- Mergeados até o PR #148 (2026-11-05); lista antiga até o PR #116: M0, #46, #62, #64, #65, #69, #16, #80, #82, #74, #73, #98, #100,
   #75 (PRs #103, #104), #76 (#105, #106), #56 (#110), #107 (#111), #108 (#112), #109 (#113),
   #77 (#114), #78 (#115), #51 (#116). `master` local = remoto. Com PR mergeado e ainda
   abertas, o Lucca fecha: #51, #56, #75–#78, #107–#109. #79 (importar o vault) fechada como

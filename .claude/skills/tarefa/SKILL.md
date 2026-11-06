@@ -7,7 +7,8 @@ argument-hint: "<o que fazer>"
 
 1. **Onde estamos.** `ai/np status`. Branch atual já é desta tarefa → pule para o 3. Sem tarefa
    dita → próxima issue aberta da milestone atual (`gh issue list -m "<milestone>"`).
-2. **Branch + escopo.** Da `master` atualizada: `git switch -c <nome-em-inglês-kebab>`. Nome da branch = título da issue
+2. **Branch + escopo.** Da `master` atualizada ou, com branch em aberto, da ponta da pilha
+   (`CLAUDE.md`, "Branches empilhadas"): `git switch -c <nome-em-inglês-kebab>`. Nome da branch = título da issue
    em kebab-case. Escreva `ai/kb/escopos/<branch>.md` (`/` no nome vira `__`), com o número da
    issue no `nome`, e espere o ok do Pedido:
    ```
