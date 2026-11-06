@@ -6,10 +6,21 @@ import {
     saveSettings,
 } from './api.ts'
 
-import type { ModelOption, Settings, SettingsUpdate } from './api.ts'
+import type {
+    ModelOption,
+    Settings,
+    SettingsUpdate,
+    Thinking,
+} from './api.ts'
 
 
 // Global variables
+const THINKING_NAMES: Record<Thinking, string> = {
+    adaptive: 'On',
+    between_tools: 'Off, with progress notes',
+    disabled: 'Off',
+}
+
 type Elements = {
     dialog: HTMLDialogElement
     form: HTMLFormElement
@@ -17,6 +28,7 @@ type Elements = {
     keyState: HTMLElement
     removeKey: HTMLButtonElement
     model: HTMLSelectElement
+    thinking: HTMLSelectElement
     maxTokens: HTMLInputElement
     toolsMaxTurns: HTMLInputElement
     showWorkspace: HTMLInputElement
@@ -50,7 +62,10 @@ export class SettingsDialog {
         els.apiKey.addEventListener('change', () => void this.saveKey())
         els.cancel.addEventListener('click', () => els.dialog.close())
         els.removeKey.addEventListener('click', () => void this.forgetKey())
-        els.model.addEventListener('change', () => this.limitTokens())
+        els.model.addEventListener('change', () => {
+            this.limitTokens()
+            this.limitThinking(els.thinking.value as Thinking)
+        })
     }
 
     /** Show the pop-up, ready to save once the settings arrive. */
@@ -95,6 +110,7 @@ export class SettingsDialog {
         this.els.showWorkspace.checked = settings.show_workspace
         this.showKey(settings)
         this.limitTokens()
+        this.limitThinking(settings.thinking)
     }
 
     /** Say which key is saved, never the key itself. */
@@ -119,6 +135,18 @@ export class SettingsDialog {
         }
     }
 
+    /** Offer the thinking of the model picked, the wanted one if it can. */
+    limitThinking(wanted: Thinking): void {
+
+        const model = this.models.find(m => m.id === this.els.model.value)
+        const kinds = model?.thinking.length ? model.thinking : [wanted]
+
+        this.els.thinking.replaceChildren(
+            ...kinds.map(kind => new Option(THINKING_NAMES[kind], kind)),
+        )
+        this.els.thinking.value = kinds.includes(wanted) ? wanted : kinds[0]
+    }
+
     /** What the form holds; the key only when one was typed. */
     values(): SettingsUpdate {
 
@@ -126,6 +154,7 @@ export class SettingsDialog {
             model: this.els.model.value,
             max_tokens: Number(this.els.maxTokens.value),
             tools_max_turns: Number(this.els.toolsMaxTurns.value),
+            thinking: this.els.thinking.value as Thinking,
             show_workspace: this.els.showWorkspace.checked,
         }
         const apiKey = this.els.apiKey.value.trim()

@@ -2,12 +2,15 @@
 // Same origin: Caddy forwards /api/chat to lonzo, with the session cookie
 const BASE = '/api/chat/settings'
 
+export type Thinking = 'adaptive' | 'between_tools' | 'disabled'
+
 export type Settings = {
     has_key: boolean
     key_end: string | null
     model: string
     max_tokens: number
     tools_max_turns: number
+    thinking: Thinking
     show_workspace: boolean
 }
 
@@ -15,6 +18,7 @@ export type SettingsUpdate = {
     model: string
     max_tokens: number
     tools_max_turns: number
+    thinking: Thinking
     show_workspace: boolean
     api_key?: string
 }
@@ -23,6 +27,7 @@ export type ModelOption = {
     id: string
     name: string
     max_tokens: number | null
+    thinking: Thinking[]
 }
 
 

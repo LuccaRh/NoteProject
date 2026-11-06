@@ -94,6 +94,7 @@ const settingsDialog = new SettingsDialog(
         keyState: byId('settings-key-state'),
         removeKey: byId('settings-remove-key'),
         model: byId('settings-model'),
+        thinking: byId('settings-thinking'),
         maxTokens: byId('settings-max-tokens'),
         toolsMaxTurns: byId('settings-tools-max-turns'),
         showWorkspace: byId('settings-show-workspace'),
