@@ -514,12 +514,14 @@ def _textos(no: ast.AST) -> list[str]:
 
 def checar_prompts(texto: str) -> list[int]:
     """Linhas de variável global cujo texto parece prompt (8 palavras ou mais): instrução para
-    o modelo mora num .md do serviço, lido pelo código, nunca numa global (2026-11-03)."""
+    o modelo mora num .md do serviço, lido pelo código, nunca numa global (2026-11-03). Lista
+    separada por vírgulas (colunas de SQL) não conta."""
     out = []
     for no in ast.parse(texto).body:
         if not isinstance(no, (ast.Assign, ast.AnnAssign)) or no.value is None:
             continue
-        if len(" ".join(_textos(no.value)).split()) >= 8:
+        palavras = " ".join(_textos(no.value)).split()
+        if len(palavras) >= 8 and sum(not w.endswith(",") for w in palavras) > 1:
             out.append(no.lineno)
     return out
 
