@@ -10,7 +10,7 @@ from fakes import USER, FakeIchiro
 from fastapi.testclient import TestClient
 from httpx2 import Response
 
-from lonzo import connections
+from lonzo.core import connections
 from lonzo.core.errors import TitleTaken
 from lonzo.main import app
 
