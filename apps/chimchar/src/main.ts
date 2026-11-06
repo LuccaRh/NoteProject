@@ -19,6 +19,7 @@ import {
     updateNote,
 } from './notes/api.ts'
 import { Page } from './notes/page.ts'
+import { wireReading } from './notes/reading.ts'
 import { Search } from './notes/search.ts'
 import { Tree } from './notes/tree.ts'
 import { getSettings } from './settings/api.ts'
@@ -356,5 +357,6 @@ byId('settings').addEventListener('click', () => {
 })
 byId('log-out').addEventListener('click', () => void leave())
 
+wireReading({ button: byId('reading'), page })
 runTheme()
 void start()
