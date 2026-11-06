@@ -28,11 +28,25 @@ function calls(question: string, skill: WorkspaceSkill): boolean {
     return /^(\s|$)/.test(question.slice(name.length))
 }
 
+/** The skill a question calls, if it calls one. */
+function calledSkill(
+    question: string,
+    skills: WorkspaceSkill[],
+): WorkspaceSkill | undefined {
+
+    // The longest first: /a must not win over /a b
+    return [...skills]
+        .sort((a, b) => b.title.length - a.title.length)
+        .find(skill => calls(question, skill))
+}
+
 /** List of the workspace's skills, opened by a / in the question. */
 export class SkillMenu {
     input: HTMLTextAreaElement
     folderId: () => string | null
     list: HTMLUListElement
+    // Behind the input, a copy of the question with the skill colored
+    backdrop: HTMLDivElement
     // Asked once per /, so a skill added meanwhile shows up the next time
     skills: Promise<WorkspaceSkill[]> | null = null
     shown: WorkspaceSkill[] = []
@@ -51,7 +65,12 @@ export class SkillMenu {
         this.list.ariaLabel = 'Skills'
         // Keeps the focus in the question when a skill is clicked
         this.list.addEventListener('mousedown', e => e.preventDefault())
+        this.backdrop = document.createElement('div')
+        this.backdrop.className = 'question-backdrop'
+        this.backdrop.hidden = true
+        this.backdrop.ariaHidden = 'true'
         input.addEventListener('input', () => void this.update())
+        input.addEventListener('scroll', () => this.scrollBackdrop())
     }
 
     /** The skills of the conversation's workspace; none if they fail. */
@@ -72,6 +91,7 @@ export class SkillMenu {
         this.skills = null
         this.closed = false
         this.show([])
+        this.paint([])
     }
 
     /** Filter the list by what follows the /. */
@@ -90,10 +110,35 @@ export class SkillMenu {
         // More was typed while the skills were coming
         if (this.input.value !== typed) return
 
+        this.paint(skills)
         const query = typed.slice(1).toLowerCase()
         const found = skills
             .filter(skill => skill.title.toLowerCase().includes(query))
         this.show(this.closed ? [] : found)
+    }
+
+    /** Color the name of the skill the question calls, if any. */
+    paint(skills: WorkspaceSkill[]): void {
+
+        const question = this.input.value
+        const skill = calledSkill(question, skills)
+        this.input.classList.toggle('calling', skill !== undefined)
+        this.backdrop.hidden = skill === undefined
+
+        if (!skill) return
+
+        const name = document.createElement('mark')
+        name.textContent = `/${skill.title}`
+        const rest = question.slice(name.textContent.length)
+        // The last line break only takes up a line with text after it
+        this.backdrop.replaceChildren(name, `${rest}\n`)
+        this.scrollBackdrop()
+    }
+
+    /** Keep the copy of the question on the lines shown in the input. */
+    scrollBackdrop(): void {
+
+        this.backdrop.scrollTop = this.input.scrollTop
     }
 
     /** Show these skills with the first one marked. */
@@ -140,6 +185,7 @@ export class SkillMenu {
 
         this.input.value = `/${skill.title} `
         this.show([])
+        this.paint([skill])
     }
 
     /** Handle a key while the list is open; false if it isn't for it. */
@@ -181,10 +227,7 @@ export class SkillMenu {
 
         if (!question.startsWith('/')) return question
 
-        // The longest first: /a must not win over /a b
-        const skills = [...await this.load()]
-            .sort((a, b) => b.title.length - a.title.length)
-        const skill = skills.find(s => calls(question, s))
+        const skill = calledSkill(question, await this.load())
         this.forget()
 
         if (!skill) return question

@@ -121,7 +121,7 @@ export class Chat {
 
         const form = element('form', 'ask')
         const box = element('div', 'question-box')
-        box.append(this.menu.list, this.question)
+        box.append(this.menu.list, this.menu.backdrop, this.question)
         form.append(box, this.send)
         form.addEventListener('submit', event => {
             event.preventDefault()

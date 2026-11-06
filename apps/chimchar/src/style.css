@@ -752,15 +752,49 @@ button {
     min-width: 0;
 }
 
-.question {
-    display: block;
+.question,
+.question-backdrop {
     box-sizing: border-box;
     width: 100%;
     padding: 8px 12px;
     border: 1px solid var(--line);
     border-radius: 8px;
     background: var(--panel);
+    scrollbar-gutter: stable;
+}
+
+.question {
+    position: relative;
+    display: block;
     resize: none;
+}
+
+/* The text shows from the backdrop, with the skill colored */
+.question.calling {
+    background: transparent;
+    color: transparent;
+    caret-color: var(--text);
+}
+
+.question.calling::selection {
+    background: rgb(143 184 222 / 30%);
+    color: transparent;
+}
+
+.question-backdrop {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-color: transparent;
+    color: var(--text);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+.question-backdrop mark {
+    border-radius: 4px;
+    background: rgb(198 159 213 / 18%);
+    color: var(--code-keyword);
 }
 
 .skill-menu {
