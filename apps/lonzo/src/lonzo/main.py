@@ -2,8 +2,8 @@
 from fastapi import FastAPI
 
 from lonzo.core.handlers import add_handlers
+from lonzo.core.lifespan import lifespan
 from lonzo.core.user import read_user
-from lonzo.lifespan import lifespan
 from lonzo.routers import chat, conversations, health, settings, workspaces
 
 
