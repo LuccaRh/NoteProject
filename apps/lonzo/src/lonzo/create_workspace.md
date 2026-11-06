@@ -31,9 +31,9 @@ piece with `create_note`, at its whole path from that folder: first
   text already says.
 - skills: instructions for a task the person will ask for again and again
   (e.g. "review my lab report"), one note each, titled by a short command
-  name (e.g. `review-report`), opening with one line that says what it
-  does: the app lists that line in every question. Only for a task the
-  text names.
+  name (e.g. `review-report`), opening with one line in the form "Does X.
+  Use when Y": the app lists that line in every question, and it is what
+  makes the skill get picked. Only for a task the text names.
 - scripts: Python scripts for work a program does better than a model
   (counting, converting, checking a format), each starting with a docstring
   that gives its name, description and params. Only when the text needs one.
