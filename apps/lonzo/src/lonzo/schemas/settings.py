@@ -66,9 +66,11 @@ class ModelSettings(BaseModel):
 
 class ModelOption(BaseModel):
     """
-    A model the key can use, with its limit of tokens when the API says it
+    A model the key can use, with its limit of tokens and its kinds of
+    thinking when the API says them
     """
 
     id: str
     name: str
     max_tokens: int | None
+    thinking: list[Thinking]

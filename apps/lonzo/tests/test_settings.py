@@ -26,15 +26,27 @@ from lonzo.user import current_user
 client = TestClient(app, headers={"X-User-Id": str(USER)})
 other_client = TestClient(app, headers={"X-User-Id": str(OTHER_USER)})
 KEY = "sk-ant-the-key-x7Qa"
+ON = SimpleNamespace(supported=True)
+OFF = SimpleNamespace(supported=False)
 HAIKU = SimpleNamespace(
     id="claude-haiku-5-5",
     display_name="Haiku",
     max_tokens=64000,
+    capabilities=SimpleNamespace(
+        thinking=SimpleNamespace(
+            types=SimpleNamespace(
+                adaptive=ON,
+                between_tools=OFF,
+                disabled=ON,
+            ),
+        ),
+    ),
 )
 SONNET = SimpleNamespace(
     id="claude-sonnet-5-5",
     display_name="Sonnet",
     max_tokens=32000,
+    capabilities=None,
 )
 
 

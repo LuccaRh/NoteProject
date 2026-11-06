@@ -1,11 +1,12 @@
 # Imports
-from typing import Any, cast
+from typing import Any, cast, get_args
 
 from anthropic import AsyncAnthropic, AuthenticationError
 from anthropic.lib.tools import (
     BetaAsyncFunctionTool,
     BetaAsyncStreamingToolRunner,
 )
+from anthropic.types import ModelInfo
 from anthropic.types.beta import (
     BetaCacheControlEphemeralParam,
     BetaMessageParam,
@@ -14,7 +15,7 @@ from anthropic.types.beta import (
 
 from lonzo.errors import InvalidApiKey
 from lonzo.schemas.conversations import Message
-from lonzo.schemas.settings import ModelOption, ModelSettings
+from lonzo.schemas.settings import ModelOption, ModelSettings, Thinking
 
 
 # Global variables
@@ -22,6 +23,23 @@ CACHE: BetaCacheControlEphemeralParam = {"type": "ephemeral"}
 
 
 # Code
+def thinking_of(model: ModelInfo) -> list[Thinking]:
+    """
+    The kinds of thinking the API says the model takes; none when it does
+    not say
+    """
+
+    if model.capabilities is None:
+        return []
+
+    types = model.capabilities.thinking.types
+
+    return [
+        kind for kind in get_args(Thinking)
+        if getattr(types, kind).supported
+    ]
+
+
 class AnthropicClient:
     """
     The Anthropic API: one method per kind of call lonzo makes, with the
@@ -58,6 +76,7 @@ class AnthropicClient:
                     id=model.id,
                     name=model.display_name,
                     max_tokens=model.max_tokens,
+                    thinking=thinking_of(model=model),
                 )
                 async for model in sdk.models.list()
             ]

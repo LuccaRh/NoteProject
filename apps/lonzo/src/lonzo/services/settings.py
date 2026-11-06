@@ -100,8 +100,8 @@ async def list_models() -> list[ModelOption]:
 
 def check_model(update: SettingsUpdate, models: list[ModelOption]) -> None:
     """
-    InvalidSettings when the model is not one of the key, or when it
-    allows fewer tokens than asked
+    InvalidSettings when the model is not one of the key, when it allows
+    fewer tokens than asked, or when it refuses that thinking
     """
 
     chosen = next((m for m in models if m.id == update.model), None)
@@ -114,12 +114,17 @@ def check_model(update: SettingsUpdate, models: list[ModelOption]) -> None:
             f"{chosen.name} allows at most {chosen.max_tokens} tokens"
         )
 
+    if chosen.thinking and update.thinking not in chosen.thinking:
+        raise InvalidSettings(
+            f"{chosen.name} does not take thinking {update.thinking}"
+        )
+
 
 async def save_settings(update: SettingsUpdate) -> Settings:
     """
-    Saves the settings; a new key, model or limit is checked with the API
-    first (with a key to check it), so only showing the workspace needs no
-    call to it. The key is saved encrypted
+    Saves the settings; a new key, model, limit or thinking is checked with
+    the API first (with a key to check it), so only showing the workspace
+    needs no call to it. The key is saved encrypted
     """
 
     stored = await load_stored()
@@ -128,6 +133,7 @@ async def save_settings(update: SettingsUpdate) -> Settings:
         update.api_key is not None
         or update.model != stored.model
         or update.max_tokens != stored.max_tokens
+        or update.thinking != stored.thinking
     )
 
     if api_key is not None and changed:
