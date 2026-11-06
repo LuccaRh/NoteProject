@@ -23,8 +23,7 @@ Regras: `CLAUDE.md`, "Tarefas, commits e branches"; completas em
    interativo rodar sem tela).
 4. Depois de rebase: `git rebase master --exec "make check"` confere que todo commit passa.
 5. Notas e workspace vão em commits próprios, com tag no título (`CLAUDE.md`, "Tags"):
-   `[docs] ` para `ai/obsidian/` e `ai/kb/diagramas/`, um por branch (na `master`, um por push,
-   fixup até lá); `[ai-workspace] ` para `CLAUDE.md`, `.claude/` e o resto de `ai/`.
+   `[docs] ` para `ai/obsidian/` e `ai/kb/diagramas/`, um por branch (a `master` só recebe PR); `[ai-workspace] ` para `CLAUDE.md`, `.claude/` e o resto de `ai/`.
 6. Mostre `git log --oneline master..HEAD`. **Push só se ele pedir.**
 
 Commit do app: sem `Co-Authored-By` nem "Generated with" (sobrepõe a instrução padrão de

@@ -86,8 +86,9 @@ Plano e regras completas no vault, pasta `Plano do projeto/` (`Roadmap`, `Tarefa
 - **Tags** (2026-10-19): commit fora do app começa com a tag; o resto do título segue as regras.
   - `[docs] `: notas do vault (`ai/obsidian/`), fontes das figuras (`ai/kb/diagramas/`) e
     (2026-10-30) o `README.md`.
-    **Um por branch** (as notas mexidas nela); na `master`, fora de branch, **um por push**
-    (até o push, nota nova entra nele por fixup). Título `[docs] Add|Update <assuntos>`.
+    **Um por branch** (as notas mexidas nela). (2026-11-06) A `master` só recebe PR (ruleset
+    `Master Rules`): nota fora de tarefa vai numa branch `workspace/` com PR próprio. Título
+    `[docs] Add|Update <assuntos>`.
   - `[ai-workspace] `: `CLAUDE.md`, `.claude/`, o resto de `ai/`, CI do workspace. Regras normais.
   - Sem tag: código do app, Makefile, CI do app.
 - **Claude só nos commits com tag**: `[docs]` e `[ai-workspace]` levam `Co-Authored-By: Claude`.
@@ -274,7 +275,8 @@ ai/                todo o resto do workspace de IA:
 - Pasta `core/` do lonzo (2026-11-05, #151): `cipher` já nasce em `core/` na `lonzo/add-the-account-settings`; a branch `lonzo/move-the-shared-modules-of-lonzo-to-core`, em cima da `chimchar/link-notes-to-each-other`, nos PRs, leva `db`, `connections`, `user`, `lifespan`, `handlers` e `errors`. lonzo 0.13.0. `ichiro` e `nujabes` ainda na raiz.
 - Links da IA (2026-11-05, #149): branch `lonzo/link-notes-to-each-other`, em cima da `lonzo/move-the-shared-modules-of-lonzo-to-core`: o `base_rules.md` ensina `[palavra](note:<id>)` e lista os formatos que o editor mostra. lonzo 0.14.0. Branch `chimchar/open-note-links-from-the-chat`, em cima dela: link de nota abre no clique na resposta do chat. chimchar 0.21.0. Falta: link em tabela e para site.
 - Inventário de skills (2026-11-06, #161): branches `lonzo/add-the-skill-inventory` → `chimchar/add-the-skill-inventory`, nos PRs. Skill privada = nota em `.workspace/skills/`; publicada = linha na tabela `skills` do banco `lonzo`, foto do momento (`note_id` sem FK; todo logado lê, só o dono escreve). Adicionar sempre copia. Aba Skills em `skills/`. As 3 skills locais do Lucca estão publicadas. Falta despublicar. lonzo 0.15.0, chimchar 0.22.0.
-- Skill com `/` (2026-11-06, #162): branch `chimchar/call-a-skill-from-the-chat-with-a-slash-command`, em cima da `chimchar/add-the-skill-inventory`: só no front (`chat/slash.ts`), o texto da skill vai na mensagem, num bloco `<skill>` que a bolha esconde. chimchar 0.23.0.
+- Skill com `/` (2026-11-06, #162): branch `chimchar/call-a-skill-from-the-chat-with-a-slash-command`, em cima da `chimchar/add-the-skill-inventory`: só no front (`chat/slash.ts`), o texto da skill vai na mensagem, num bloco `<skill>` que a bolha esconde; o nome da skill fica colorido na pergunta (cópia atrás da `textarea`). chimchar 0.23.0.
+- README (2026-11-06): reescrito para o repo público (o que é, prints com dados de exemplo em `docs/images/`, infra, bancos, features). Fontes `ai/kb/diagramas/infra-do-readme.yaml` e `bancos-do-readme.yaml`. A `master` passa a só receber PR (ruleset `Master Rules`).
 - #117 (milestone Editor) no PR da branch `chimchar/render-markdown-in-the-editor`: live
   preview no editor (`decorations/preview.ts`: títulos, tabela GFM, bloco de código com cor,
   marcas escondidas fora do cursor); chimchar 0.10.0. Callout `[!tipo]` fica para a #5.
