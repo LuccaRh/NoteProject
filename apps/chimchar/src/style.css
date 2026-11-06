@@ -388,6 +388,11 @@ button {
     outline: none;
 }
 
+/* Only the themes with line numbers show the gutter */
+:root .cm-editor .cm-gutters {
+    display: none;
+}
+
 /* Searched words: a flash, then a soft mark until the first edit */
 .cm-found {
     border-radius: 3px;
