@@ -1,5 +1,6 @@
 // Imports
 import './style.css'
+import './themes/retro.css'
 import { isLoggedIn, logOut } from './auth/api.ts'
 import { LoginDialog } from './auth/login-dialog.ts'
 import { Chat } from './chat/chat.ts'
@@ -104,9 +105,9 @@ const settingsDialog = new SettingsDialog(
         maxTokens: byId('settings-max-tokens'),
         toolsMaxTurns: byId('settings-tools-max-turns'),
         showWorkspace: byId('settings-show-workspace'),
+        theme: byId('settings-theme'),
         status: byId('settings-status'),
-        save: byId('settings-save'),
-        cancel: byId('settings-cancel'),
+        close: byId('settings-close'),
     },
     settings => applySettings(settings),
 )
