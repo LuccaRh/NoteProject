@@ -1,5 +1,6 @@
 import { EditorView, minimalSetup } from 'codemirror'
 import { EditorState } from '@codemirror/state'
+import { highlightActiveLineGutter, lineNumbers } from '@codemirror/view'
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
 import { languages } from '@codemirror/language-data'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
@@ -142,6 +143,8 @@ export function createEditor(
         markdown({ base: markdownLanguage, codeLanguages: languages }),
         syntaxHighlighting(highlight),
         theme,
+        lineNumbers(),
+        highlightActiveLineGutter(),
         EditorView.lineWrapping,
         preview,
         found,

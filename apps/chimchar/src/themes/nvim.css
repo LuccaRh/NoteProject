@@ -1,0 +1,216 @@
+/* Nvim: a monospace terminal with line numbers and a status line */
+:root[data-theme='nvim'] {
+    --ground: #1a2129;
+    --panel: #171e25;
+    --line: rgb(255 255 255 / 0.12);
+    --hover: rgb(255 255 255 / 0.06);
+    --active: rgb(255 255 255 / 0.1);
+    --selection: #33475a;
+    --text: #e6e8ec;
+    --body: #d7dae0;
+    --soft: #c3c8d0;
+    --muted: #a7afba;
+    --faint: #8a93a0;
+    --sans: 'JetBrains Mono', ui-monospace, monospace;
+    --serif: 'JetBrains Mono', ui-monospace, monospace;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --code-bg: rgb(0 0 0 / 0.25);
+    --code-keyword: #e06cc5;
+    --code-string: #98c379;
+    --code-number: #e5a86b;
+    --code-name: #7fb4e6;
+    --accent: #7fb4e6;
+    --mark: #e5c07b;
+    --danger: #e06c75;
+    color-scheme: dark;
+}
+
+[data-theme='nvim'] * {
+    border-radius: 0 !important;
+}
+
+[data-theme='nvim'] body {
+    background:
+        radial-gradient(460px at 84% 30%, rgb(59 84 104 / 0.55), transparent),
+        radial-gradient(360px at 44% 108%, rgb(90 74 58 / 0.45), transparent),
+        var(--ground);
+    background-attachment: fixed;
+}
+
+/* Sidebar */
+
+[data-theme='nvim'] .sidebar {
+    flex-basis: 280px;
+    background: rgb(18 23 29 / 0.55);
+}
+
+[data-theme='nvim'] .sidebar-foot {
+    background: transparent;
+}
+
+[data-theme='nvim'] .node-open {
+    color: var(--soft);
+}
+
+[data-theme='nvim'] .folder .node-open {
+    color: var(--accent);
+}
+
+[data-theme='nvim'] .node[aria-selected='true'] .node-open {
+    color: #fff;
+}
+
+/* Work area */
+
+[data-theme='nvim'] .work {
+    position: relative;
+    background: rgb(18 23 29 / 0.55);
+}
+
+[data-theme='nvim'] .tabs {
+    padding: 0;
+}
+
+[data-theme='nvim'] .tab {
+    border-right: 1px solid var(--line);
+}
+
+[data-theme='nvim'] .page {
+    padding: 14px 24px 50px 8px;
+}
+
+[data-theme='nvim'] .column {
+    max-width: 96ch;
+    margin: 0;
+}
+
+/* The path and the save status become the status line */
+[data-theme='nvim'] .topbar {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    align-items: center;
+    height: 26px;
+    margin: 0;
+    padding: 0 18px;
+    background: rgb(12 16 20 / 0.9);
+}
+
+[data-theme='nvim'] .topbar::before {
+    content: 'NORMAL';
+    padding: 0 8px;
+    background: var(--accent);
+    font-weight: 600;
+    color: #12171d;
+}
+
+[data-theme='nvim'] #path {
+    margin-right: auto;
+}
+
+[data-theme='nvim'] #save-status {
+    color: var(--code-string);
+}
+
+/* The title reads as the first line of the file */
+[data-theme='nvim'] #note {
+    position: relative;
+}
+
+[data-theme='nvim'] #note::before {
+    content: '#';
+    position: absolute;
+    left: 44px;
+    font: 600 14px/22px var(--mono);
+    color: var(--code-keyword);
+}
+
+[data-theme='nvim'] .title {
+    box-sizing: border-box;
+    margin-bottom: 22px;
+    padding-left: calc(44px + 2ch);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--code-keyword);
+}
+
+/* Editor */
+
+[data-theme='nvim'] .cm-editor {
+    font-size: 14px;
+    line-height: 22px;
+}
+
+:root[data-theme='nvim'] .cm-editor .cm-gutters {
+    display: flex;
+    border: 0;
+    background: transparent;
+    color: var(--faint);
+}
+
+[data-theme='nvim'] .cm-lineNumbers .cm-gutterElement {
+    min-width: 44px;
+    padding: 0 18px 0 0;
+}
+
+:root[data-theme='nvim'] .cm-editor .cm-activeLineGutter {
+    background: transparent;
+    color: var(--mark);
+}
+
+:root[data-theme='nvim'] .cm-editor .cm-cursor {
+    border-left: 0.6em solid rgb(215 218 224 / 0.55);
+}
+
+[data-theme='nvim'] .md-h1,
+[data-theme='nvim'] .md-h2,
+[data-theme='nvim'] .md-h3,
+[data-theme='nvim'] .md-h4,
+[data-theme='nvim'] .md-h5,
+[data-theme='nvim'] .md-h6 {
+    padding-top: 0 !important;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 22px;
+    --text: var(--accent);
+}
+
+[data-theme='nvim'] .md-h1 {
+    --text: var(--code-keyword);
+}
+
+/* Same line height everywhere, so the numbers stay beside their lines */
+[data-theme='nvim'] .md-codeblock {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 22px;
+}
+
+[data-theme='nvim'] .md-bullet {
+    color: var(--code-number);
+}
+
+[data-theme='nvim'] .md-quote {
+    color: #5fd7d7;
+}
+
+[data-theme='nvim'] .md-code {
+    color: var(--mark);
+}
+
+/* Chat */
+
+[data-theme='nvim'] .message.user {
+    border-left: 2px solid var(--accent);
+    background: var(--hover);
+}
+
+[data-theme='nvim'] .message.assistant h1,
+[data-theme='nvim'] .message.assistant h2,
+[data-theme='nvim'] .message.assistant h3 {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--accent);
+}

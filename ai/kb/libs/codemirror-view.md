@@ -38,3 +38,4 @@ avisa; reconfira as linhas antes de confiar no card.
 - `MatchDecorator({regexp /g, decoration | decorate})` (d.ts:1822): regex por linha;
   `createDeco(view)` no construtor e `updateDeco(update, deco)` no `update` (d.ts:1874–1880).
   Serve para `[!duvida]` sem escrever o laço de linhas à mão.
+- `lineNumbers(config?)` (`index.d.ts:2395`) e `highlightActiveLineGutter()` (`:2401`): números na margem. O `formatNumber` recebe o `state`, mas a margem só redesenha quando o documento ou a config mudam, então número relativo ao cursor não sai só com ele.

@@ -3,6 +3,7 @@
 family=Anton&family=Cormorant+Garamond:wght@400;500&\
 family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&\
 family=IBM+Plex+Mono:wght@400;500&family=Jost:wght@300;400;500&\
+family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&\
 family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600&\
 family=Orbitron:wght@800&family=Outfit:wght@400;500;600&\
 family=Playfair+Display:ital,wght@1,400&\
@@ -385,6 +386,11 @@ button {
 
 .cm-editor.cm-focused {
     outline: none;
+}
+
+/* Only the themes with line numbers show the gutter */
+:root .cm-editor .cm-gutters {
+    display: none;
 }
 
 /* Searched words: a flash, then a soft mark until the first edit */
