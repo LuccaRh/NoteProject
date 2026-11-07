@@ -179,6 +179,9 @@ function renderInline(text: string, parent: HTMLElement): void {
  * Whether a cursor or selection touches from..to
  */
 export function touches(state: EditorState, from: number, to: number): boolean {
+    // Reading: no edit will come, so the marks stay hidden everywhere
+    if (state.readOnly) return false
+
     return state.selection.ranges.some(r => r.from <= to && r.to >= from)
 }
 
@@ -384,7 +387,9 @@ export const preview = StateField.define<DecorationSet>({
     update(decos, tr) {
         const parsed = syntaxTree(tr.state) !== syntaxTree(tr.startState)
 
-        if (tr.docChanged || tr.selection || parsed) return build(tr.state)
+        if (tr.docChanged || tr.selection || tr.reconfigured || parsed) {
+            return build(tr.state)
+        }
 
         return decos
     },

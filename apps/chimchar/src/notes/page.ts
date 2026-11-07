@@ -119,6 +119,13 @@ export class Page {
         this.editor.mark(words)
     }
 
+    /** Switch the body and the title between reading and writing. */
+    setReading({ reading }: { reading: boolean }): void {
+
+        this.editor.setReading({ reading })
+        this.els.title.readOnly = reading
+    }
+
     /** Tell something about the open note where the saves show. */
     say(text: string): void {
 

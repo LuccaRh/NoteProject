@@ -99,6 +99,15 @@ button {
     overflow-y: auto;
 }
 
+#reading .reading-icon,
+#reading[aria-pressed='true'] .writing-icon {
+    display: none;
+}
+
+#reading[aria-pressed='true'] .reading-icon {
+    display: block;
+}
+
 .sidebar-foot {
     display: flex;
     justify-content: flex-end;
