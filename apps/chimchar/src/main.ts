@@ -1,5 +1,6 @@
 // Imports
 import './style.css'
+import './themes/grid.css'
 import './themes/retro.css'
 import { isLoggedIn, logOut } from './auth/api.ts'
 import { LoginDialog } from './auth/login-dialog.ts'
