@@ -1,6 +1,7 @@
 // Imports
 import './style.css'
 import './themes/grid.css'
+import './themes/liquid.css'
 import './themes/retro.css'
 import { isLoggedIn, logOut } from './auth/api.ts'
 import { LoginDialog } from './auth/login-dialog.ts'
@@ -18,6 +19,7 @@ import { Search } from './notes/search.ts'
 import { Tree } from './notes/tree.ts'
 import { getSettings } from './settings/api.ts'
 import { SettingsDialog } from './settings/settings-dialog.ts'
+import { runTheme } from './settings/theme.ts'
 import { SkillsTab } from './skills/skills-tab.ts'
 import { Tabs } from './tabs.ts'
 
@@ -350,4 +352,5 @@ byId('settings').addEventListener('click', () => {
 })
 byId('log-out').addEventListener('click', () => void leave())
 
+runTheme()
 void start()
