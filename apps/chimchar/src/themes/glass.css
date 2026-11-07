@@ -1,0 +1,176 @@
+/* Glass: pale panels over soft colour blobs, with round glossy buttons */
+:root[data-theme='glass'] {
+    --ground: #c4c8cd;
+    --panel: #d5d8db;
+    --line: rgb(255 255 255 / 0.5);
+    --hover: rgb(255 255 255 / 0.2);
+    --active: rgb(255 255 255 / 0.32);
+    --selection: rgb(255 255 255 / 0.55);
+    --text: #1f2328;
+    --body: #262b31;
+    --soft: #2f353c;
+    --muted: #3f464e;
+    --faint: #4c545d;
+    --sans: Outfit, system-ui, sans-serif;
+    --serif: Outfit, system-ui, sans-serif;
+    --code-bg: rgb(255 255 255 / 0.32);
+    --code-keyword: #6a3f8f;
+    --code-string: #2f6147;
+    --code-number: #8a3a2a;
+    --code-name: #24527a;
+    --accent: #2b3036;
+    --mark: #b98a2f;
+    --danger: #8a2a20;
+    --glass: rgb(255 255 255 / 0.22);
+    --gloss:
+        inset 0 1px 0 rgb(255 255 255 / 0.7),
+        inset 0 0 0 1px rgb(255 255 255 / 0.35),
+        0 30px 60px -30px rgb(20 24 30 / 0.3);
+    color-scheme: light;
+}
+
+/* The blobs are already soft, so the panels need no backdrop blur */
+[data-theme='glass'] body {
+    background:
+        radial-gradient(420px at 34% 8%, rgb(142 152 164 / 0.9), transparent),
+        radial-gradient(320px at 88% 92%, rgb(217 207 193 / 0.85), transparent),
+        radial-gradient(240px at 6% 82%, rgb(169 185 194 / 0.7), transparent),
+        var(--ground);
+    background-attachment: fixed;
+}
+
+[data-theme='glass'] .app {
+    box-sizing: border-box;
+    gap: 12px;
+    padding: 16px;
+}
+
+/* Sidebar */
+
+[data-theme='glass'] .sidebar,
+[data-theme='glass'] .work {
+    border: 0;
+    background: var(--glass);
+    box-shadow: var(--gloss);
+}
+
+[data-theme='glass'] .sidebar {
+    flex-basis: 300px;
+    gap: 18px;
+    padding: 16px;
+    border-radius: 18px;
+}
+
+[data-theme='glass'] .sidebar::before {
+    content: 'Notes';
+    font-weight: 600;
+    font-size: 15px;
+    text-align: center;
+}
+
+[data-theme='glass'] .toolbar {
+    padding: 0;
+}
+
+[data-theme='glass'] .tool-group {
+    gap: 6px;
+    background: transparent;
+    --hover: var(--selection);
+}
+
+[data-theme='glass'] .icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.35);
+    box-shadow:
+        inset 0 1px 1px rgb(255 255 255 / 0.9),
+        inset 0 -2px 4px rgb(20 24 30 / 0.1),
+        0 6px 14px -6px rgb(20 24 30 / 0.25);
+    transition: transform 0.2s;
+}
+
+[data-theme='glass'] .icon:active {
+    transform: scale(0.94);
+}
+
+[data-theme='glass'] .icon[aria-label='New note'] {
+    background: var(--accent);
+    color: #fff;
+}
+
+[data-theme='glass'] .node {
+    border-radius: 10px;
+}
+
+[data-theme='glass'] .sidebar-foot {
+    background: transparent;
+}
+
+/* Work area */
+
+[data-theme='glass'] .work {
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+[data-theme='glass'] .tab[aria-selected='true'] {
+    background: var(--active);
+}
+
+[data-theme='glass'] .tabs {
+    padding: 10px 12px 0;
+}
+
+[data-theme='glass'] #note {
+    position: relative;
+}
+
+/* The dark tile beside the title */
+[data-theme='glass'] #note::before {
+    content: '';
+    position: absolute;
+    width: 84px;
+    height: 84px;
+    border-radius: 16px;
+    background: #3a4048 url('./panels-logo.svg') center / 38px no-repeat;
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.3),
+        0 14px 30px -12px rgb(20 24 30 / 0.5);
+}
+
+[data-theme='glass'] .title {
+    box-sizing: border-box;
+    height: 84px;
+    margin-bottom: 26px;
+    padding-left: 102px;
+    font-weight: 600;
+    font-size: 36px;
+    letter-spacing: -0.02em;
+}
+
+[data-theme='glass'] .md-h1,
+[data-theme='glass'] .md-h2,
+[data-theme='glass'] .md-h3,
+[data-theme='glass'] .md-h4,
+[data-theme='glass'] .md-h5,
+[data-theme='glass'] .md-h6,
+[data-theme='glass'] .message.assistant h1,
+[data-theme='glass'] .message.assistant h2,
+[data-theme='glass'] .message.assistant h3 {
+    font-weight: 600;
+}
+
+/* Chat */
+
+[data-theme='glass'] .message.user {
+    border-radius: 12px;
+    background: var(--active);
+    box-shadow: inset 0 0 0 1px var(--line);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme='glass'] .icon {
+        transition: none;
+    }
+}
