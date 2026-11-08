@@ -11,6 +11,7 @@ Como o projeto anda: em que ordem, onde ficam as tarefas e como cada mudança en
 | [[Roadmap]]           | navegador → app desktop → celular; no navegador, M0 servidor → M1 notas → M2 login → M3 AWS → M4 ao vivo; editor em paralelo |
 | [[Entrega de 2026-11-06]] | notas e IA em localhost até 2026-11-06: sequência das issues, o que a IA faz, o que fica fora |
 | [[Prioridade das features]] | as ideias de [[Features]] numa fila só, por urgência: risco, v1, uso diário |
+| [[Melhorias possíveis]] | o que já funciona e pode ficar mais barato, rápido ou limpo: cache das regras, idas ao `ichiro`, pendências do código |
 | [[Tarefas no GitHub]] | issue = branch = PR; milestone = etapa; labels por lado (backend, frontend, infrastructure, ai-workspace) |
 | [[Regras de git]]     | branch, commit, mensagem, PR e merge                                                                      |
 | [[Um repo ou vários]] | monorepo com `apps/` e `infra/`, e não um repo por serviço                                                |
