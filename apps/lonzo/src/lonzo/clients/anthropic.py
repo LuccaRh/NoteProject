@@ -99,13 +99,14 @@ class AnthropicClient:
         history: list[Message],
         question: str,
         tools: list[BetaAsyncFunctionTool[Any]],
-        context: str = "",
+        context: str,
     ) -> BetaAsyncStreamingToolRunner[None]:
         """
         The answer to one question after the messages of the conversation,
         by the tool runner of the SDK: one stream per turn of the model,
         until it stops calling tools or reaches the turns of the user; the
-        first piece of system is the fixed one, marked for the cache
+        first piece of system is marked for the cache, and the context goes
+        before the messages
         """
 
         sdk = self.sdk.with_options(api_key=settings.api_key)
@@ -114,11 +115,8 @@ class AnthropicClient:
             cast(BetaMessageParam, {"role": m.role, "content": m.content})
             for m in history
         ]
+        messages.insert(0, {"role": "user", "content": context})
         messages.append({"role": "user", "content": question})
-
-        if context:
-            messages.insert(0, {"role": "user", "content": context})
-
         blocks: list[BetaTextBlockParam] = [
             {"type": "text", "text": text} for text in system if text
         ]
