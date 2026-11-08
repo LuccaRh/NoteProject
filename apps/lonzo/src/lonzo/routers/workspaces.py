@@ -3,7 +3,7 @@ from fastapi import APIRouter
 
 from lonzo.schemas.notes import Note
 from lonzo.schemas.workspaces import WorkspaceRequest
-from lonzo.services.workspaces import create_workspace
+from lonzo.services.create_workspace import create_workspace
 
 
 # Global variables
