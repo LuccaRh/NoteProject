@@ -90,17 +90,42 @@ def split_skill(body: str) -> tuple[str, str]:
     return first.lstrip("# ").strip(), rest.strip()
 
 
+async def skill_notes(folder_id: UUID, above: bool = False) -> list[Note]:
+    """
+    The skill notes of the folder's own .workspace; with above, after the
+    ones of each .workspace above it, from the root down
+    """
+
+    path = f"{WORKSPACE}/{SKILLS}"
+    folders: list[Note] = []
+
+    if above:
+        folders = await ichiro.list_notes_above(note_id=folder_id, path=path)
+
+    own = await ichiro.get_note_by_path(parent_id=folder_id, path=path)
+
+    if own is not None:
+        folders.append(own)
+
+    return [
+        note
+        for folder in folders
+        if folder.is_folder
+        for note in await ichiro.list_notes(parent_id=folder.id)
+        if not note.is_folder
+    ]
+
+
 async def skills_list(folder_id: UUID) -> list[str]:
     """
-    The skills of a workspace, one line each with the id, the title and
-    the summary, in one part; the bodies stay out and nothing comes back
-    with no skills
+    The skills a folder can use, its own and the ones above it, one line
+    each with the id, the title and the summary, in one part; the bodies
+    stay out and nothing comes back with no skills
     """
 
     lines = [
         f"- {note.id} {note.title}: {split_skill(body=note.body)[0]}"
-        for note in await ichiro.list_notes(parent_id=folder_id)
-        if not note.is_folder
+        for note in await skill_notes(folder_id=folder_id, above=True)
     ]
 
     return ["# Skills\n\n" + "\n".join(lines)] if lines else []
@@ -111,7 +136,8 @@ async def workspace_rules(folder_id: UUID | None) -> str:
     Rules for a question: the CLAUDE.md of each .workspace above the
     folder, from the root down, then the notes of the folder's own
     .workspace, as written (the CLAUDE.md opens saying they win), and the
-    list of its skills; empty with no folder (the root never has one)
+    list of the skills it can use; empty with no folder (the root never
+    has one)
     """
 
     if folder_id is None:
@@ -131,10 +157,7 @@ async def workspace_rules(folder_id: UUID | None) -> str:
         if not note.is_folder
     ]
 
-    for note in notes:
-
-        if note.is_folder and note.title == SKILLS:
-            parts.extend(await skills_list(folder_id=note.id))
+    parts.extend(await skills_list(folder_id=folder_id))
 
     return "\n\n".join(parts)
 

@@ -239,6 +239,42 @@ def test_chat_lists_the_skills_without_their_bodies() -> None:
     assert "Look at the video" not in system
 
 
+def test_chat_lists_the_skills_above_with_the_closest_last() -> None:
+
+    ichiro = FakeIchiro()
+    sport = ichiro.add(title="Sport", is_folder=True)
+    middle = ichiro.add(title="Team", parent_id=sport, is_folder=True)
+    folder = ichiro.add(title="Baseball", parent_id=middle, is_folder=True)
+
+    for parent, title in [(sport, "far"), (folder, "near")]:
+        dot = ichiro.add(title=".workspace", parent_id=parent, is_folder=True)
+        skills = ichiro.add(title="skills", parent_id=dot, is_folder=True)
+        ichiro.add(title=title, parent_id=skills, body=f"Does {title}.")
+
+    body = {"question": "Hi", "folder_id": str(folder)}
+    post(body=body, http=ichiro.client())
+
+    system = str(FakeMessages.params["system"])
+    assert system.count("\\n# Skills\\n") == 1
+    assert system.index("far: Does far.") < system.index("near: Does near.")
+    assert system.count("near: Does near.") == 1
+
+
+def test_chat_lists_the_skills_above_a_folder_with_no_workspace() -> None:
+
+    ichiro = FakeIchiro()
+    sport = ichiro.add(title="Sport", is_folder=True)
+    folder = ichiro.add(title="Baseball", parent_id=sport, is_folder=True)
+    dot = ichiro.add(title=".workspace", parent_id=sport, is_folder=True)
+    skills = ichiro.add(title="skills", parent_id=dot, is_folder=True)
+    ichiro.add(title="far", parent_id=skills, body="Does far.")
+
+    body = {"question": "Hi", "folder_id": str(folder)}
+    post(body=body, http=ichiro.client())
+
+    assert "far: Does far." in str(FakeMessages.params["system"])
+
+
 def test_chat_names_the_folder_by_its_whole_path() -> None:
 
     ichiro = FakeIchiro()
