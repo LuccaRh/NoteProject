@@ -86,6 +86,26 @@ class FakeIchiro:
 
             return httpx2.Response(200, json=rows)
 
+        if request.method == "GET" and path.endswith("/above"):
+            target = UUID(path.removeprefix("/notes/").removesuffix("/above"))
+
+            if target not in self.rows:
+                return httpx2.Response(404, json={"detail": "note not found"})
+
+            folders: list[str | None] = []
+            parent = self.rows[target]["parent_id"]
+
+            while parent is not None:
+                folders = [str(parent), *folders]
+                parent = self.rows[UUID(str(parent))]["parent_id"]
+
+            found = [
+                self.walk(parent_id=folder, path=request.url.params["path"])
+                for folder in [None, *folders]
+            ]
+
+            return httpx2.Response(200, json=[r for r in found if r])
+
         if request.method == "GET" and path.endswith("/path"):
             target = UUID(path.removeprefix("/notes/").removesuffix("/path"))
             names = self.path(note_id=target)
