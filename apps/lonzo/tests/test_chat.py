@@ -340,6 +340,7 @@ def test_chat_gives_the_model_the_note_tools() -> None:
         "search_titles",
         "list_folder",
         "read_note",
+        "load_skill",
         "create_note",
         "create_folder",
         "edit_note",

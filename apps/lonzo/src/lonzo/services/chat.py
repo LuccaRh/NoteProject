@@ -67,7 +67,7 @@ async def events(
     turns: list[Turn] = []
     usage = {"input_tokens": 0, "output_tokens": 0, "cached_tokens": 0}
     end: dict[str, object] = {"usage": usage}
-    tools = NoteTools()
+    tools = NoteTools(folder_id=conversation.folder_id)
     runner = claude.stream_answer(
         settings=settings,
         system=[base_rules()],

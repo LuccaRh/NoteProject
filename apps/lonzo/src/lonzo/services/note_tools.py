@@ -7,7 +7,11 @@ from anthropic.lib.tools import BetaAsyncFunctionTool, beta_async_tool
 
 from lonzo.core.connections import ichiro
 from lonzo.schemas.notes import Note, NoteMatch, TitleMatch
-from lonzo.services.workspaces import is_skill_path, skill_header
+from lonzo.services.workspaces import (
+    find_skill,
+    is_skill_path,
+    skill_header,
+)
 
 
 # Code
@@ -20,12 +24,15 @@ class NoteTools:
 
     created: list[Note]
     titles: dict[str, str]
+    folder_id: UUID | None
 
-    def __init__(self) -> None:
+    def __init__(self, folder_id: UUID | None = None) -> None:
         """
-        Tools with no note created and no title seen yet
+        Tools of a conversation in folder_id, with no note created and no
+        title seen yet
         """
 
+        self.folder_id = folder_id
         self.created = []
         self.titles = {}
 
@@ -177,11 +184,26 @@ class NoteTools:
 
             return f"deleted {note_id}"
 
+        @beta_async_tool(strict=True)
+        async def load_skill(name: str) -> str:
+            """
+            Loads a skill of the `# Skills` list by its name: the
+            instructions to follow for that task
+            """
+
+            skill = await find_skill(folder_id=self.folder_id, name=name)
+
+            if skill is None:
+                raise ValueError(f"there is no skill {name}")
+
+            return f"# {skill.title}\n\n{skill.body}"
+
         return [
             search_notes,
             search_titles,
             list_folder,
             read_note,
+            load_skill,
             create_note,
             create_folder,
             edit_note,
@@ -306,7 +328,8 @@ class NoteTools:
     def target(self, tool_input: Mapping[str, object]) -> str | None:
         """
         What a tool call acts on, for the status of the chat: the words
-        searched, the last name of the path or the title of the note;
+        searched, the name of the skill, the last name of the path or the
+        title of the note;
         None while the input is still coming, or for an id never seen
         """
 
@@ -314,6 +337,11 @@ class NoteTools:
 
         if search is not None:
             return str(search)
+
+        name = tool_input.get("name")
+
+        if name is not None:
+            return str(name)
 
         path = tool_input.get("path")
 
