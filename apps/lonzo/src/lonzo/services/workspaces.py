@@ -119,6 +119,17 @@ def split_skill(body: str) -> tuple[str, str]:
     return first.lstrip("# ").strip(), rest.strip()
 
 
+def skill_text(title: str, summary: str, body: str) -> str:
+    """
+    The text of a skill note: the header with its name and description,
+    then the instructions
+    """
+
+    header = f"{HEADER}\nname: {title}\ndescription: {summary}\n{HEADER}"
+
+    return f"{header}\n\n{body}".strip()
+
+
 async def skill_notes(folder_id: UUID, above: bool = False) -> list[Note]:
     """
     The skill notes of the folder's own .workspace; with above, after the

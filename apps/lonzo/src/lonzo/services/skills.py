@@ -13,6 +13,7 @@ from lonzo.services.workspaces import (
     find_skills_folder,
     find_workspace,
     is_skill_path,
+    skill_text,
     split_skill,
 )
 
@@ -99,8 +100,8 @@ async def add_skill(folder_id: UUID, source: SkillAdd) -> Note:
 
 async def published_text(skill_id: UUID | None) -> tuple[str, str]:
     """
-    The title and the note body of a published skill, the summary as the
-    first line; the transaction ends before any call to ichiro
+    The title and the note body of a published skill, the summary in its
+    header; the transaction ends before any call to ichiro
     """
 
     skill = None
@@ -112,7 +113,9 @@ async def published_text(skill_id: UUID | None) -> tuple[str, str]:
     if skill is None:
         raise SkillNotFound("skill not found")
 
-    return skill.title, f"{skill.summary}\n\n{skill.body}".strip()
+    body = skill_text(title=skill.title, summary=skill.summary, body=skill.body)
+
+    return skill.title, body
 
 
 async def publish_skill(note_id: UUID) -> Skill:

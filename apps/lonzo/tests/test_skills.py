@@ -216,7 +216,9 @@ def test_published_skill_is_copied_for_someone_else() -> None:
     assert response.status_code == 201
     assert response.json()["title"] == "swing"
     assert response.json()["parent_id"] == str(target_skills)
-    assert response.json()["body"] == "Does X.\n\nSteps"
+    assert response.json()["body"] == (
+        "---\nname: swing\ndescription: Does X.\n---\n\nSteps"
+    )
 
 
 def test_own_note_is_copied_to_another_workspace() -> None:
