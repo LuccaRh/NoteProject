@@ -191,6 +191,34 @@ def test_chat_uses_the_folder_workspace_rules() -> None:
     assert "Exam soon." not in str(system)
 
 
+# The CLAUDE.md of each workspace above comes first, from the root down
+def test_chat_uses_the_rules_of_the_workspaces_above() -> None:
+
+    ichiro = FakeIchiro()
+    root = ichiro.add(title=".workspace", is_folder=True)
+    ichiro.add(title="CLAUDE.md", parent_id=root, body="Answer short.")
+    top = ichiro.add(title="Sports", is_folder=True)
+    top_workspace = ichiro.add(
+        title=".workspace",
+        parent_id=top,
+        is_folder=True,
+    )
+    ichiro.add(title="CLAUDE.md", parent_id=top_workspace, body="Use stats.")
+    folder = ichiro.add(title="Baseball", parent_id=top, is_folder=True)
+    workspace = ichiro.add(title=".workspace", parent_id=folder, is_folder=True)
+    ichiro.add(title="CLAUDE.md", parent_id=workspace, body="Bats left.")
+
+    body = {"question": "Hi", "folder_id": str(folder)}
+    post(body=body, http=ichiro.client())
+
+    system = str(FakeMessages.params["system"])
+    short = system.index("Answer short.")
+    stats = system.index("Use stats.")
+
+    assert short < stats < system.index("Bats left.")
+    assert system.count("Bats left.") == 1
+
+
 def test_chat_lists_the_skills_without_their_bodies() -> None:
 
     ichiro = FakeIchiro()
