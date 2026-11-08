@@ -14,6 +14,7 @@ from ichiro.schemas.notes import (
 )
 from ichiro.services.notes import (
     create_note,
+    find_above,
     find_by_path,
     find_note,
     find_path,
@@ -109,6 +110,16 @@ def get_path(note_id: UUID) -> NotePath:
     """
 
     return find_path(note_id=note_id)
+
+
+@router.get("/{note_id}/above")
+def get_above(note_id: UUID, path: str) -> list[Note]:
+    """
+    The note at a path of titles (a/b) inside each folder above note_id,
+    the root too, from the root down; 404 when note_id doesn't exist
+    """
+
+    return find_above(note_id=note_id, path=path)
 
 
 @router.post("", status_code=201)
