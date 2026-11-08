@@ -14,7 +14,7 @@ A raiz era o [[Laço de ferramentas|harness]]. O `lonzo` já tinha o laço e as 
 | instruções fixas | system prompt do programa | nenhuma; sem workspace, o `system` ia vazio | `base_rules.md`, igual em toda pergunta |
 | onde estou | pasta de trabalho no pacote | id da pasta, só se o modelo o escreveu no `CLAUDE.md` | data e pasta atual, geradas pelo código |
 | escrita | `Write` exige caminho absoluto | `folder_id` opcional, com a raiz como padrão | caminho inteiro começando em `/` |
-| skills | lista gerada dos arquivos | só notas soltas, que nenhum código lia | lista gerada com id, título e primeira linha |
+| skills | lista gerada dos arquivos | só notas soltas, que nenhum código lia | lista gerada da raiz até a pasta, com título e `description`; `load_skill` lê pelo nome |
 | histórico | guarda as chamadas de ferramenta | só o texto | texto, `tool_use` e `tool_result` |
 | cache | automático | sem marca nenhuma | duas marcas de [[Cache de prompt\|cache]] |
 
@@ -30,7 +30,7 @@ O `lonzo` só alcança as notas, e por isso roda no servidor sem permissão nem 
 ![[pacote-do-lonzo.drawio.svg]]
 *Do mais fixo ao mais variável: o [[Cache de prompt|cache]] compara o começo do pacote, então uma mudança invalida só o que vem depois dela.*
 
-O `system` virou dois blocos. O primeiro é o `base_rules.md`, igual para todo mundo. O segundo sai de `question_context` em `services/workspaces.py`: data, pasta atual, notas do `.workspace/` e lista de skills. A primeira marca fica no bloco fixo e a segunda é o `cache_control` no topo do `tool_runner`, que acompanha o fim do pacote a cada volta do laço.
+(2026-11-08, issue #198) O `system` é só o `base_rules.md`, igual para todo mundo. O resto sai de `question_context` em `services/workspaces.py` (data, pasta atual, o `CLAUDE.md` de cada `.workspace` acima, as notas do `.workspace/` da pasta e a lista de skills) e vai num bloco `<context>` na primeira mensagem `user`. O bloco é refeito a cada pergunta e não é gravado no histórico. A primeira marca fica no `system` e a segunda é o `cache_control` no topo do `tool_runner`, que acompanha o fim do pacote a cada volta do laço.
 
 > [!example] Medição real (2026-11-05, Haiku 5.5)
 > A primeira pergunta de um workspace leu 2.732 tokens do cache e pagou 6 de entrada normal. A pergunta seguinte, com o histórico, leu 10.799 e pagou 8. O número sai no evento final, em `usage.cached_tokens`.
@@ -45,7 +45,7 @@ Com pasta no caminho, o primeiro nome precisa existir. Pastas faltando no meio s
 
 ## Skills
 
-O `lonzo` lista `.workspace/skills/` a cada pergunta, sem depender do `CLAUDE.md`. Só a primeira linha de cada skill entra no pacote, e por isso o `create_workspace.md` exige que ela diga o que a skill faz. O modelo lê a skill inteira com `read_note` quando a pergunta pede. A lista garante que o modelo saiba da skill, não que a use; para garantir o uso, falta o comando `/` previsto em [[Workspace no app]]. ⏳
+(2026-11-08, issues #192, #195, #196) O `lonzo` lista `.workspace/skills/` a cada pergunta, sem depender do `CLAUDE.md`: as skills da pasta e as dos workspaces acima, da raiz para baixo. Cada skill entra com uma linha só, o título e a `description` do cabeçalho `---` (sem cabeçalho, a primeira linha), e por isso `create_note` e `edit_note` recusam skill sem `description`. O modelo lê a skill inteira com `load_skill(name)`, que acha pelo título; com duas de mesmo nome, vence a mais perto da pasta. A lista garante que o modelo saiba da skill, não que a use; para garantir o uso, a pessoa chama com `/` no chat.
 
 ## Inventário de skills
 

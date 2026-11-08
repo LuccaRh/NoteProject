@@ -4,9 +4,9 @@ grade: [235, 125]
 destino: IA no projeto/Figuras
 nos:
   l_in:   {tipo: bloco, pos: [1, 0], texto: "<b>chimchar</b><br>POST /api/chat (SSE)", cor: azul}
-  l_pac:  {tipo: bloco, pos: [1, 1], texto: "<b>monta o pacote</b><br>base_rules.md, data, pasta,<br>.workspace, lista de skills", cor: verde}
+  l_pac:  {tipo: bloco, pos: [1, 1], texto: "<b>monta o pacote</b><br>system: base_rules.md;<br>&lt;context&gt;: data, pasta,<br>.workspace de cima, skills", cor: verde}
   l_run:  {tipo: bloco, pos: [1, 2], texto: "<b>laço</b><br>tool_runner do SDK,<br>até tools_max_turns", cor: verde}
-  l_tool: {tipo: bloco, pos: [1, 4], texto: "<b>8 ferramentas de nota</b><br>NoteTools: buscar, ler,<br>criar, editar, apagar", cor: verde}
+  l_tool: {tipo: bloco, pos: [1, 4], texto: "<b>9 ferramentas</b><br>NoteTools: buscar, ler,<br>criar, editar, apagar,<br>load_skill", cor: verde}
   l_hist: {tipo: banco, pos: [0, 2], texto: "banco lonzo<br>grava no fim,<br>sem resumo", cor: amarelo}
   l_nada: {tipo: nota, pos: [0, 3], texto: "sem permissão<br>nem hook: a chamada<br>vai direto"}
   l_dado: {tipo: banco, pos: [1, 5], texto: "ichiro + Postgres<br>só as notas", cor: amarelo}

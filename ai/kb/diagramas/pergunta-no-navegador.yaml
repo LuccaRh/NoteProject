@@ -5,8 +5,8 @@ destino: IA no projeto/Figuras
 nos:
   nav1: {tipo: bloco, pos: [0, 0], texto: "1. pergunta no chat<br>POST /api/chat<br>{workspace, conversa, pergunta}", cor: azul}
   as0:  {tipo: bloco, pos: [2, 0], texto: "2. recebe a pergunta<br>(o Caddy encaminhou)", cor: verde}
-  no1:  {tipo: bloco, pos: [1, 1], texto: "lê .workspace/:<br>regras + cabeçalho<br>das skills", cor: amarelo}
-  as1:  {tipo: bloco, pos: [2, 1], texto: "3. pacote 1:<br>system (regras, índice)<br>+ tools + histórico", cor: verde}
+  no1:  {tipo: bloco, pos: [1, 1], texto: "lê o .workspace/ da pasta<br>e os de cima: regras +<br>description das skills", cor: amarelo}
+  as1:  {tipo: bloco, pos: [2, 1], texto: "3. pacote 1: system<br>+ tools + &lt;context&gt;<br>+ histórico", cor: verde}
   an1:  {tipo: bloco, pos: [3, 1], texto: "4. modelo entende a pergunta<br>e não tem a nota:<br>tool_use search_notes('caddy')", cor: laranja}
   no2:  {tipo: bloco, pos: [1, 2], texto: "busca no Postgres<br>→ [{id 42, 'Caddy'}]", cor: amarelo}
   as2:  {tipo: bloco, pos: [2, 2], texto: "5. executa search_notes<br>pacote 2 = pacote 1<br>+ pedido + resultado", cor: verde}

@@ -3,9 +3,9 @@ tipo: blocos
 grade: [420, 95]
 destino: IA no projeto/Figuras
 nos:
-  tools: {tipo: bloco, pos: [0, 0], texto: "<b>tools</b><br>as ferramentas de nota", cor: verde}
-  base:  {tipo: bloco, pos: [0, 1], texto: "<b>system 1: base</b> (base_rules.md)<br>igual para todo mundo", cor: verde}
-  ctx:   {tipo: bloco, pos: [0, 2], texto: "<b>system 2: contexto</b><br>data, pasta atual, notas do .workspace, lista de skills", cor: amarelo}
+  tools: {tipo: bloco, pos: [0, 0], texto: "<b>tools</b><br>as ferramentas de nota + load_skill", cor: verde}
+  base:  {tipo: bloco, pos: [0, 1], texto: "<b>system</b> (base_rules.md)<br>igual para todo mundo", cor: verde}
+  ctx:   {tipo: bloco, pos: [0, 2], texto: "<b>messages: &lt;context&gt;</b>, refeito a cada pergunta<br>data, pasta, regras dos .workspace de cima, lista de skills", cor: amarelo}
   hist:  {tipo: bloco, pos: [0, 3], texto: "<b>messages: histórico</b><br>texto, tool_use e tool_result", cor: amarelo}
   perg:  {tipo: bloco, pos: [0, 4], texto: "<b>messages: pergunta</b>", cor: azul}
   c1:    {tipo: bloco, pos: [1, 1], texto: "marca de cache 1: tools + base", cor: cinza}

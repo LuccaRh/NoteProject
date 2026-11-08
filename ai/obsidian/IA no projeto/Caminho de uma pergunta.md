@@ -14,8 +14,8 @@ Exemplo das duas figuras: "atualiza a nota do Caddy com o que vimos, cria uma de
 
 1. O chat manda `POST /api/chat {workspace, conversa, pergunta}`. O navegador não manda regra nem nota: só diz qual workspace e qual conversa.
 2. O [[Reverse proxy|Caddy]] encaminha ao `lonzo`, o serviço de IA, que chama a Messages API pela lib `anthropic`.
-3. Antes de chamar o modelo, o `lonzo` pede à [[API de notas]] o `.workspace/` daquele workspace: as regras inteiras e só o cabeçalho (nome + descrição) de cada skill. Do banco dele, lê o histórico da conversa.
-4. Monta o pacote 1 ([[Chamada a um modelo]]): `system` com regras e índice de skills, `tools` com as ferramentas de nota, `messages` com o histórico e a pergunta. Request 1 à Anthropic.
+3. Antes de chamar o modelo, o `lonzo` pede à [[API de notas]] o `.workspace/` da pasta e o `CLAUDE.md` de cada `.workspace` acima: as regras inteiras e só uma linha (título + `description`) de cada skill. Do banco dele, lê o histórico da conversa.
+4. Monta o pacote 1 ([[Chamada a um modelo]]): `system` com o `base_rules.md`, `tools` com as ferramentas de nota e o `load_skill`, `messages` com um bloco `<context>` (data, pasta, regras e lista de skills), o histórico e a pergunta. Request 1 à Anthropic.
 5. O modelo entende a pergunta e vê que não tem a nota do Caddy. Responde com um pedido, em JSON com campos fixos: `tool_use search_notes("caddy")`. As palavras da busca ele tira da própria pergunta.
 6. O `lonzo` lê o nome do pedido, chama a função `search_notes` (código nosso, sem IA), que chama o `/notes/search` do `ichiro`, e recebe `[{id: 42, title: "Caddy"}]`.
 7. Request 2: o pacote 1 inteiro + o pedido + o resultado. A Anthropic não guardou nada da request 1; quem reenvia é o `lonzo` ([[Laço de ferramentas]]).
