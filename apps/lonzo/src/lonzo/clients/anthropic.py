@@ -99,6 +99,7 @@ class AnthropicClient:
         history: list[Message],
         question: str,
         tools: list[BetaAsyncFunctionTool[Any]],
+        context: str = "",
     ) -> BetaAsyncStreamingToolRunner[None]:
         """
         The answer to one question after the messages of the conversation,
@@ -114,6 +115,10 @@ class AnthropicClient:
             for m in history
         ]
         messages.append({"role": "user", "content": question})
+
+        if context:
+            messages.insert(0, {"role": "user", "content": context})
+
         blocks: list[BetaTextBlockParam] = [
             {"type": "text", "text": text} for text in system if text
         ]
