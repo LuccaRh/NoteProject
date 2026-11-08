@@ -52,6 +52,31 @@ def test_split_skill_skips_blank_lines_and_heading_marks() -> None:
 
 
 @pytest.mark.parametrize(
+    "description",
+    ["Does X. Use when Y", '"Does X. Use when Y"', "'Does X. Use when Y'"],
+)
+def test_split_skill_takes_the_description_of_the_header(
+    description: str,
+) -> None:
+
+    body = f"---\nname: swing\ndescription: {description}\n---\n\nSteps"
+
+    assert split_skill(body=body) == ("Does X. Use when Y", "Steps")
+
+
+def test_split_skill_keeps_the_indentation_of_the_steps() -> None:
+
+    body = "---\ndescription: Does X.\n---\n\n- One\n    - Two"
+
+    assert split_skill(body=body) == ("Does X.", "- One\n    - Two")
+
+
+def test_split_skill_without_a_description_keeps_the_first_line() -> None:
+
+    assert split_skill(body="---\nname: swing") == ("---", "name: swing")
+
+
+@pytest.mark.parametrize(
     ("path", "expected"),
     [
         ("Baseball/.workspace/skills/swing", True),
