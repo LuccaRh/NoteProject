@@ -229,7 +229,7 @@ ai/                todo o resto do workspace de IA:
   build/           gerado (estado dos hooks, png de diagrama), fora do git
 ```
 
-## Estado (2026-11-06)
+## Estado (2026-11-08)
 
 - Mergeados até o PR #148 (2026-11-05); lista antiga até o PR #116: M0, #46, #62, #64, #65, #69, #16, #80, #82, #74, #73, #98, #100,
   #75 (PRs #103, #104), #76 (#105, #106), #56 (#110), #107 (#111), #108 (#112), #109 (#113),
@@ -283,6 +283,7 @@ ai/                todo o resto do workspace de IA:
 - Cores (2026-11-06, #169): branch `chimchar/color-the-interface-and-separate-the-ai-tools`: fundos e notas com as cores de antes (paleta de fundos e cor nas notas foram recusadas); na barra, botões em dois grupos, cada um na sua bandeja cinza (`.tool-group`); roxo só no lado da IA (`--accent`: abas de chat e skills, títulos do chat, nome da skill). chimchar 0.24.0.
 - Temas (2026-11-06, #172): branch `chimchar/add-selectable-interface-themes`: seletor Theme nas configurações (`settings/theme.ts`, `data-theme` no `<html>`, fica no `localStorage`), tema em `src/themes/` (`retro.css`), fontes por `@import` do Google Fonts no `style.css`. As configurações salvam sozinhas a cada mudança (só botão Close). chimchar 0.25.0. Tema F na branch `chimchar/add-the-grid-theme` (#173), em cima dela: `themes/grid.css`, cubo em `.cube-scene` no `index.html`, só neste tema. chimchar 0.26.0. Tema G na branch `chimchar/add-the-liquid-theme` (#174), em cima dela: `themes/liquid.css`, globo em `themes/globe.ts` (`<canvas>`, ligado por `runTheme()` no `settings/theme.ts`; 20 quadros/s, some abaixo de 1200px). chimchar 0.27.0. Tema A na branch `chimchar/add-the-panels-theme` (#175), em cima dela: `themes/panels.css`, só CSS. chimchar 0.28.0. Tema B na branch `chimchar/add-the-glass-theme` (#176), em cima dela: `themes/glass.css`, só CSS, manchas em `radial-gradient` e sem `backdrop-filter`. chimchar 0.29.0. Tema C na branch `chimchar/add-the-minimal-theme` (#177), em cima dela: `themes/minimal.css`, só CSS. chimchar 0.30.0. Tema D na branch `chimchar/add-the-nvim-theme` (#178), em cima dela: `themes/nvim.css`; `lineNumbers()` no `editor.ts`, margem escondida no `style.css` para os outros temas; `.topbar` vira a barra de estado. chimchar 0.31.0.
 - Modo de leitura (2026-11-06, #179): branch `chimchar/add-the-reading-mode`, em cima da `chimchar/add-the-nvim-theme`: botão `#reading` no pé da barra (`notes/reading.ts`, fica no `localStorage`, vale para todas as notas); `readOnly` + `editable` num `Compartment` do `editor.ts`, título `readOnly`; em leitura o `touches` devolve falso e as marcas nunca aparecem. chimchar 0.32.0.
+- Regras de cima (2026-11-08, #191): pilha `ichiro` → `lonzo` `/read-the-rules-of-every-workspace-above-the-conversation`, nos PRs: `GET /notes/{id}/above?path=a/b` (uma consulta recursiva, RLS dá o dono); o `lonzo` põe o `.workspace/CLAUDE.md` de cada pasta acima, da raiz para baixo, antes do workspace da pasta. ichiro 0.19.0, lonzo 0.16.0. Vault `Plano do projeto/Melhorias possíveis` (foto das regras, data fora do bloco das regras).
 - #117 (milestone Editor) no PR da branch `chimchar/render-markdown-in-the-editor`: live
   preview no editor (`decorations/preview.ts`: títulos, tabela GFM, bloco de código com cor,
   marcas escondidas fora do cursor); chimchar 0.10.0. Callout `[!tipo]` fica para a #5.
