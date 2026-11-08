@@ -40,7 +40,7 @@ legenda: {WS: "WebSocket com o token do dispositivo"}
 - Quebra de linha no texto: `<br>` (o rótulo é HTML; `\n` não quebra).
 - Nós: `bloco`, `banco` (cilindro), `nota`, `grupo` (pode conter grupo), `entrada`, `saida`,
   `ramo`; os de circuito (`resistor`...) também existem, herdados.
-- Portas `e d c b` (esquerda, direita, cima, baixo): `[a.b, b.c]`. Sem porta, a lib escolhe.
+- Portas `e d c b` (esquerda, direita, cima, baixo): `[a.b, b.c]`. Sem porta, a lib escolhe. `b@-12`: no lado, 12 px antes do meio (ida e volta em duas setas paralelas e retas).
 - ER: nó `tabela` com `colunas: [[nome, tipo, PK|FK|UQ, "null"]]`, `extras: [[ix, texto]]`, `nota`; porta `d:coluna`
   liga na linha da coluna; aresta com `pontas: [ERmany, ERmandOne]`. `escuro: true` no topo e `forte: true` no grupo
   (modelo: `esquema-do-postgres.yaml`).
