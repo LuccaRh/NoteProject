@@ -12,6 +12,7 @@ from lonzo.services.settings import get_model_settings
 
 # Global variables
 WORKSPACE = ".workspace"
+RULES = "CLAUDE.md"
 SKILLS = "skills"
 WORKSPACE_FOLDERS = ["kb", SKILLS, "scripts", "hooks"]
 PROMPT_PATH = Path(__file__).parent.parent / "create_workspace.md"
@@ -107,23 +108,26 @@ async def skills_list(folder_id: UUID) -> list[str]:
 
 async def workspace_rules(folder_id: UUID | None) -> str:
     """
-    Rules for a question: notes of the folder's .workspace, as written
-    (the CLAUDE.md opens saying they win), and the list of its skills;
-    empty with no folder or no .workspace (the root never has one)
+    Rules for a question: the CLAUDE.md of each .workspace above the
+    folder, from the root down, then the notes of the folder's own
+    .workspace, as written (the CLAUDE.md opens saying they win), and the
+    list of its skills; empty with no folder (the root never has one)
     """
 
     if folder_id is None:
         return ""
 
+    path = f"{WORKSPACE}/{RULES}"
+    above = await ichiro.list_notes_above(note_id=folder_id, path=path)
     workspace = await find_workspace(parent_id=folder_id)
+    notes: list[Note] = []
 
-    if workspace is None:
-        return ""
+    if workspace is not None:
+        notes = await ichiro.list_notes(parent_id=workspace)
 
-    notes = await ichiro.list_notes(parent_id=workspace)
     parts = [
         f"# {note.title}\n\n{note.body}"
-        for note in notes
+        for note in [*above, *notes]
         if not note.is_folder
     ]
 
