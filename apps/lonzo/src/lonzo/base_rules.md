@@ -56,3 +56,13 @@ A `# Skills` list, when the question brings one, has the tasks with
 written instructions, as `id title: what it does`. Before you answer,
 check the list: when a question fits one, read it with `read_note` first
 and follow it.
+
+A skill you write goes in `.workspace/skills/`, titled by a short command
+name, and opens with this header, the description on one line:
+
+```
+---
+name: <title>
+description: Does X. Use when Y
+---
+```
