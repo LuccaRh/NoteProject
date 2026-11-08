@@ -304,3 +304,58 @@ def test_target_is_the_title_of_a_note_just_created(
     note_id = str(id_of(fake=ichiro, title="Chess"))
 
     assert tools.target(tool_input={"note_id": note_id}) == "Chess"
+
+
+def add_skill(fake: FakeIchiro, parent: UUID, title: str, body: str) -> None:
+
+    dot = fake.add(title=".workspace", parent_id=parent, is_folder=True)
+    skills = fake.add(title="skills", parent_id=dot, is_folder=True)
+    fake.add(title=title, parent_id=skills, body=body)
+
+
+def load(folder_id: UUID | None, name: str) -> str:
+
+    tools = NoteTools(folder_id=folder_id).tools()
+    tool = next(tool for tool in tools if tool.name == "load_skill")
+
+    return str(asyncio.run(tool.call({"name": name})))
+
+
+def test_load_skill_reads_a_skill_above_by_its_name(
+    ichiro: FakeIchiro,
+) -> None:
+
+    baseball = id_of(fake=ichiro, title="Baseball")
+    add_skill(fake=ichiro, parent=baseball, title="swing", body="Look twice.")
+    stats = id_of(fake=ichiro, title="Stats")
+
+    assert load(folder_id=stats, name="swing") == "# swing\n\nLook twice."
+
+
+def test_load_skill_takes_the_closest_of_two_with_the_name(
+    ichiro: FakeIchiro,
+) -> None:
+
+    baseball = id_of(fake=ichiro, title="Baseball")
+    stats = id_of(fake=ichiro, title="Stats")
+    add_skill(fake=ichiro, parent=baseball, title="swing", body="Far.")
+    add_skill(fake=ichiro, parent=stats, title="swing", body="Near.")
+
+    assert load(folder_id=stats, name="swing") == "# swing\n\nNear."
+
+
+@pytest.mark.parametrize("use_folder", [True, False])
+def test_load_skill_with_no_such_skill(
+    ichiro: FakeIchiro,
+    use_folder: bool,
+) -> None:
+
+    folder = id_of(fake=ichiro, title="Stats") if use_folder else None
+
+    with pytest.raises(ValueError, match="there is no skill"):
+        load(folder_id=folder, name="nope")
+
+
+def test_target_is_the_name_of_a_skill() -> None:
+
+    assert NoteTools().target(tool_input={"name": "swing"}) == "swing"
