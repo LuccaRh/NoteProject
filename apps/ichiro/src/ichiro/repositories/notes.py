@@ -169,6 +169,43 @@ def select_by_path(
     return Note.model_validate(row)
 
 
+def select_above(
+    conn: Connection,
+    note_id: UUID,
+    names: list[str],
+) -> list[Note]:
+    """
+    The note at a list of titles inside each folder above note_id (the
+    root too), from the root down, in one query: walks up one parent per
+    level, then down the titles from each one
+    """
+
+    rows = conn.execute(
+        text(
+            "WITH RECURSIVE up AS ("
+            " SELECT parent_id, 0 AS depth FROM notes WHERE id = :note_id"
+            " UNION ALL"
+            " SELECT n.parent_id, u.depth + 1 FROM notes n"
+            " JOIN up u ON n.id = u.parent_id"
+            "), walk AS ("
+            " SELECT n.id, u.depth, 1 AS step FROM up u JOIN notes n"
+            " ON n.parent_id IS NOT DISTINCT FROM u.parent_id"
+            " AND n.title = (CAST(:names AS text[]))[1]"
+            " UNION ALL"
+            " SELECT n.id, w.depth, w.step + 1 FROM notes n"
+            " JOIN walk w ON n.parent_id = w.id"
+            " WHERE n.title = (CAST(:names AS text[]))[w.step + 1]"
+            f") SELECT {COLUMNS} FROM notes"
+            " JOIN walk USING (id)"
+            " WHERE step = cardinality(CAST(:names AS text[]))"
+            " ORDER BY depth DESC"
+        ),
+        {"note_id": note_id, "names": names},
+    ).mappings()
+
+    return [Note.model_validate(row) for row in rows]
+
+
 def select_matches(
     conn: Connection,
     query: str,
