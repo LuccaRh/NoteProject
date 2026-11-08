@@ -12,6 +12,7 @@ WORKSPACE = ".workspace"
 RULES = "CLAUDE.md"
 SKILLS = "skills"
 WORKSPACE_FOLDERS = ["kb", SKILLS, "scripts", "hooks"]
+HEADER = "---"
 BASE_PATH = Path(__file__).parent.parent / "base_rules.md"
 
 
@@ -75,11 +76,43 @@ def is_skill_path(path: str) -> bool:
     return path.split("/")[-3:-1] == [WORKSPACE, SKILLS]
 
 
+def skill_header(body: str) -> tuple[str, str] | None:
+    """
+    The description in the --- header that opens a skill and the text after
+    the header; None when it has no header or no description in it
+    """
+
+    lines = body.strip().split("\n")
+    marks = [line.strip() for line in lines]
+
+    if marks[0] != HEADER or HEADER not in marks[1:]:
+        return None
+
+    end = marks.index(HEADER, 1)
+
+    for line in marks[1:end]:
+        key, _, value = line.partition(":")
+        value = value.strip()
+
+        if value[:1] in ('"', "'") and value[:1] == value[-1:]:
+            value = value[1:-1]
+
+        if key == "description" and value:
+            return value, "\n".join(lines[end + 1:]).strip()
+
+    return None
+
+
 def split_skill(body: str) -> tuple[str, str]:
     """
-    The summary of a skill, its first line with text and without heading
-    marks, and the rest of the body
+    The summary of a skill and the rest of its body: the description of its
+    header, or its first line without heading marks when it has no header
     """
+
+    header = skill_header(body=body)
+
+    if header is not None:
+        return header
 
     first, _, rest = body.strip().partition("\n")
 
