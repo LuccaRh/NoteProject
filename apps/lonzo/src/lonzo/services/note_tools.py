@@ -7,6 +7,7 @@ from anthropic.lib.tools import BetaAsyncFunctionTool, beta_async_tool
 
 from lonzo.core.connections import ichiro
 from lonzo.schemas.notes import Note, NoteMatch, TitleMatch
+from lonzo.services.workspaces import is_skill_path, skill_header
 
 
 # Code
@@ -105,6 +106,7 @@ class NoteTools:
             on the way are created, except the first one. Answers its id.
             """
 
+            self.check_skill(path=path, body=body)
             *folders, title = self.split(path=path)
             parent_id = await self.folder(names=folders)
             note = await self.create(
@@ -154,6 +156,10 @@ class NoteTools:
                 )
 
             body = note.body.replace(old_text, new_text)
+            place = await ichiro.get_note_path(note_id=note_id)
+
+            if place is not None:
+                self.check_skill(path=place.path, body=body)
 
             if await ichiro.update_note(note_id=note_id, body=body) is None:
                 raise ValueError(f"there is no note {note_id}")
@@ -197,6 +203,18 @@ class NoteTools:
             raise ValueError(f"{note.title} is a folder: use list_folder")
 
         return note
+
+    def check_skill(self, path: str, body: str) -> None:
+        """
+        Refuses a skill note whose header has no description, so the list
+        of skills always has a line that says when to use it
+        """
+
+        if is_skill_path(path=path) and skill_header(body=body) is None:
+            raise ValueError(
+                "a skill opens with a header: a --- line, name: <title>,"
+                " description: <what it does and when to use it>, a --- line"
+            )
 
     def split(self, path: str) -> list[str]:
         """

@@ -95,7 +95,7 @@ def test_workspace_saves_rules_and_skills_in_the_folder() -> None:
     skill = call(
         name="create_note",
         path="/Baseball/.workspace/skills/review-swing",
-        body="Look at the video.",
+        body="---\ndescription: Reviews it.\n---\n\nLook at the video.",
     )
     response = post(ichiro=ichiro, body=body, turns=[[rules], [skill]])
 
