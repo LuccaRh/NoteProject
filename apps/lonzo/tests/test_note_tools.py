@@ -175,6 +175,52 @@ def test_edit_note_changes_only_the_piece(ichiro: FakeIchiro) -> None:
     assert ichiro.rows[batting]["body"] == "Bats right, hits far."
 
 
+def test_create_note_refuses_a_skill_with_no_description(
+    ichiro: FakeIchiro,
+) -> None:
+
+    with pytest.raises(ValueError, match="opens with a header"):
+        call(
+            name="create_note",
+            path="/Baseball/.workspace/skills/swing",
+            body="Look at the video.",
+        )
+
+
+def test_create_note_saves_a_skill_with_a_description(
+    ichiro: FakeIchiro,
+) -> None:
+
+    body = "---\nname: swing\ndescription: Does X.\n---\n\nSteps"
+    path = "/Baseball/.workspace/skills/swing"
+
+    assert "created" in call(name="create_note", path=path, body=body)
+
+
+def test_edit_note_refuses_to_drop_the_description_of_a_skill(
+    ichiro: FakeIchiro,
+) -> None:
+
+    baseball = ichiro.find(parent_id=None, title="Baseball")
+    assert baseball is not None
+    dot = ichiro.add(
+        title=".workspace",
+        parent_id=UUID(str(baseball["id"])),
+        is_folder=True,
+    )
+    skills = ichiro.add(title="skills", parent_id=dot, is_folder=True)
+    body = "---\ndescription: Does X.\n---\n\nSteps"
+    note = ichiro.add(title="swing", parent_id=skills, body=body)
+
+    with pytest.raises(ValueError, match="opens with a header"):
+        call(
+            name="edit_note",
+            note_id=note,
+            old_text="description: Does X.",
+            new_text="",
+        )
+
+
 def test_edit_note_without_the_old_text(ichiro: FakeIchiro) -> None:
 
     batting = id_of(fake=ichiro, title="Batting")
