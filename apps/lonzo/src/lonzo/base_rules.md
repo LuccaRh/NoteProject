@@ -55,9 +55,9 @@ with `edit_note`. Never make up an id: without one, write the plain word.
 ## Skills
 
 A `# Skills` list, when the `<context>` brings one, has the tasks with
-written instructions, as `id title: what it does`. Before you answer,
-check the list: when a question fits one, read it with `read_note` first
-and follow it.
+written instructions, as `name: what it does`. Before you answer, check
+the list: when a question fits one, load it with `load_skill` first and
+follow it.
 
 A skill you write goes in `.workspace/skills/`, titled by a short command
 name, and opens with this header, the description on one line:

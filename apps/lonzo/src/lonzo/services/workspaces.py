@@ -173,12 +173,12 @@ async def find_skill(folder_id: UUID | None, name: str) -> Note | None:
 async def skills_list(folder_id: UUID) -> list[str]:
     """
     The skills a folder can use, its own and the ones above it, one line
-    each with the id, the title and the summary, in one part; the bodies
-    stay out and nothing comes back with no skills
+    each with the title and the summary, in one part; the bodies stay out
+    and nothing comes back with no skills
     """
 
     lines = [
-        f"- {note.id} {note.title}: {split_skill(body=note.body)[0]}"
+        f"- {note.title}: {split_skill(body=note.body)[0]}"
         for note in await skill_notes(folder_id=folder_id, above=True)
     ]
 

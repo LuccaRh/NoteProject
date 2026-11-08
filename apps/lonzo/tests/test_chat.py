@@ -260,7 +260,7 @@ def test_chat_lists_the_skills_without_their_bodies() -> None:
     folder = ichiro.add(title="Baseball", is_folder=True)
     workspace = ichiro.add(title=".workspace", parent_id=folder, is_folder=True)
     skills = ichiro.add(title="skills", parent_id=workspace, is_folder=True)
-    skill = ichiro.add(
+    ichiro.add(
         title="review-swing",
         parent_id=skills,
         body="Reviews a swing.\nLook at the video twice.",
@@ -270,7 +270,7 @@ def test_chat_lists_the_skills_without_their_bodies() -> None:
     post(body=body, http=ichiro.client())
 
     system = context()
-    assert f"- {skill} review-swing: Reviews a swing." in system
+    assert "- review-swing: Reviews a swing." in system
     assert "Look at the video" not in system
 
 
