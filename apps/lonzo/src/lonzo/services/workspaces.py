@@ -204,8 +204,9 @@ async def workspace_rules(folder_id: UUID | None) -> str:
 
 async def question_context(folder_id: UUID | None) -> str:
     """
-    What changes with the question: today's date, the folder of the
-    conversation by its path from the root, and the rules of its workspace
+    What the app tells the model before the conversation, in a block of
+    its own: today's date, the folder by its path from the root, and the
+    rules of its workspace
     """
 
     path = "/"
@@ -217,7 +218,9 @@ async def question_context(folder_id: UUID | None) -> str:
     place = f"Today is {date.today().isoformat()}. Current folder: {path}"
     rules = await workspace_rules(folder_id=folder_id)
 
-    return f"{place}\n\n{rules}" if rules else place
+    text = f"{place}\n\n{rules}" if rules else place
+
+    return f"<context>\n{text}\n</context>"
 
 
 async def create_workspace_folders(parent_id: UUID) -> list[Note]:
