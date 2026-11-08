@@ -156,6 +156,20 @@ async def skill_notes(folder_id: UUID, above: bool = False) -> list[Note]:
     ]
 
 
+async def find_skill(folder_id: UUID | None, name: str) -> Note | None:
+    """
+    The skill titled name that a folder can use, the closest one when more
+    than one has the title; None with no folder or no such skill
+    """
+
+    if folder_id is None:
+        return None
+
+    notes = await skill_notes(folder_id=folder_id, above=True)
+
+    return next((n for n in reversed(notes) if n.title == name), None)
+
+
 async def skills_list(folder_id: UUID) -> list[str]:
     """
     The skills a folder can use, its own and the ones above it, one line
