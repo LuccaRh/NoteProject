@@ -10,7 +10,7 @@ areas: [ia]
 4. lonzo 0.19.0.
 
 ## Contexto (pode tocar só o mínimo para o Pedido funcionar)
-- Em cima da `chimchar/read-the-skills-of-every-workspace-above-the-conversation`.
+- Em cima da `lonzo/take-the-summary-of-a-skill-from-a-description-in-its-header`.
 - Skills globais, se existirem um dia, entram na mesma lista deste bloco.
 - Duas mensagens `user` seguidas: a API junta num turno só (`anthropic/types/beta/message_create_params.py:60`).
 
