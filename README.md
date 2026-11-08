@@ -8,21 +8,21 @@ It is a personal project, built to be used every day and to learn systems engine
 
 ## The app
 
-The screenshots use sample notes.
+The recordings use sample notes.
 
 The editor renders Markdown as you type and shows the raw marks only on the line with the cursor.
 
-![The note editor with a table and a code block](docs/images/editor.png)
+![Typing a short list in a note, with the Markdown marks hidden off the cursor line](docs/images/editor.gif)
 
-The chat answers next to your notes. Here it created a note, which appeared in the tree when the answer ended.
+The chat answers next to your notes. Here it opens from a note, picks the `Research` workspace, searches and reads the notes, and answers with a link to the note it used.
 
-![The chat after creating a note](docs/images/chat.png)
+![Asking the chat about a paper in the Research workspace](docs/images/chat.gif)
 
-The Skills tab lists the skills of each workspace and the ones other people published.
+The Skills tab lists the skills of each workspace and the ones other people published. Here it adds a published skill to `Research`, then copies a private skill from `Research` to `Teaching`.
 
-![The Skills tab](docs/images/skills.png)
+![Adding a published skill and copying a private one in the Skills tab](docs/images/skills.gif)
 
-These screenshots use Minimal dark, the default theme. The settings have seven others, and the browser remembers the choice.
+These recordings use Minimal dark, the default theme. The settings have seven others, and the browser remembers the choice.
 
 <details>
 <summary>Minimal</summary>
