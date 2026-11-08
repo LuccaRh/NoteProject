@@ -53,7 +53,7 @@ async def events(
     conversation: Conversation,
     history: list[Message],
     question: str,
-    system: list[str],
+    context: str,
 ) -> AsyncIterator[Event]:
     """
     The events of one answer, as (name, data), while the model writes; the
@@ -67,13 +67,14 @@ async def events(
     turns: list[Turn] = []
     usage = {"input_tokens": 0, "output_tokens": 0, "cached_tokens": 0}
     end: dict[str, object] = {"usage": usage}
-    tools = NoteTools()
+    tools = NoteTools(folder_id=conversation.folder_id)
     runner = claude.stream_answer(
         settings=settings,
-        system=system,
+        system=[base_rules()],
         history=history,
         question=question,
         tools=tools.tools(),
+        context=context,
     )
 
     try:
@@ -160,12 +161,12 @@ async def answer(
             question=question,
         )
 
-    system = [base_rules(), await question_context(folder_id=folder_id)]
+    context = await question_context(folder_id=folder_id)
 
     return events(
         settings=settings,
         conversation=conversation,
         history=history,
         question=question,
-        system=system,
+        context=context,
     )

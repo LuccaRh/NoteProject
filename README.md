@@ -156,13 +156,13 @@ Each database also has Alembic's `alembic_version` table, which records the last
 
 A workspace is a folder that has a `.workspace/` folder inside, which is hidden from the tree by default. It gives the AI the context of one subject across conversations. You create one by describing what you want, and the AI writes it:
 
-- `.workspace/CLAUDE.md`: the goal and how to answer, sent with every question asked in that folder.
+- `.workspace/CLAUDE.md`: the goal and how to answer, sent with every question asked in that folder or in any folder inside it.
 - `.workspace/kb/`: background notes the AI reads when it needs them.
 - `.workspace/skills/`: skills.
 
 **Skills**
 
-A skill is a note with instructions for one task, kept in `.workspace/skills/`. The list of skills goes with each question, and the AI reads a skill when the question fits it. You can also call one by typing `/` and its name in the chat.
+A skill is a note with instructions for one task, kept in `.workspace/skills/`. It opens with a header whose `description` says what it does and when to use it. Each question carries the list of skills of its workspace and of the workspaces above it, one line per skill, and the AI loads the whole skill with `load_skill` when the question fits it. You can also call one by typing `/` and its name in the chat.
 
 In the Skills tab you can copy a skill to another workspace, publish it, or add a skill someone else published. Publishing and adding both make copies, so later edits to one copy do not reach the others.
 
@@ -176,6 +176,7 @@ The chat works on your notes through tools, so it can change them as well as tal
 | `list_folder`, `read_note` | Browse folders and read a note. |
 | `create_note`, `create_folder` | Write new notes and folders at a path. |
 | `edit_note`, `delete_note` | Change or remove a note. |
+| `load_skill` | Read a skill from the list by its name. |
 
 The tools reach any of your folders, not only the current one. When the AI writes, the tree and the open note reload at the end of the answer.
 
@@ -197,9 +198,9 @@ Both run the same loop against the Anthropic API: the model returns text or a `t
 | Part | `lonzo` | Claude Code |
 |---|---|---|
 | Runs | on the server | on the person's computer |
-| Request | `base_rules.md`, date, current folder, `.workspace` notes, list of skills | its system prompt, folder, `CLAUDE.md`, memory, skills |
+| Request | `base_rules.md` as the system prompt; date, current folder, the rules of each `.workspace` above and the list of skills in a `<context>` block of the first message | its system prompt, folder, `CLAUDE.md`, memory, skills |
 | Loop | `tool_runner` of the Anthropic SDK, up to `tools_max_turns` | its own |
-| Tools | 8 note tools | general tools: files, shell, MCP |
+| Tools | 8 note tools and `load_skill` | general tools: files, shell, MCP |
 | Checks before a tool runs | none | permissions and hooks can block the call |
 | History | in the `lonzo` database, never summarized | in a session file, summarized when it fills up |
 | Subagents | none | yes, each with its own loop and context |

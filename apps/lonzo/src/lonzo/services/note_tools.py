@@ -7,6 +7,11 @@ from anthropic.lib.tools import BetaAsyncFunctionTool, beta_async_tool
 
 from lonzo.core.connections import ichiro
 from lonzo.schemas.notes import Note, NoteMatch, TitleMatch
+from lonzo.services.workspaces import (
+    find_skill,
+    is_skill_path,
+    skill_header,
+)
 
 
 # Code
@@ -19,12 +24,15 @@ class NoteTools:
 
     created: list[Note]
     titles: dict[str, str]
+    folder_id: UUID | None
 
-    def __init__(self) -> None:
+    def __init__(self, folder_id: UUID | None = None) -> None:
         """
-        Tools with no note created and no title seen yet
+        Tools of a conversation in folder_id, with no note created and no
+        title seen yet
         """
 
+        self.folder_id = folder_id
         self.created = []
         self.titles = {}
 
@@ -105,6 +113,7 @@ class NoteTools:
             on the way are created, except the first one. Answers its id.
             """
 
+            self.check_skill(path=path, body=body)
             *folders, title = self.split(path=path)
             parent_id = await self.folder(names=folders)
             note = await self.create(
@@ -154,6 +163,10 @@ class NoteTools:
                 )
 
             body = note.body.replace(old_text, new_text)
+            place = await ichiro.get_note_path(note_id=note_id)
+
+            if place is not None:
+                self.check_skill(path=place.path, body=body)
 
             if await ichiro.update_note(note_id=note_id, body=body) is None:
                 raise ValueError(f"there is no note {note_id}")
@@ -171,11 +184,26 @@ class NoteTools:
 
             return f"deleted {note_id}"
 
+        @beta_async_tool(strict=True)
+        async def load_skill(name: str) -> str:
+            """
+            Loads a skill of the `# Skills` list by its name: the
+            instructions to follow for that task
+            """
+
+            skill = await find_skill(folder_id=self.folder_id, name=name)
+
+            if skill is None:
+                raise ValueError(f"there is no skill {name}")
+
+            return f"# {skill.title}\n\n{skill.body}"
+
         return [
             search_notes,
             search_titles,
             list_folder,
             read_note,
+            load_skill,
             create_note,
             create_folder,
             edit_note,
@@ -197,6 +225,18 @@ class NoteTools:
             raise ValueError(f"{note.title} is a folder: use list_folder")
 
         return note
+
+    def check_skill(self, path: str, body: str) -> None:
+        """
+        Refuses a skill note whose header has no description, so the list
+        of skills always has a line that says when to use it
+        """
+
+        if is_skill_path(path=path) and skill_header(body=body) is None:
+            raise ValueError(
+                "a skill opens with a header: a --- line, name: <title>,"
+                " description: <what it does and when to use it>, a --- line"
+            )
 
     def split(self, path: str) -> list[str]:
         """
@@ -288,7 +328,8 @@ class NoteTools:
     def target(self, tool_input: Mapping[str, object]) -> str | None:
         """
         What a tool call acts on, for the status of the chat: the words
-        searched, the last name of the path or the title of the note;
+        searched, the name of the skill, the last name of the path or the
+        title of the note;
         None while the input is still coming, or for an id never seen
         """
 
@@ -296,6 +337,11 @@ class NoteTools:
 
         if search is not None:
             return str(search)
+
+        name = tool_input.get("name")
+
+        if name is not None:
+            return str(name)
 
         path = tool_input.get("path")
 

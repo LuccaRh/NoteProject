@@ -3,9 +3,9 @@ tipo: blocos
 grade: [235, 125]
 nos:
   l_in:   {tipo: bloco, pos: [1, 0], texto: "<b>chimchar</b><br>POST /api/chat (SSE)", cor: azul}
-  l_pac:  {tipo: bloco, pos: [1, 1], texto: "<b>builds the request</b><br>base_rules.md, date, folder,<br>.workspace, list of skills", cor: verde}
+  l_pac:  {tipo: bloco, pos: [1, 1], texto: "<b>builds the request</b><br>system: base_rules.md;<br>&lt;context&gt;: date, folder,<br>.workspace above, skills", cor: verde}
   l_run:  {tipo: bloco, pos: [1, 2], texto: "<b>loop</b><br>tool_runner of the SDK,<br>up to tools_max_turns", cor: verde}
-  l_tool: {tipo: bloco, pos: [1, 4], texto: "<b>8 note tools</b><br>NoteTools: search, read,<br>create, edit, delete", cor: verde}
+  l_tool: {tipo: bloco, pos: [1, 4], texto: "<b>9 tools</b><br>NoteTools: search, read,<br>create, edit, delete,<br>load_skill", cor: verde}
   l_hist: {tipo: banco, pos: [0, 2], texto: "lonzo database<br>saved at the end,<br>no summary", cor: amarelo}
   l_nada: {tipo: nota, pos: [0, 3], texto: "no permissions<br>or hooks: the call<br>goes straight through"}
   l_dado: {tipo: banco, pos: [1, 5], texto: "ichiro + Postgres<br>notes only", cor: amarelo}

@@ -52,6 +52,31 @@ def test_split_skill_skips_blank_lines_and_heading_marks() -> None:
 
 
 @pytest.mark.parametrize(
+    "description",
+    ["Does X. Use when Y", '"Does X. Use when Y"', "'Does X. Use when Y'"],
+)
+def test_split_skill_takes_the_description_of_the_header(
+    description: str,
+) -> None:
+
+    body = f"---\nname: swing\ndescription: {description}\n---\n\nSteps"
+
+    assert split_skill(body=body) == ("Does X. Use when Y", "Steps")
+
+
+def test_split_skill_keeps_the_indentation_of_the_steps() -> None:
+
+    body = "---\ndescription: Does X.\n---\n\n- One\n    - Two"
+
+    assert split_skill(body=body) == ("Does X.", "- One\n    - Two")
+
+
+def test_split_skill_without_a_description_keeps_the_first_line() -> None:
+
+    assert split_skill(body="---\nname: swing") == ("---", "name: swing")
+
+
+@pytest.mark.parametrize(
     ("path", "expected"),
     [
         ("Baseball/.workspace/skills/swing", True),
@@ -191,7 +216,9 @@ def test_published_skill_is_copied_for_someone_else() -> None:
     assert response.status_code == 201
     assert response.json()["title"] == "swing"
     assert response.json()["parent_id"] == str(target_skills)
-    assert response.json()["body"] == "Does X.\n\nSteps"
+    assert response.json()["body"] == (
+        "---\nname: swing\ndescription: Does X.\n---\n\nSteps"
+    )
 
 
 def test_own_note_is_copied_to_another_workspace() -> None:

@@ -3,11 +3,8 @@ from datetime import date
 from pathlib import Path
 from uuid import UUID
 
-from lonzo.core.connections import claude, ichiro
-from lonzo.core.errors import FolderNotFound, NotAFolder
+from lonzo.core.connections import ichiro
 from lonzo.schemas.notes import Note
-from lonzo.services.note_tools import NoteTools
-from lonzo.services.settings import get_model_settings
 
 
 # Global variables
@@ -15,7 +12,7 @@ WORKSPACE = ".workspace"
 RULES = "CLAUDE.md"
 SKILLS = "skills"
 WORKSPACE_FOLDERS = ["kb", SKILLS, "scripts", "hooks"]
-PROMPT_PATH = Path(__file__).parent.parent / "create_workspace.md"
+HEADER = "---"
 BASE_PATH = Path(__file__).parent.parent / "base_rules.md"
 
 
@@ -79,15 +76,58 @@ def is_skill_path(path: str) -> bool:
     return path.split("/")[-3:-1] == [WORKSPACE, SKILLS]
 
 
+def skill_header(body: str) -> tuple[str, str] | None:
+    """
+    The description in the --- header that opens a skill and the text after
+    the header; None when it has no header or no description in it
+    """
+
+    lines = body.strip().split("\n")
+    marks = [line.strip() for line in lines]
+
+    if marks[0] != HEADER or HEADER not in marks[1:]:
+        return None
+
+    end = marks.index(HEADER, 1)
+
+    for line in marks[1:end]:
+        key, _, value = line.partition(":")
+        value = value.strip()
+
+        if value[:1] in ('"', "'") and value[:1] == value[-1:]:
+            value = value[1:-1]
+
+        if key == "description" and value:
+            return value, "\n".join(lines[end + 1:]).strip()
+
+    return None
+
+
 def split_skill(body: str) -> tuple[str, str]:
     """
-    The summary of a skill, its first line with text and without heading
-    marks, and the rest of the body
+    The summary of a skill and the rest of its body: the description of its
+    header, or its first line without heading marks when it has no header
     """
+
+    header = skill_header(body=body)
+
+    if header is not None:
+        return header
 
     first, _, rest = body.strip().partition("\n")
 
     return first.lstrip("# ").strip(), rest.strip()
+
+
+def skill_text(title: str, summary: str, body: str) -> str:
+    """
+    The text of a skill note: the header with its name and description,
+    then the instructions
+    """
+
+    header = f"{HEADER}\nname: {title}\ndescription: {summary}\n{HEADER}"
+
+    return f"{header}\n\n{body}".strip()
 
 
 async def skill_notes(folder_id: UUID, above: bool = False) -> list[Note]:
@@ -116,15 +156,29 @@ async def skill_notes(folder_id: UUID, above: bool = False) -> list[Note]:
     ]
 
 
+async def find_skill(folder_id: UUID | None, name: str) -> Note | None:
+    """
+    The skill titled name that a folder can use, the closest one when more
+    than one has the title; None with no folder or no such skill
+    """
+
+    if folder_id is None:
+        return None
+
+    notes = await skill_notes(folder_id=folder_id, above=True)
+
+    return next((n for n in reversed(notes) if n.title == name), None)
+
+
 async def skills_list(folder_id: UUID) -> list[str]:
     """
     The skills a folder can use, its own and the ones above it, one line
-    each with the id, the title and the summary, in one part; the bodies
-    stay out and nothing comes back with no skills
+    each with the title and the summary, in one part; the bodies stay out
+    and nothing comes back with no skills
     """
 
     lines = [
-        f"- {note.id} {note.title}: {split_skill(body=note.body)[0]}"
+        f"- {note.title}: {split_skill(body=note.body)[0]}"
         for note in await skill_notes(folder_id=folder_id, above=True)
     ]
 
@@ -164,8 +218,9 @@ async def workspace_rules(folder_id: UUID | None) -> str:
 
 async def question_context(folder_id: UUID | None) -> str:
     """
-    What changes with the question: today's date, the folder of the
-    conversation by its path from the root, and the rules of its workspace
+    What the app tells the model before the conversation, in a block of
+    its own: today's date, the folder by its path from the root, and the
+    rules of its workspace
     """
 
     path = "/"
@@ -177,7 +232,9 @@ async def question_context(folder_id: UUID | None) -> str:
     place = f"Today is {date.today().isoformat()}. Current folder: {path}"
     rules = await workspace_rules(folder_id=folder_id)
 
-    return f"{place}\n\n{rules}" if rules else place
+    text = f"{place}\n\n{rules}" if rules else place
+
+    return f"<context>\n{text}\n</context>"
 
 
 async def create_workspace_folders(parent_id: UUID) -> list[Note]:
@@ -215,39 +272,3 @@ async def create_workspace_folders(parent_id: UUID) -> list[Note]:
         created.append(folder)
 
     return created
-
-
-async def create_workspace(folder_id: UUID, description: str) -> list[Note]:
-    """
-    Turns a folder into a workspace from one text: creates .workspace/ and
-    its subfolders, then the model saves the CLAUDE.md and any kb notes,
-    skills, scripts and hooks with tools; answers every note created.
-    What was saved stays when it fails, and a retry reuses it
-    """
-
-    settings = await get_model_settings()
-    folder = await ichiro.get_note_path(note_id=folder_id)
-
-    if folder is None:
-        raise FolderNotFound("folder not found")
-
-    if not folder.is_folder:
-        raise NotAFolder("folder_id is not a folder")
-
-    folders = await create_workspace_folders(parent_id=folder.id)
-    notes = NoteTools()
-
-    # A fixed system prompt keeps the cache; date and folder go in the request
-    system = PROMPT_PATH.read_text(encoding="utf-8")
-    request = (
-        f"Today is {date.today().isoformat()}. The workspace folder is"
-        f" /{folder.path}.\n\n{description}"
-    )
-    await claude.run_tools(
-        settings=settings,
-        system=system,
-        request=request,
-        tools=notes.tools(),
-    )
-
-    return [*folders, *notes.created]

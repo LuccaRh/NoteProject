@@ -35,6 +35,7 @@ const TOOL_STATUS: Record<string, [string, string]> = {
     search_titles: ['Searching', 'the titles'],
     list_folder: ['Opening', 'a folder'],
     read_note: ['Reading', 'a note'],
+    load_skill: ['Using', 'a skill'],
     create_note: ['Creating', 'a note'],
     create_folder: ['Creating', 'a folder'],
     edit_note: ['Editing', 'a note'],

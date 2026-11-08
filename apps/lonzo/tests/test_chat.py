@@ -94,6 +94,15 @@ class FakeClient:
         return self
 
 
+# The block the app puts before the conversation in the last call
+def context() -> str:
+
+    messages = FakeMessages.params["messages"]
+    assert isinstance(messages, list)
+
+    return str(messages[0]["content"])
+
+
 # Parses a server-sent events body into (name, data) pairs
 def parse(body: str) -> list[tuple[str, dict[str, object]]]:
 
@@ -167,9 +176,37 @@ def test_chat_without_workspace_has_only_the_base_rules() -> None:
 
     system = FakeMessages.params["system"]
     assert isinstance(system, list)
+    assert len(system) == 1
     assert system[0]["text"] == base_rules()
     assert system[0]["cache_control"] == {"type": "ephemeral"}
-    assert system[1]["text"].endswith("Current folder: /")
+    assert context().endswith("Current folder: /\n</context>")
+
+
+def test_chat_keeps_the_same_system_in_every_folder() -> None:
+
+    ichiro = FakeIchiro()
+    folder = ichiro.add(title="Baseball", is_folder=True)
+    workspace = ichiro.add(title=".workspace", parent_id=folder, is_folder=True)
+    ichiro.add(title="CLAUDE.md", parent_id=workspace, body="Bats left.")
+
+    post(body={"question": "Hi"})
+    root = FakeMessages.params["system"]
+    body = {"question": "Hi", "folder_id": str(folder)}
+    post(body=body, http=ichiro.client())
+
+    assert FakeMessages.params["system"] == root
+    assert "Bats left." in context()
+
+
+# Only the question is kept, so the context never piles up in the history
+def test_chat_sends_the_context_once_after_a_saved_question() -> None:
+
+    first = post(body={"question": "Who bats left?"})
+    conversation_id = conversation_of(response=first)
+    post(body={"question": "And right?", "conversation_id": conversation_id})
+
+    assert context().startswith("<context>")
+    assert str(FakeMessages.params["messages"]).count("<context>") == 1
 
 
 def test_chat_uses_the_folder_workspace_rules() -> None:
@@ -185,10 +222,8 @@ def test_chat_uses_the_folder_workspace_rules() -> None:
     body = {"question": "Hi", "folder_id": str(folder)}
     post(body=body, http=ichiro.client())
 
-    system = FakeMessages.params["system"]
-    assert isinstance(system, list)
-    assert system[-1]["text"].endswith("# Fixed facts\n\nBats left.")
-    assert "Exam soon." not in str(system)
+    assert "# Fixed facts\n\nBats left." in context()
+    assert "Exam soon." not in context()
 
 
 # The CLAUDE.md of each workspace above comes first, from the root down
@@ -211,7 +246,7 @@ def test_chat_uses_the_rules_of_the_workspaces_above() -> None:
     body = {"question": "Hi", "folder_id": str(folder)}
     post(body=body, http=ichiro.client())
 
-    system = str(FakeMessages.params["system"])
+    system = context()
     short = system.index("Answer short.")
     stats = system.index("Use stats.")
 
@@ -225,7 +260,7 @@ def test_chat_lists_the_skills_without_their_bodies() -> None:
     folder = ichiro.add(title="Baseball", is_folder=True)
     workspace = ichiro.add(title=".workspace", parent_id=folder, is_folder=True)
     skills = ichiro.add(title="skills", parent_id=workspace, is_folder=True)
-    skill = ichiro.add(
+    ichiro.add(
         title="review-swing",
         parent_id=skills,
         body="Reviews a swing.\nLook at the video twice.",
@@ -234,8 +269,8 @@ def test_chat_lists_the_skills_without_their_bodies() -> None:
     body = {"question": "Hi", "folder_id": str(folder)}
     post(body=body, http=ichiro.client())
 
-    system = str(FakeMessages.params["system"])
-    assert f"- {skill} review-swing: Reviews a swing." in system
+    system = context()
+    assert "- review-swing: Reviews a swing." in system
     assert "Look at the video" not in system
 
 
@@ -254,8 +289,8 @@ def test_chat_lists_the_skills_above_with_the_closest_last() -> None:
     body = {"question": "Hi", "folder_id": str(folder)}
     post(body=body, http=ichiro.client())
 
-    system = str(FakeMessages.params["system"])
-    assert system.count("\\n# Skills\\n") == 1
+    system = context()
+    assert system.count("\n# Skills\n") == 1
     assert system.index("far: Does far.") < system.index("near: Does near.")
     assert system.count("near: Does near.") == 1
 
@@ -272,7 +307,7 @@ def test_chat_lists_the_skills_above_a_folder_with_no_workspace() -> None:
     body = {"question": "Hi", "folder_id": str(folder)}
     post(body=body, http=ichiro.client())
 
-    assert "far: Does far." in str(FakeMessages.params["system"])
+    assert "far: Does far." in context()
 
 
 def test_chat_names_the_folder_by_its_whole_path() -> None:
@@ -284,9 +319,7 @@ def test_chat_names_the_folder_by_its_whole_path() -> None:
     body = {"question": "Hi", "folder_id": str(folder)}
     post(body=body, http=ichiro.client())
 
-    assert "Current folder: /Sport/Baseball" in str(
-        FakeMessages.params["system"]
-    )
+    assert "Current folder: /Sport/Baseball" in context()
 
 
 def test_chat_marks_the_messages_for_the_cache() -> None:
@@ -307,6 +340,7 @@ def test_chat_gives_the_model_the_note_tools() -> None:
         "search_titles",
         "list_folder",
         "read_note",
+        "load_skill",
         "create_note",
         "create_folder",
         "edit_note",
@@ -424,11 +458,12 @@ def test_chat_keeps_the_tool_calls_of_an_answer() -> None:
     assert isinstance(messages, list)
     assert [m["role"] for m in messages] == [
         "user",
+        "user",
         "assistant",
         "user",
         "user",
     ]
-    assert messages[1]["content"] == [
+    assert messages[2]["content"] == [
         {
             "type": "tool_use",
             "id": "toolu_1",
@@ -436,7 +471,7 @@ def test_chat_keeps_the_tool_calls_of_an_answer() -> None:
             "input": {"note_id": "1"},
         }
     ]
-    assert messages[2]["content"] == [result]
+    assert messages[3]["content"] == [result]
 
 
 def test_chat_sends_the_history_of_the_conversation() -> None:
@@ -451,7 +486,9 @@ def test_chat_sends_the_history_of_the_conversation() -> None:
     assert conversation_of(response=second) == conversation_id
     question = [{"type": "text", "text": "Who bats left?"}]
     answer = [{"type": "text", "text": "Hello there"}]
-    assert FakeMessages.params["messages"] == [
+    messages = FakeMessages.params["messages"]
+    assert isinstance(messages, list)
+    assert messages[1:] == [
         {"role": "user", "content": question},
         {"role": "assistant", "content": answer},
         {"role": "user", "content": "And right?"},
@@ -478,4 +515,4 @@ def test_chat_keeps_no_empty_turn() -> None:
 
     messages = FakeMessages.params["messages"]
     assert isinstance(messages, list)
-    assert [m["role"] for m in messages] == ["user", "user"]
+    assert [m["role"] for m in messages] == ["user", "user", "user"]
