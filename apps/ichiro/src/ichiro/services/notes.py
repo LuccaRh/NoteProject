@@ -15,6 +15,7 @@ from ichiro.errors import (
 from ichiro.repositories.notes import (
     delete_note,
     insert_note,
+    select_above,
     select_by_path,
     select_children,
     select_is_folder,
@@ -161,6 +162,24 @@ def find_by_path(path: str, parent_id: UUID | None) -> Note:
         raise NoteNotFound("note not found")
 
     return note
+
+
+def find_above(note_id: UUID, path: str) -> list[Note]:
+    """
+    The note at a path of titles (a/b) inside each folder above note_id,
+    the root too, from the root down; NoteNotFound when note_id doesn't
+    exist
+    """
+
+    names = [name for name in path.split("/") if name]
+
+    if not names:
+        raise PathEmpty("path is empty")
+
+    with transaction() as conn:
+        load_note(conn=conn, note_id=note_id)
+
+        return select_above(conn=conn, note_id=note_id, names=names)
 
 
 def find_note(note_id: UUID) -> Note:

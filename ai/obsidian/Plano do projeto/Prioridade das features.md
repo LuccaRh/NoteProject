@@ -3,7 +3,7 @@ tags: [noteproject, plano]
 ---
 # Prioridade das features
 
-As ideias soltas em [[Features]] não têm ordem nem dizem o que já existe. Esta página põe todas numa fila só, para escolher a próxima tarefa do [[Roadmap]].
+As ideias soltas em [[Features]] não têm ordem nem dizem o que já existe. Esta página põe todas numa fila só, para escolher a próxima tarefa do [[Roadmap]]. O que já existe e pode melhorar fica em [[Melhorias possíveis]].
 
 ## Critério
 

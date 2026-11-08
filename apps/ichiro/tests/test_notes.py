@@ -380,6 +380,65 @@ def test_path_of_a_missing_note(client: TestClient) -> None:
     assert response.status_code == 404
 
 
+# The path inside each folder above, root first; the note's own is left out
+def test_above_from_the_root_down(client: TestClient) -> None:
+
+    rules = create(client=client, title="Rules", is_folder=True)
+    root_main = create(client=client, title="Main", parent_id=rules["id"])
+    top = create(client=client, title="Work", is_folder=True)
+    top_rules = create(
+        client=client,
+        title="Rules",
+        parent_id=top["id"],
+        is_folder=True,
+    )
+    top_main = create(client=client, title="Main", parent_id=top_rules["id"])
+    middle = create(
+        client=client,
+        title="Plans",
+        parent_id=top["id"],
+        is_folder=True,
+    )
+    bottom = create(
+        client=client,
+        title="Week",
+        parent_id=middle["id"],
+        is_folder=True,
+    )
+    bottom_rules = create(
+        client=client,
+        title="Rules",
+        parent_id=bottom["id"],
+        is_folder=True,
+    )
+    create(client=client, title="Main", parent_id=bottom_rules["id"])
+
+    params = {"path": "Rules/Main"}
+    response = client.get(f"/notes/{bottom['id']}/above", params=params)
+
+    assert response.status_code == 200
+    assert response.json() == [root_main, top_main]
+
+
+# No folder above with the path gives an empty list
+def test_above_without_the_path(client: TestClient) -> None:
+
+    folder = create(client=client, title="Work", is_folder=True)
+
+    params = {"path": "Rules/Main"}
+    response = client.get(f"/notes/{folder['id']}/above", params=params)
+
+    assert response.json() == []
+
+
+def test_above_a_missing_note(client: TestClient) -> None:
+
+    params = {"path": "Rules/Main"}
+    response = client.get(f"/notes/{uuid4()}/above", params=params)
+
+    assert response.status_code == 404
+
+
 # The tree of a folder: every level, with paths, in file tree order
 def test_tree_of_a_folder(client: TestClient) -> None:
 

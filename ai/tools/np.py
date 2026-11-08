@@ -7,7 +7,7 @@
     ai/np obsidian [-q] [--simular] sincronia vault Note Project/ ↔ obsidian/
     ai/np duvidas [trecho da pág]   marcas [!duvida] [duvidas] [fix] [coment] nas notas
     ai/np diagrama <spec.yaml> [--png]   YAML → draw.io; `destino:` no spec copia o .drawio.svg para obsidian/
-    ai/np lint                      regras do workspace que viraram código (W01–W24)
+    ai/np lint                      regras do workspace que viraram código (W01–W25)
     ai/np test                      testes das ferramentas (tools/test_*.py)
     ai/np check                     o check do app (make check: ruff, mypy, pytest, tsc, build)
 
@@ -208,6 +208,7 @@ def problemas() -> list[str]:
     out += _branch_servico()
     out += _compose()
     out += _chamadas()
+    out += _commits_em_camadas()
     return out
 
 
@@ -565,6 +566,27 @@ def _chamadas() -> list[str]:
                 out.append(f"W22 {n}:{i}: router importa de clients/, connections,"
                            " db ou repositories/;"
                            " chame uma função de services/")
+    return out
+
+
+def camadas_do_commit(arquivos: list[str]) -> list[str]:
+    """Camadas do backend (routers, services, clients, repositories) mexidas por um commit."""
+    achadas = (re.match(r"apps/[^/]+/src/[^/]+/(routers|services|clients|repositories)/", a)
+               for a in arquivos)
+    return sorted({m.group(1) for m in achadas if m})
+
+
+def _commits_em_camadas() -> list[str]:
+    """W25: cada commit da branch mexe em no máximo uma camada do backend (2026-11-08)."""
+    if git("rev-parse", "--abbrev-ref", "HEAD") in ("master", "HEAD"):
+        return []
+    base = git("merge-base", "master", "HEAD")
+    out = []
+    for sha in git("log", "--format=%h", f"{base}..HEAD").splitlines():
+        camadas = camadas_do_commit(git("show", "--name-only", "--format=", sha).splitlines())
+        if len(camadas) > 1:
+            out.append(f"W25 commit {sha}: mexe em {', '.join(camadas)};"
+                       " um commit por camada, de baixo para cima")
     return out
 
 

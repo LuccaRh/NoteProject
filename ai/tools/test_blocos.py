@@ -4,6 +4,7 @@ from np import (
     checar_atributos,
     checar_blocos,
     checar_docstrings,
+    camadas_do_commit,
     checar_camadas,
     checar_comentarios,
     checar_constantes,
@@ -81,6 +82,20 @@ class TestBlocos(unittest.TestCase):
         texto = ("def f(a, b):\n    return a\n\n\nf(1, b=2)\nf(a=1, b=2)\nprint(1)\n"
                  "class C:\n    def g(self, x):\n        self.g(1)\n        x.g(1)\n")
         self.assertEqual(checar_posicionais(texto, {"f", "g"}), [5, 10])
+
+
+class TestCamadasDoCommit(unittest.TestCase):
+    def test_acha_cada_camada_uma_vez(self) -> None:
+        arquivos = [
+            "apps/ichiro/src/ichiro/routers/notes.py",
+            "apps/ichiro/src/ichiro/services/notes.py",
+            "apps/ichiro/src/ichiro/services/health.py",
+        ]
+        self.assertEqual(camadas_do_commit(arquivos), ["routers", "services"])
+
+    def test_fora_das_camadas_nao_conta(self) -> None:
+        arquivos = ["apps/lonzo/tests/fakes.py", "apps/lonzo/src/lonzo/main.py", "CLAUDE.md"]
+        self.assertEqual(camadas_do_commit(arquivos), [])
 
 
 if __name__ == "__main__":
