@@ -105,6 +105,23 @@ class IchiroClient:
 
         return NotePath.model_validate(response.json())
 
+    async def list_notes_above(self, note_id: UUID, path: str) -> list[Note]:
+        """
+        GET /notes/{id}/above: the note at a path of titles (a/b) inside
+        each folder above a note, the root too, from the root down; empty
+        when there is no such note
+        """
+
+        params = {"path": path}
+        response = await self.http.get(f"/notes/{note_id}/above", params=params)
+
+        if response.status_code == 404:
+            return []
+
+        response.raise_for_status()
+
+        return TypeAdapter(list[Note]).validate_python(response.json())
+
     async def get_note_by_path(
         self,
         parent_id: UUID | None,
