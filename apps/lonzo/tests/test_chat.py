@@ -182,6 +182,33 @@ def test_chat_without_workspace_has_only_the_base_rules() -> None:
     assert context().endswith("Current folder: /\n</context>")
 
 
+def test_chat_keeps_the_same_system_in_every_folder() -> None:
+
+    ichiro = FakeIchiro()
+    folder = ichiro.add(title="Baseball", is_folder=True)
+    workspace = ichiro.add(title=".workspace", parent_id=folder, is_folder=True)
+    ichiro.add(title="CLAUDE.md", parent_id=workspace, body="Bats left.")
+
+    post(body={"question": "Hi"})
+    root = FakeMessages.params["system"]
+    body = {"question": "Hi", "folder_id": str(folder)}
+    post(body=body, http=ichiro.client())
+
+    assert FakeMessages.params["system"] == root
+    assert "Bats left." in context()
+
+
+# Only the question is kept, so the context never piles up in the history
+def test_chat_sends_the_context_once_after_a_saved_question() -> None:
+
+    first = post(body={"question": "Who bats left?"})
+    conversation_id = conversation_of(response=first)
+    post(body={"question": "And right?", "conversation_id": conversation_id})
+
+    assert context().startswith("<context>")
+    assert str(FakeMessages.params["messages"]).count("<context>") == 1
+
+
 def test_chat_uses_the_folder_workspace_rules() -> None:
 
     ichiro = FakeIchiro()
