@@ -119,6 +119,17 @@ def test_workspace_saves_rules_and_skills_in_the_folder() -> None:
     assert skill["parent_id"] == skills["id"]
 
 
+def test_workspace_streams_the_turns_of_the_model() -> None:
+
+    ichiro = FakeIchiro()
+    folder = ichiro.add(title="Baseball", is_folder=True)
+    body = {"folder_id": str(folder), "description": "I play baseball"}
+    response = post(ichiro=ichiro, body=body)
+
+    assert response.status_code == 201
+    assert FakeRunner.params["stream"] is True
+
+
 def test_note_creates_the_folders_on_its_path() -> None:
 
     ichiro = FakeIchiro()
