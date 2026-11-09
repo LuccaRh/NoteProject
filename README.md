@@ -27,77 +27,77 @@ These recordings use Minimal dark, the default theme. The settings have seven ot
 <details>
 <summary>Minimal</summary>
 
-![A note in the Minimal theme](docs/images/themes/minimal-note.png)
+![A note in the Minimal theme](docs/images/themes/minimal-note.gif)
 
-![The chat in the Minimal theme](docs/images/themes/minimal-chat.png)
+![The chat in the Minimal theme](docs/images/themes/minimal-chat.gif)
 
-![The Skills tab in the Minimal theme](docs/images/themes/minimal-skills.png)
+![The Skills tab in the Minimal theme](docs/images/themes/minimal-skills.gif)
 
 </details>
 
 <details>
 <summary>Glass</summary>
 
-![A note in the Glass theme](docs/images/themes/glass-note.png)
+![A note in the Glass theme](docs/images/themes/glass-note.gif)
 
-![The chat in the Glass theme](docs/images/themes/glass-chat.png)
+![The chat in the Glass theme](docs/images/themes/glass-chat.gif)
 
-![The Skills tab in the Glass theme](docs/images/themes/glass-skills.png)
+![The Skills tab in the Glass theme](docs/images/themes/glass-skills.gif)
 
 </details>
 
 <details>
 <summary>Grid 3D</summary>
 
-![A note in the Grid 3D theme](docs/images/themes/grid-note.png)
+![A note in the Grid 3D theme](docs/images/themes/grid-note.gif)
 
-![The chat in the Grid 3D theme](docs/images/themes/grid-chat.png)
+![The chat in the Grid 3D theme](docs/images/themes/grid-chat.gif)
 
-![The Skills tab in the Grid 3D theme](docs/images/themes/grid-skills.png)
+![The Skills tab in the Grid 3D theme](docs/images/themes/grid-skills.gif)
 
 </details>
 
 <details>
 <summary>Liquid</summary>
 
-![A note in the Liquid theme](docs/images/themes/liquid-note.png)
+![A note in the Liquid theme](docs/images/themes/liquid-note.gif)
 
-![The chat in the Liquid theme](docs/images/themes/liquid-chat.png)
+![The chat in the Liquid theme](docs/images/themes/liquid-chat.gif)
 
-![The Skills tab in the Liquid theme](docs/images/themes/liquid-skills.png)
+![The Skills tab in the Liquid theme](docs/images/themes/liquid-skills.gif)
 
 </details>
 
 <details>
 <summary>Nvim</summary>
 
-![A note in the Nvim theme](docs/images/themes/nvim-note.png)
+![A note in the Nvim theme](docs/images/themes/nvim-note.gif)
 
-![The chat in the Nvim theme](docs/images/themes/nvim-chat.png)
+![The chat in the Nvim theme](docs/images/themes/nvim-chat.gif)
 
-![The Skills tab in the Nvim theme](docs/images/themes/nvim-skills.png)
+![The Skills tab in the Nvim theme](docs/images/themes/nvim-skills.gif)
 
 </details>
 
 <details>
 <summary>Light panels</summary>
 
-![A note in the Light panels theme](docs/images/themes/panels-note.png)
+![A note in the Light panels theme](docs/images/themes/panels-note.gif)
 
-![The chat in the Light panels theme](docs/images/themes/panels-chat.png)
+![The chat in the Light panels theme](docs/images/themes/panels-chat.gif)
 
-![The Skills tab in the Light panels theme](docs/images/themes/panels-skills.png)
+![The Skills tab in the Light panels theme](docs/images/themes/panels-skills.gif)
 
 </details>
 
 <details>
 <summary>Retrofuturism</summary>
 
-![A note in the Retrofuturism theme](docs/images/themes/retro-note.png)
+![A note in the Retrofuturism theme](docs/images/themes/retro-note.gif)
 
-![The chat in the Retrofuturism theme](docs/images/themes/retro-chat.png)
+![The chat in the Retrofuturism theme](docs/images/themes/retro-chat.gif)
 
-![The Skills tab in the Retrofuturism theme](docs/images/themes/retro-skills.png)
+![The Skills tab in the Retrofuturism theme](docs/images/themes/retro-skills.gif)
 
 </details>
 

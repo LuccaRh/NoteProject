@@ -64,6 +64,7 @@ Todas rodam no serviço de IA, `apps/lonzo`, em [[Container|container]] próprio
 | `read_note` | devolve o texto de uma nota ou skill | API do `ichiro` |
 | `create_note`, `create_folder`, `edit_note` | grava nota, pasta, regra ou skill; a edição manda só o trecho velho → novo (é assim que a IA monta o workspace) | API do `ichiro` |
 | `delete_note` | apaga uma nota pelo id, ou uma pasta com tudo dentro | API do `ichiro` |
+| `load_skill` | (2026-11-08, #196) lê uma skill da lista pelo nome; a do workspace mais perto vence | API do `ichiro` |
 | scripts do `.workspace/` | o que a pessoa ou a IA escreveu | [[Sandbox]] ([[Workspace no app#Scripts]]) |
 
 - (2026-11-03) As ferramentas não têm trava de pasta: a IA lê, cria, edita e apaga em qualquer pasta, quantas notas e pastas quiser. O ponto de partida é o id da pasta do workspace, gravado no `CLAUDE.md` dele quando a IA o cria: o código não monta prompt, só junta as regras.
@@ -76,7 +77,7 @@ Todas rodam no serviço de IA, `apps/lonzo`, em [[Container|container]] próprio
 |---|---|
 | perguntar com o vault de contexto | ✅ ferramentas de nota |
 | escrever e corrigir notas, ensinar conceito, achar lacuna | ✅ skills em texto + `create_note`, `edit_note` |
-| regras de resposta e de página | ✅ notas no `.workspace/`, no `system` |
+| regras de resposta e de página | ✅ notas no `.workspace/`, no bloco `<context>` da primeira mensagem (2026-11-08, #198) |
 | subagente | depois: um segundo laço com pacote próprio (o SDK tem) |
 | desenho draw.io, script | depois: [[Sandbox]] |
 | hooks | v3 ([[Workspace no app#Liberação em fases]]) |
