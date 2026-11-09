@@ -147,6 +147,12 @@ class No:
             x, y, w, _ = self.ret()
             yc = y + TABELA_TOPO + TABELA_LINHA * (self.colunas.index(coluna) + 0.5)
             return x + LADOS[lado][0] * w, yc, lado
+        if "@" in nome:                         # `b@-12`: lado b, 12 px antes do meio (ida e volta lado a lado)
+            lado, _, desloc = nome.partition("@")
+            fx, fy = LADOS[lado]
+            x, y, w, h = self.ret()
+            dx, dy = (float(desloc), 0.0) if lado in "cb" else (0.0, float(desloc))
+            return x + fx * w + dx, y + fy * h + dy, lado
         if nome in LADOS:
             fx, fy = LADOS[nome]
             x, y, w, h = self.ret()
