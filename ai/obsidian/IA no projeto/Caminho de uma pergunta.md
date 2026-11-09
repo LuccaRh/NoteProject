@@ -28,7 +28,7 @@ Exemplo das duas figuras: "atualiza a nota do Caddy com o que vimos, cria uma de
 11. O modelo não precisa de mais nada e responde só com texto. Fim do laço.
 12. O `lonzo` grava a conversa no banco dele e manda o texto ao chat aos pedaços; a lista de notas recarrega com as mudanças.
 
-- Se a skill pedida tiver mais passos ou citar outra skill, o modelo pede o corpo dela (`read_note` no `.workspace/`) e segue; a skill é texto que o modelo lê, não código que roda.
+- Se a skill pedida tiver mais passos ou citar outra skill, o modelo pede o corpo dela pelo nome (`load_skill`) e segue; a skill é texto que o modelo lê, não código que roda.
 - Um script do workspace é mais um pedido de ferramenta; o `lonzo` roda num [[Sandbox|sandbox]] e devolve a saída.
 
 ### Os pedaços, dentro do `answer` ✅
