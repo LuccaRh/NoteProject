@@ -1,7 +1,9 @@
 // Imports
 import { createWorkspace, Refused } from './api.ts'
+import { listTree } from '../notes/api.ts'
+import { inWorkspace, workspaceOf } from '../notes/tree.ts'
 
-import type { Folder } from '../notes/tree.ts'
+import type { NotePath } from '../notes/api.ts'
 
 
 // Global variables
@@ -38,23 +40,36 @@ const TEMPLATE = [
 
 
 // Code
+/** Every folder outside a .workspace; the ones with a workspace locked. */
+function folderOptions(entries: NotePath[]): HTMLOptionElement[] {
+
+    const paths = new Set(entries.map(entry => entry.path))
+
+    return entries
+        .filter(entry => entry.is_folder && !inWorkspace(entry.path))
+        .map(entry => {
+            const taken = paths.has(workspaceOf(entry.path))
+            const label = entry.path.split('/').join(' / ')
+            const option = new Option(label, entry.id)
+            option.disabled = taken
+
+            if (taken) option.text += ' (workspace)'
+
+            return option
+        })
+}
+
 /** Pop-up that turns a folder into a workspace from one text. */
 export class WorkspaceDialog {
     els: Elements
-    folders: () => Folder[]
     onCreated: (folderId: string) => void
     // The AI takes a while; the dialog waits and stays open
     busy: boolean = false
 
     /** Wire the form; the description starts as the template. */
-    constructor(
-        els: Elements,
-        folders: () => Folder[],
-        onCreated: (folderId: string) => void,
-    ) {
+    constructor(els: Elements, onCreated: (folderId: string) => void) {
 
         this.els = els
-        this.folders = folders
         this.onCreated = onCreated
         els.description.value = TEMPLATE
         els.form.addEventListener('submit', event => {
@@ -70,19 +85,32 @@ export class WorkspaceDialog {
         })
     }
 
-    /** Open the pop-up with a folder picked (the first one if none). */
-    open(folderId: string | null): void {
+    /** Open the pop-up with a folder picked (the first free one if not). */
+    async open(folderId: string | null): Promise<void> {
 
-        const folders = this.folders()
-            .map(folder => new Option(folder.path, folder.id))
-        this.els.folder.replaceChildren(...folders)
+        let options: HTMLOptionElement[] = []
+        let status = ''
 
-        if (folderId) this.els.folder.value = folderId
+        try {
+            options = folderOptions(await listTree())
+        } catch (error) {
+            status = 'Server unreachable, try again'
+            console.error(error)
+        }
 
-        this.els.status.textContent = folders.length
-            ? ''
-            : 'Create a folder first: a workspace lives in one.'
-        this.els.create.disabled = folders.length === 0
+        const free = options.filter(option => !option.disabled)
+        const picked = free.find(option => option.value === folderId)
+        this.els.folder.replaceChildren(...options)
+        this.els.folder.value = (picked ?? free[0])?.value ?? ''
+
+        if (!status && !options.length) {
+            status = 'Create a folder first: a workspace lives in one.'
+        } else if (!status && !free.length) {
+            status = 'Every folder already has a workspace.'
+        }
+
+        this.els.status.textContent = status
+        this.els.create.disabled = free.length === 0
         this.els.dialog.showModal()
     }
 
