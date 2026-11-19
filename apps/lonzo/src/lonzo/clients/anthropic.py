@@ -148,6 +148,7 @@ class AnthropicClient:
         """
 
         sdk = self.sdk.with_options(api_key=settings.api_key)
+        # Without a stream the SDK refuses turns that may pass 10 minutes
         runner = sdk.beta.messages.tool_runner(
             model=settings.model,
             max_tokens=settings.max_tokens,
@@ -157,5 +158,6 @@ class AnthropicClient:
             tools=tools,
             max_iterations=settings.tools_max_turns,
             cache_control=CACHE,
+            stream=True,
         )
         await runner.until_done()
