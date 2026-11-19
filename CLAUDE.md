@@ -229,7 +229,7 @@ ai/                todo o resto do workspace de IA:
   build/           gerado (estado dos hooks, png de diagrama), fora do git
 ```
 
-## Estado (2026-11-08)
+## Estado (2026-11-19)
 
 - Mergeados até o PR #148 (2026-11-05); lista antiga até o PR #116: M0, #46, #62, #64, #65, #69, #16, #80, #82, #74, #73, #98, #100,
   #75 (PRs #103, #104), #76 (#105, #106), #56 (#110), #107 (#111), #108 (#112), #109 (#113),
@@ -286,6 +286,9 @@ ai/                todo o resto do workspace de IA:
 - Regras de cima (2026-11-08, #191): pilha `ichiro` → `lonzo` `/read-the-rules-of-every-workspace-above-the-conversation`, nos PRs: `GET /notes/{id}/above?path=a/b` (uma consulta recursiva, RLS dá o dono); o `lonzo` põe o `.workspace/CLAUDE.md` de cada pasta acima, da raiz para baixo, antes do workspace da pasta. ichiro 0.19.0, lonzo 0.16.0. Vault `Plano do projeto/Melhorias possíveis` (foto das regras, data fora do bloco das regras).
 - Skills de cima e cabeçalho (2026-11-08, #192, #195): pilha `lonzo/read-the-skills-of-every-workspace-above-the-conversation` → `lonzo/take-the-summary-of-a-skill-from-a-description-in-its-header`, nos PRs (#201, #202). O `# Skills` da pergunta vai da raiz até a pasta; o menu `/` e a aba Skills mostram só as do workspace. Resumo = `description` do cabeçalho `---` (sem cabeçalho, a primeira linha); `create_note`/`edit_note` recusam skill sem `description`; cópia de publicada nasce com cabeçalho; `create_workspace` foi para módulo próprio. Falta: avisar no editor (skill salva pela pessoa sem cabeçalho). lonzo 0.18.0.
 - Contexto e `load_skill` (2026-11-08, #198, #196): pilha `lonzo/send-the-workspace-rules-in-the-messages-instead-of-the-system-prompt` → `lonzo/add-a-tool-that-loads-a-skill-by-name` → `chimchar/add-a-tool-that-loads-a-skill-by-name`, nos PRs (#203–#205), em cima da #192. Desenhos da IA e README atualizados. O `system` é só o `base_rules.md`; data, pasta, regras e skills vão num bloco `<context>` na primeira mensagem `user`, refeito a cada pergunta e não salvo. `load_skill(name)` acha pelo título (a mais perto vence); a lista perde os ids. lonzo 0.20.0, chimchar 0.33.0.
+- Mergeados até o PR #215 (2026-11-09, README com GIFs).
+- Criação de workspace (2026-11-19, #229, #230): pilha `lonzo/stream-the-workspace-creation` (`run_tools` com `stream=True`; lonzo 0.21.0) → `chimchar/list-every-folder-in-the-workspace-dialog` (o pop-up lista as pastas do `listTree()`, as com `.workspace` desabilitadas; chimchar 0.34.0), nos PRs.
+- Arquivos (2026-11-19, #206–#210, #44): a primeira pilha (seaweedfs → caddy → postgres → bbmetal → caddy → chimchar) foi desfeita para o Lucca refazer à mão; plano no vault `Plano do projeto/Plano do bbmetal`, branches no bundle `ai/build/bbmetal-stack.bundle`. Banco `bbmetal` e volume `noteproject_files` apagados do dev.
 - #117 (milestone Editor) no PR da branch `chimchar/render-markdown-in-the-editor`: live
   preview no editor (`decorations/preview.ts`: títulos, tabela GFM, bloco de código com cor,
   marcas escondidas fora do cursor); chimchar 0.10.0. Callout `[!tipo]` fica para a #5.
