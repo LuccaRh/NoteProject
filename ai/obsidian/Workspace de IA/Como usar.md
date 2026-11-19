@@ -48,6 +48,8 @@ Ferramentas em `ai/tools/`: `np.py`, `obsidian_sync.py`, `hooks_contexto.py` (ho
 
 Agente `leitor`: lê fonte de lib ou log grande e devolve só o trecho.
 
+Quais skills mais rodam: [[Uso das skills]]. Propostas da sessão que foram recusadas: [[Propostas recusadas]].
+
 Próximas peças (scripts e hooks nas etapas fixas, agente `revisor`, card do front): [[Esqueleto de tarefas]].
 
 ## Marcar nas notas

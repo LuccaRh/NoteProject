@@ -384,6 +384,12 @@ export function inWorkspace(path: string): boolean {
     return path.split('/').includes(WORKSPACE)
 }
 
+/** Path of the .workspace folder that makes a folder a workspace. */
+export function workspaceOf(folder: string): string {
+
+    return `${folder}/${WORKSPACE}`
+}
+
 /** Sort like the server: folders first, then by title. */
 function sorted(notes: Note[]): Note[] {
 

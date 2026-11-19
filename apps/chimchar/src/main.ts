@@ -88,7 +88,6 @@ const workspaceDialog = new WorkspaceDialog(
         create: byId('workspace-create'),
         cancel: byId('workspace-cancel'),
     },
-    () => tree.folders(),
     folderId => void workspaceCreated(folderId),
 )
 
@@ -348,7 +347,7 @@ byId('new-note').addEventListener('click', () => void create(false))
 byId('new-folder').addEventListener('click', () => void create(true))
 byId('new-chat').addEventListener('click', () => openChat(tree.target()))
 byId('new-workspace').addEventListener('click', () => {
-    workspaceDialog.open(tree.target())
+    void workspaceDialog.open(tree.target())
 })
 byId('open-skills').addEventListener('click', openSkills)
 
