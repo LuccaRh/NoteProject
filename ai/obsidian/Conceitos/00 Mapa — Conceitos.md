@@ -55,6 +55,13 @@ Os conceitos que o projeto usa, uma página cada: como funcionam, em geral. Cada
 | [[Gerador]] | o `yield` entrega um item por vez e pausa; o `async for` espera cada item sem travar os outros |
 | [[ContextVar]] | uma variável visível de qualquer função, com um valor por pedido |
 | [[FastAPI]] | a função tipada vira rota validada e documentada |
+| [[Tratamento de erros]] | `raise` quando não dá para cumprir; `except` só onde se faz algo com o erro; o resto sobe |
+
+## Backend
+
+| Página | Ideia |
+|---|---|
+| [[Falha parcial]] | a ordem dos passos decide se a falha no meio deixa sobra inofensiva ou dado quebrado |
 
 ## Rede
 

@@ -1,0 +1,25 @@
+titulo: NoteProject hoje, no Docker Compose
+destino: "Resumo do projeto/Figuras"
+tipo: blocos
+grade: [230, 120]
+nos:
+  nav:     {tipo: bloco, pos: [0, 1], texto: "Navegador", cor: azul}
+  caddy:   {tipo: bloco, pos: [1, 1], texto: "caddy<br>HTTPS, rotas,<br>confere a sessão", cor: vermelho}
+  chim:    {tipo: bloco, pos: [2, 0], texto: "chimchar<br>/<br>front (Vite)", cor: azul}
+  nuj:     {tipo: bloco, pos: [2, 1], texto: "nujabes<br>/api/auth<br>login e sessões", cor: verde}
+  ich:     {tipo: bloco, pos: [2, 2], texto: "ichiro<br>/api/notes<br>notas e busca", cor: verde}
+  lon:     {tipo: bloco, pos: [2, 3], texto: "lonzo<br>/api/chat<br>chat, skills, config", cor: verde}
+  pg:      {tipo: banco, pos: [3, 2], texto: "postgres<br>um banco<br>por serviço", cor: amarelo}
+  anth:    {tipo: bloco, pos: [3, 3.85], texto: "Anthropic API", cor: roxo}
+  compose: {tipo: grupo, contem: [caddy, chim, nuj, ich, lon, pg], texto: "docker compose", cor: cinza}
+arestas:
+  - [nav, caddy, {rotulo: "HTTPS"}]
+  - [caddy.c, chim.e]
+  - [caddy, nuj]
+  - [caddy.b, ich.e]
+  - [caddy.b, lon.e]
+  - [nuj.d, pg.c]
+  - [ich, pg]
+  - [lon.d, pg.b]
+  - [lon.c, ich.b, {rotulo: "ferramentas de nota"}]
+  - [lon.b, anth.e, {rotulo: "HTTPS"}]

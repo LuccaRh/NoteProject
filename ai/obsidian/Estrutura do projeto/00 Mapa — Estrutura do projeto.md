@@ -32,6 +32,7 @@ O app em três partes (front, back, infra), marcando o que já existe no código
 | [[Bancos dos serviços]] | um banco e dois usuários por serviço: quem é dono, quem conecta e quais variáveis |
 | [[Login no navegador]] | o caminho do login e de cada pedido: cookie, `nujabes`, Caddy, `X-User-Id` e [[Row-Level Security\|RLS]] |
 | [[Criar um serviço Python]] | o roteiro de um serviço novo em `apps/`: uv, ruff e mypy, health, container, Caddy, banco e Alembic |
+| [[Erros nos serviços]] | cada camada traduz o erro de baixo; o handler vira status; a chamada externa vem antes da transação |
 | [[O daemon notesd]] | desenho do [[Daemon\|daemon]] do app desktop: camadas, rotas, busca |
 | [[Pastas, campos e views]] | organizar = escolher onde criar a nota |
 | [[Comandos do Docker no dev]] | o alias `dc` e os comandos de subir, apagar, psql e migrations |
@@ -51,3 +52,4 @@ O app em três partes (front, back, infra), marcando o que já existe no código
 
 - Ordem e milestones no [[Roadmap]]: navegador → app desktop → celular; hoje, M0.
 - O que é cada peça (SQLite, Yjs, Caddy, EC2...): [[00 Mapa — Conceitos|Conceitos]].
+- Como cada parte foi feita, de uma vez, no [[00 Mapa — Resumo do projeto|resumo do projeto]].

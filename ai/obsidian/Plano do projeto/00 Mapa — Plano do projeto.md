@@ -12,6 +12,7 @@ Como o projeto anda: em que ordem, onde ficam as tarefas e como cada mudança en
 | [[Entrega de 2026-11-06]] | notas e IA em localhost até 2026-11-06: sequência das issues, o que a IA faz, o que fica fora |
 | [[Prioridade das features]] | as ideias de [[Features]] numa fila só, por urgência: risco, v1, uso diário |
 | [[Melhorias possíveis]] | o que já funciona e pode ficar mais barato, rápido ou limpo: cache das regras, idas ao `ichiro`, pendências do código |
+| [[Plano do bbmetal]] | arquivos das fontes: serviço `bbmetal`, tabela `files`, bytes no S3 por URL assinada; pilha de 6 branches (#206–#208), refazer à mão |
 | [[Tarefas no GitHub]] | issue = branch = PR; milestone = etapa; labels por lado (backend, frontend, infrastructure, ai-workspace) |
 | [[Regras de git]]     | branch, commit, mensagem, PR e merge                                                                      |
 | [[Um repo ou vários]] | monorepo com `apps/` e `infra/`, e não um repo por serviço                                                |

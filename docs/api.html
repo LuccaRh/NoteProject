@@ -52,7 +52,7 @@ main > h1 { margin: 0 0 6px; font-size: 28px; }
 .endpoint p { margin: 0; }
 .m { font-weight: 700; }
 .GET { color: var(--get); } .POST { color: var(--post); }
-.PATCH { color: var(--patch); } .DELETE { color: var(--delete); }
+.PATCH, .PUT { color: var(--patch); } .DELETE { color: var(--delete); }
 table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 th { text-align: left; color: var(--muted); font-weight: 500; }
 th, td { padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line);
@@ -136,6 +136,22 @@ const noteId = ["note_id", "uuid", "Id of the note or folder", true];
 const convFolder = [
   "folder_id", "uuid", "Workspace folder; default: root workspace",
 ];
+const folderId = ["folder_id", "uuid", "Id of the workspace folder", true];
+const keyErrors = [
+  "422 no Anthropic key: add one in the settings",
+  "422 the Anthropic key was refused",
+];
+const apiError = "502 Anthropic API error, or notes service unavailable";
+const settings = {
+  has_key: true, key_end: "x9Qa", model: "claude-haiku-5-5",
+  max_tokens: 64000, tools_max_turns: 20, thinking: "disabled",
+  show_workspace: false,
+};
+const skill = {
+  id: CONV, user_id: USER, title: "Flashcards",
+  summary: "Turns a note into questions and answers",
+  body: "Read the note and write one question per idea.",
+};
 
 const SERVICES = [
   {
@@ -235,6 +251,21 @@ const SERVICES = [
         errors: [noSession, notFound],
       },
       {
+        method: "GET", path: "/notes/{note_id}/above",
+        about: "The note at a path of titles inside each folder above "
+          + "this one, the root too, from the root down. Folders "
+          + "without it are left out.",
+        pathParams: [noteId],
+        query: [["path", "string", "Titles split by /", true]],
+        queryExample: "?path=.workspace/CLAUDE.md",
+        status: "200 OK",
+        response: [{
+          ...note, parent_id: PARENT, title: "CLAUDE.md",
+          body: "Answer in short steps.",
+        }],
+        errors: [noSession, notFound, "422 path is empty"],
+      },
+      {
         method: "POST", path: "/notes",
         about: "Creates a note or folder.",
         body: [
@@ -303,12 +334,13 @@ event: message_end
 data: {"usage": {"input_tokens": 812, "output_tokens": 64,
   "cached_tokens": 0}, "model": "claude-haiku-5-5",
   "stop_reason": "end_turn"}`,
-        note: "If the model fails mid-answer, the stream ends with an "
-          + "error event, {\"message\": ...}, and nothing is saved.",
+        note: "Uses the key, model and limits of the settings. The rules "
+          + "and skills of every workspace from the root down to the "
+          + "folder go in the question. If the model fails mid-answer, "
+          + "the stream ends with an error event, {\"message\": ...}, "
+          + "and nothing is saved.",
         errors: [
-          noSession, "404 conversation not found",
-          "502 Anthropic API error, or notes service unavailable",
-          "503 ANTHROPIC_API_KEY is not set",
+          noSession, "404 conversation not found", ...keyErrors, apiError,
         ],
       },
       {
@@ -357,10 +389,124 @@ data: {"usage": {"input_tokens": 812, "output_tokens": 64,
         }],
         errors: [
           noSession, "404 folder not found",
-          "422 folder_id is not a folder",
-          "502 Anthropic API error, or notes service unavailable",
-          "503 ANTHROPIC_API_KEY is not set",
+          "422 folder_id is not a folder", ...keyErrors,
+          "409 <title> already exists", apiError,
         ],
+      },
+      {
+        method: "GET", path: "/chat/workspaces/{folder_id}/skills",
+        about: "The skills of a workspace (notes in .workspace/skills/), "
+          + "with the summary from the description of their header. "
+          + "Empty when the folder is not a workspace.",
+        pathParams: [folderId],
+        status: "200 OK",
+        response: [{
+          id: ID, title: "Flashcards",
+          summary: "Turns a note into questions and answers",
+        }],
+        errors: [noSession, apiError],
+      },
+      {
+        method: "POST", path: "/chat/workspaces/{folder_id}/skills",
+        about: "Copies a published skill, or one of your skill notes, to "
+          + "the skills of a workspace; the copy has no tie to where it "
+          + "came from.",
+        pathParams: [folderId],
+        body: [
+          ["skill_id", "uuid", "Published skill to copy"],
+          ["note_id", "uuid", "Skill note to copy; send this or skill_id"],
+        ],
+        bodyExample: { skill_id: CONV },
+        status: "201 Created",
+        response: {
+          ...note, title: "Flashcards",
+          body: "---\nname: Flashcards\ndescription: Turns a note into "
+            + "questions and answers\n---\n\nRead the note and write "
+            + "one question per idea.",
+        },
+        errors: [
+          noSession, "404 skill not found",
+          "422 folder is not a workspace", "422 note is not a skill",
+          "422 send skill_id or note_id", "409 <title> already exists",
+          apiError,
+        ],
+      },
+      {
+        method: "GET", path: "/chat/skills",
+        about: "The skills other people published; with owner=me, yours.",
+        query: [["owner", '"me"', "Only your published skills"]],
+        queryExample: "?owner=me",
+        status: "200 OK", response: [skill], errors: [noSession],
+      },
+      {
+        method: "POST", path: "/chat/skills",
+        about: "Publishes a skill note, or updates what it published "
+          + "before. The published skill is a copy of that moment.",
+        body: [["note_id", "uuid", "Skill note to publish", true]],
+        bodyExample: { note_id: ID },
+        status: "200 OK", response: skill,
+        errors: [
+          noSession, "422 note is not a skill", "422 the skill is empty",
+          apiError,
+        ],
+      },
+      {
+        method: "GET", path: "/chat/settings",
+        about: "Your chat settings. Of the Anthropic key, only whether "
+          + "there is one and its last 4 characters; without saved "
+          + "settings, the defaults.",
+        status: "200 OK", response: settings, errors: [noSession],
+      },
+      {
+        method: "PUT", path: "/chat/settings",
+        about: "Saves the settings. A new key, model, limit or thinking is "
+          + "checked with the Anthropic API first; the key is saved "
+          + "encrypted.",
+        body: [
+          ["model", "string", "Model id, one of GET /chat/settings/models",
+            true],
+          ["max_tokens", "integer", "Tokens per answer, > 0", true],
+          ["tools_max_turns", "integer", "Tool calls per answer, > 0",
+            true],
+          ["thinking", "string", "adaptive, between_tools or disabled",
+            true],
+          ["show_workspace", "boolean", "Shows .workspace in the tree",
+            true],
+          ["api_key", "string", "New Anthropic key; without it, the "
+            + "saved one stays"],
+        ],
+        bodyExample: {
+          model: "claude-haiku-5-5", max_tokens: 64000,
+          tools_max_turns: 20, thinking: "disabled", show_workspace: false,
+        },
+        status: "200 OK", response: settings,
+        errors: [
+          noSession, "422 unknown model: <model>",
+          "422 <model> allows at most <n> tokens",
+          "422 <model> does not take thinking <thinking>",
+          "422 the Anthropic key was refused",
+          "502 Anthropic API error",
+        ],
+      },
+      {
+        method: "GET", path: "/chat/settings/models",
+        about: "The models your key can use, with their token limit and "
+          + "kinds of thinking when the API says them. Empty without a "
+          + "key.",
+        status: "200 OK",
+        response: [{
+          id: "claude-haiku-5-5", name: "Claude Haiku 5.5",
+          max_tokens: 64000, thinking: ["adaptive", "disabled"],
+        }],
+        errors: [
+          noSession, "422 the Anthropic key was refused",
+          "502 Anthropic API error",
+        ],
+      },
+      {
+        method: "DELETE", path: "/chat/settings/key",
+        about: "Forgets your Anthropic key.",
+        status: "204 No Content", errors: [noSession],
       },
       {
         method: "GET", path: "/health", internal: true,
@@ -391,7 +537,8 @@ function curl(service, e) {
   const host = e.internal
     ? `http://${service}:8000`
     : "https://notes.localhost/api";
-  const path = e.path.replace(/\{\w+\}/, e.path.includes("conv") ? CONV : ID);
+  const ids = { conversation_id: CONV, folder_id: PARENT };
+  const path = e.path.replace(/\{(\w+)\}/, (_, name) => ids[name] ?? ID);
   const url = host + path + (e.queryExample ?? "");
   const lines = [`curl${e.method === "GET" ? "" : ` -X ${e.method}`} `
     + `"${url}"`];
